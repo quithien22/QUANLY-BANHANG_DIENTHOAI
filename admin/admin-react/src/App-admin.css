@@ -1,0 +1,35 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Khung chứa toàn bộ trang Admin */
+.admin-layout-container {
+    display: flex;
+    width: 100%;  
+    height: 100vh;  
+    overflow: hidden;
+}
+
+ 
+.sidebar-admin {
+    width: 250px;
+    flex-shrink: 0; 
+}
+
+ 
+.admin-main {
+    flex: 1; 
+    width: calc(100% - 250px);  
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;  
+}
+
+ 
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;  
+}

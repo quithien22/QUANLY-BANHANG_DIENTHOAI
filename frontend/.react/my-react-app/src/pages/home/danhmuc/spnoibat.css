@@ -1,0 +1,95 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+@import url('https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css');
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+ .spnoibat {
+    margin: 40px 120px; 
+ }
+ 
+ .spnoibat-title{
+    margin-left: 20px;
+    font-family: 'Sora', sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+ }
+ 
+ .spnoibat-list {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    
+ }
+
+ .spnoibat-item{
+    padding-top: 20px;
+    width: 180px;
+    height: 130px;
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;      
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+ }
+ 
+ .spnoibat-item img {
+    width: 56px;
+    height: 56px;
+    border-radius: 20%;
+ }
+
+ .spnoibat-item_name{
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    padding-top: 5px;
+ }
+
+ /* ================= HIỆU ỨNG ANIMATION CHO DANH MỤC NỔI BẬT ================= */
+ 
+@keyframes spNoiBatFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.spnoibat {
+    animation: spNoiBatFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+ 
+.spnoibat-item {
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, box-shadow;
+}
+
+.spnoibat-item:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.12);
+    border-color: #1D4ED8;  
+}
+ 
+.spnoibat-item img {
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.spnoibat-item:hover img {
+    transform: scale(1.08);
+}

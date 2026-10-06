@@ -1,0 +1,508 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.thdathang{
+    margin: 32px 120px;
+   
+}
+
+.thdathang-steps-list{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 70px;
+    
+}
+
+.thdathang-step_number{
+    width: 24px;
+    height: 24px;
+}
+
+.thdathang-step_number-1{
+    font-family: 'Sora', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: #1D4ED8;
+    background-color: #EFF6FF;
+    border-radius: 50%;
+    border: 1px solid #1D4ED8;
+    padding: 5px ;
+    margin-right: 5px;
+}
+
+.thdathang-step_label-1, .thdathang-step_label-2{
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: #1D4ED8;
+}
+ 
+.thdathang-step_number-2{
+    font-family: 'Sora', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: #ffffff;
+    background-color: #1D4ED8;
+    border-radius:50%;
+    padding: 5px ;
+    margin-right: 5px;
+}
+
+.thdathang-step_number-3{
+    font-family: 'Sora', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: #ffffff;
+    background-color: #9CA3AF;
+    border-radius: 50%;
+    padding: 5px ;
+    margin-right: 5px;
+}
+
+.thdathang-step_label{
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: #4B5563;
+}
+
+.thdathang-main-content{
+    margin-top: 32px;
+    
+}
+
+.thdathang-layout-grid{
+    display: flex;
+    
+    gap: 32px;
+    width: 100%;
+}
+
+.thdathang-left-column{
+  width: 65%;
+}
+.thdathang-customer-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+
+}
+
+
+.thdathang-section-title {
+    font-family: 'Sora', sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #111827;
+}
+
+.thdathang-customer-info{
+    display: flex;
+    width: 100%;
+    gap: 16px;
+
+}
+.thdathang-input-group-title {
+    width: 50%;
+}
+.thdathang-input-group {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0;
+
+}
+
+.thdathang-input-group input {
+    border: 1px solid #E5E7EB;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #111827;
+    
+}
+
+.thdathang-input-label{
+    padding-bottom: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4B5563;
+}
+
+.thdathang-payment-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    margin-top: 24px;
+    padding: 24px;
+}
+
+.thdathang-section-title{
+    font-family: 'Sora', sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #111827;
+   
+}
+
+.thdathang-payment-methods{
+    padding-top: 20px;
+}
+.thdathang-payment-item button{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    margin: 12px 0;
+    padding: 12px;
+
+}
+
+.thdathang-payment-content {
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.thdathang-payment-item-btn i {
+    color: #1D4ED8;
+    font-size: 18px;
+}
+
+.thdathang-payment-name {
+    font-family: 'Sora', sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    color: #111827;
+}
+
+.thdathang-payment-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #4B5563;
+    
+}
+
+.thdathang-right-column {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    height: fit-content;
+    width: 35%;
+}
+
+.thdathang-summary-title{
+    font-family: 'Sora', sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #111827;
+}
+
+.thdathang-product-details {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+     
+}
+
+.thdathang-product-name{
+    font-family: 'Sora', sans-serif;
+    font-weight: bold;
+    font-size: 12px;
+    color: #111827;
+}
+
+.thdathang-product-price {
+    font-family: 'Sora', sans-serif;
+    font-weight: bold;
+    font-size: 13px;
+    color: #111827;
+}
+
+.thdathang-product-variants{
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #9CA3AF;
+}
+
+.thdathang-product-details img {
+    width: 40px;
+    height: 40px;
+}
+
+.thdathang-summary-item-product{
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.thdathang-summary-rows {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.thdathang-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.thdathang-summary-row-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #374151;
+}
+
+.thdathang-summary-row-value {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.text-discount {
+    color: #DC2626;
+}
+
+.text-free {
+    color: #16A34A;
+}
+
+.thdathang-summary-item-price{
+   
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.thdathang-summary-item-action{
+    margin: 20px 0;
+}
+
+.thdathang-summary-total{
+    display: flex;
+    justify-content: space-between;
+}
+
+.thdathang-summary-total-title{
+    font-family: 'Sora', sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    color: #111827;
+}
+
+.thdathang-summary-total-price{
+    font-family: 'Sora', sans-serif;
+    font-weight: bold;
+    font-size: 18px;
+    color: #E11D48;
+}
+
+.thdathang-btn-submit{
+    background-color: #E11D48;
+    width: 100%;
+    padding: 12px 0;
+    color: #ffffff;
+    font-family: 'Sora', sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.thdathang-summary-total-xn{
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+}
+
+.thdathang-terms-text{
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #9CA3AF;
+}
+
+/* BOX DIA CHI GIAO HANG */
+ 
+.modal-diachi-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+}
+
+ 
+.modal-diachi-box {
+    background: #fff;
+    width: 500px;
+    max-width: 90%;
+    border-radius: 8px;
+    padding: 20px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+ 
+.modal-diachi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.modal-diachi-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    font-family: 'Sora', sans-serif;
+    color: #111827;
+}
+
+.modal-diachi-close {
+    font-size: 24px;
+    cursor: pointer;
+    color: #6b7280;
+    transition: color 0.2s;
+}
+
+.modal-diachi-close:hover {
+    color: #111;
+}
+ 
+.modal-diachi-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-diachi-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    background-color: #fff;
+}
+
+.modal-diachi-item:hover {
+    border-color: #1D4ED8;
+    background-color: #f8fafc;
+}
+ 
+.modal-diachi-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #fef2f2;
+    color: #ef4444;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.modal-diachi-info-top {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #1f2937;
+}
+
+.modal-diachi-info-detail {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.4;
+}
+
+/* thong bao  */
+.toast-notification {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    font-family: 'Inter', sans-serif;
+    background-color: #10B981; /* Màu xanh thành công */
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-weight: 500;
+    font-size: 14px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+}
+
+/* Hiệu ứng trượt vào từ bên phải */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Hiệu ứng mờ dần khi ẩn */
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+/* ================= TRẠNG THÁI TRỐNG / CHƯA ĐĂNG NHẬP ================= */
+.thdathang-empty-state {
+    padding: 100px 20px;
+    text-align: center;
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    margin: 40px auto;
+    max-width: 800px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.thdathang-empty-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    color: #374151;
+    margin: 0;
+}
+
+.thdathang-empty-link {
+    color: #1D4ED8;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.thdathang-empty-link:hover {
+    color: #1E3A8A;
+    text-decoration: underline;
+}

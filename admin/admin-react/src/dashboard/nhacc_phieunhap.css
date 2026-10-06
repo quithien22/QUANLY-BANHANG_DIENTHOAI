@@ -1,0 +1,544 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.ncc-container{
+    margin: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.ncc-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ncc-header h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.ncc-header p {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #6B7280;
+}
+
+.ncc-tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid #dee2e6;
+    padding: 0 10px;
+}
+
+.ncc-tab {
+    background-color: transparent;
+    border: none;
+    padding: 12px 20px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #6c757d;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease-in-out;
+}
+
+.ncc-tab:hover {
+    color: #0d6efd;
+    background-color: #f8f9fa;
+    border-radius: 6px 6px 0 0;
+}
+
+.ncc-tab.active {
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+.ncc-tab.active::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #0d6efd;
+    border-radius: 4px 4px 0 0;
+}
+
+/* NHA CUNG CAP */
+.ncc-tab-content{
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+.ncc-toolbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ncc-search {
+    display: flex;
+    align-items: center;
+    border: 1px solid #6B7280;
+    padding: 8px 16px;
+    gap: 8px;
+    border-radius: 6px;
+}
+
+.ncc-search input{
+    width: 280px;
+    outline: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #6B7280;
+}
+
+.btn-add-ncc {
+    padding: 8px 16px;
+    background-color: #1D4ED8;
+    border-radius: 6px;
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    color: #ffffff;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+}
+
+.ncc-table{
+    width: 100%;
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.ncc-table th {
+    text-align: center;
+    padding: 12px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.ncc-table td {
+    text-align: center;
+    padding: 14px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+    border-bottom: 1px solid #F3F4F6;
+    vertical-align: middle;
+}
+
+.ncc-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.ncc-table tbody tr:hover {
+    background-color: #F9FAFB;
+}
+
+.trang-thai {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.ncc-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.badge-red{
+    background-color: #FEF3C7;
+    color: #DC2626;
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badge-green{
+    background-color: #D1FAE5;
+    color: #059669;
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    background-color: #EFF6FF;
+    color: #1D4ED8;
+}
+
+/* NÚT HÀNH ĐỘNG TRONG BẢNG */
+.btn-edit,
+.btn-delete,
+.btn-detail {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-edit {
+    background-color: #EFF6FF;
+    color: #1D4ED8;
+}
+.btn-edit:hover {
+    background-color: #DBEAFE;
+}
+
+.btn-delete {
+    background-color: #FEF2F2;
+    color: #DC2626;
+}
+.btn-delete:hover {
+    background-color: #FEE2E2;
+}
+
+.btn-detail {
+    background-color: #F3F4F6;
+    color: #374151;
+}
+.btn-detail:hover {
+    background-color: #E5E7EB;
+}
+
+/* PHÂN TRANG */
+.ncc-pagination-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding: 0 24px;
+}
+
+.ncc-pagination-container span {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #6B7280;
+}
+
+.ncc-pagination-controls {
+    display: flex;
+    gap: 6px;
+}
+
+.ncc-pagination-btn{
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #E5E7EB;
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.ncc-pagination-btn:hover {
+    background-color: #F3F4F6;
+}
+
+.ncc-pagination-btn.active {
+    background-color: #1D4ED8;
+    border-color: #1D4ED8;
+    color: #FFFFFF;
+}
+
+.ncc-pagination-btn:disabled {
+    color: #D1D5DB;
+    cursor: not-allowed;
+}
+
+/* ================= MODAL - PHIẾU NHẬP HÀNG ================= */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(17, 24, 39, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-box-phieunhap {
+    width: 720px;
+    max-width: 92vw;
+    max-height: 88vh;
+    overflow-y: auto;
+    background-color: #FFFFFF;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.modal-header h3 {
+    font-family: 'Sora', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.modal-header button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #6B7280;
+    cursor: pointer;
+    line-height: 0;
+}
+.modal-header button:hover {
+    color: #111827;
+}
+
+.modal-row {
+    display: flex;
+    gap: 16px;
+}
+
+.modal-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.modal-field label {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.modal-field select,
+.modal-field input {
+    padding: 9px 12px;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+    outline: none;
+    background-color: #FFFFFF;
+}
+
+.modal-field select:focus,
+.modal-field input:focus {
+    border-color: #1D4ED8;
+}
+
+.modal-field input[readOnly] {
+    background-color: #F9FAFB;
+    color: #6B7280;
+}
+
+.modal-section-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* BẢNG SẢN PHẨM TRONG MODAL */
+.sp-nhap-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.sp-nhap-table th {
+    text-align: left;
+    padding: 10px 12px;
+    background-color: #F9FAFB;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.sp-nhap-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #F3F4F6;
+    vertical-align: middle;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+}
+
+.sp-nhap-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.sp-nhap-table input,
+.sp-nhap-table select {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    outline: none;
+    background-color: #FFFFFF;
+}
+
+.sp-nhap-table input:focus,
+.sp-nhap-table select:focus {
+    border-color: #1D4ED8;
+}
+
+.thanh-tien {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+    white-space: nowrap;
+}
+
+.ct-trong {
+    text-align: center;
+    padding: 20px 12px;
+    color: #9CA3AF;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+}
+
+.btn-xoa-dong {
+    background: none;
+    border: none;
+    color: #DC2626;
+    font-size: 15px;
+    cursor: pointer;
+    padding: 4px;
+}
+.btn-xoa-dong:hover {
+    color: #B91C1C;
+}
+
+.btn-them-dong {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background-color: #EFF6FF;
+    color: #1D4ED8;
+    border: 1px dashed #93C5FD;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+}
+.btn-them-dong:hover {
+    background-color: #DBEAFE;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid #E5E7EB;
+}
+
+.modal-total-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.modal-tong-cong {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #374151;
+}
+
+.modal-tong-cong strong {
+    font-family: 'Sora', sans-serif;
+    font-size: 16px;
+    color: #1D4ED8;
+}
+
+.btn-cancel,
+.btn-save {
+    padding: 9px 20px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-cancel {
+    background-color: #F3F4F6;
+    color: #374151;
+}
+.btn-cancel:hover {
+    background-color: #E5E7EB;
+}
+
+.btn-save {
+    background-color: #1D4ED8;
+    color: #FFFFFF;
+}
+.btn-save:hover {
+    background-color: #1E40AF;
+}

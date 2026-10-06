@@ -1,0 +1,477 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+@import url('https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css');
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+  
+.chitietsp-danhgia{ 
+    display: flex;
+    width: 100%;
+    gap: 32px;
+}
+ 
+.chitietsp-danhgia-sidebar{
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 30%;
+
+}
+
+.chitietsp-danhgia-tongquan,.chitietsp-danhgia-form{
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    gap: 20px;
+}
+
+.chitietsp-danhgia-tieude{
+    font-family: 'Sora', sans-serif;
+    font-weight: bold;
+    font-size: 18px;
+    color: #111827;
+}
+
+.chitietsp-danhgia-score-container{
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.chitietsp-danhgia-score-ra{
+    display: flex;
+    flex-direction: column;
+}
+
+.chitietsp-danhgia-diemtb{
+    font-family: 'Sora', sans-serif;
+    font-weight: bold;
+    font-size: 48px;
+    color: #1D4ED8;
+}
+
+.chitietsp-danhgia-saotb{
+    color: #FBBF24;
+}
+
+.chitietsp-danhgia-tongso{
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #4B5563;
+}
+
+.chitietsp-danhgia-breakdown {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.breakdown-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.breakdown-label {
+    width: 44px;
+    flex-shrink: 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: #111827;
+    text-align: left;
+}
+
+.breakdown-bar {
+    flex: 1;
+    height: 6px;
+    background-color: #F3F4F6;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.breakdown-bar-fill {
+    height: 100%;
+    background-color: #FACC15;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+.breakdown-count {
+    width: 28px;
+    flex-shrink: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #9CA3AF;
+    text-align: right;
+}
+
+.chitietsp-danhgia-tieude{
+    font-family: 'Sora', sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #111827;
+}
+
+.form-label,.form-textarea,.form-upload-note{
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #9CA3AF;
+}
+
+.form-chonsao {
+    color: #FACC15;
+    font-size: 25px;
+}
+.form-group,.form-upload{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-textarea{
+    border: 1px solid #E5E7EB;
+    padding: 12px;
+    border-radius: 8px;
+    outline: none;
+    box-shadow: none;
+}
+
+.form-textarea:hover{
+    border: 1px solid #1D4ED8;
+}
+
+.form-upload {
+    background-color: #EFF6FF;
+    border: 2px dashed #1D4ED8;
+    border-radius: 8px;
+    padding: 16px;   
+    color: #1D4ED8;  
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+}
+
+.form-upload i{
+   font-size: 25px;
+}
+
+.form-submit {
+    width: 100%;
+    background-color: #1D4ED8;
+    padding: 12px 24px;
+    border-radius: 6px;
+    color: #ffffff;  
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+ /* CỘT PHẢI: Bộ lọc + Danh sách đánh giá */ 
+.chitietsp-danhgia-main {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.chitietsp-danhgia-filter {
+    background-color: #ffffff;
+    padding: 12px 10px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: space-around;
+}
+
+
+.chitietsp-danhgia-filter button {
+    padding: 6px 12px;
+    border-radius: 20px; 
+}
+
+ /* danh sách các bình luận */ 
+
+.chitietsp-danhgia-list {
+    list-style: none;
+    margin: 16px 0 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.danhgia-empty {
+    text-align: center;
+    color: #9CA3AF;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 32px 0;
+}
+
+.danhgia-item {
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.danhgia-item-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.danhgia-item-avatar {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background-color: #DBEAFE;
+    color: #1D4ED8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.danhgia-item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.danhgia-item-name {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    text-decoration: none;
+}
+
+.danhgia-item-name:hover {
+    text-decoration: underline;
+}
+
+.danhgia-item-time {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #9CA3AF;
+}
+
+.danhgia-item-sao {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.danhgia-item-sao i {
+    font-size: 14px;
+    color: #FACC15;
+}
+
+.danhgia-item-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #ECFDF5;
+    color: #059669;
+    border: 1px solid #A7F3D0;
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+.danhgia-item-verified i {
+    font-size: 14px;
+}
+
+.danhgia-item-content {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #374151;
+    margin: 0;
+}
+
+.danhgia-item-reply {
+    background-color: #F3F4F6;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-top: 14px;
+}
+
+.danhgia-item-reply-title {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1D4ED8;
+    margin-bottom: 4px;
+}
+
+.danhgia-item-reply p {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #4B5563;
+    margin: 0;
+    line-height: 1.5;
+}
+
+
+/* ================= HIỆU ỨNG THÔNG BÁO TRƯỢT ================= */
+.toast-notification {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    font-family: 'Inter', sans-serif;
+    background-color: #10B981;  
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-weight: 500;
+    font-size: 14px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+}
+
+/* Hiệu ứng trượt vào từ bên phải */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Hiệu ứng mờ dần khi ẩn */
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+/* ================= CSS CHỨC NĂNG SỬA / XÓA ĐÁNH GIÁ ================= */
+.danhgia-item-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 15px;
+}
+
+.danhgia-action-btn {
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: opacity 0.2s ease, text-decoration 0.2s ease;
+    
+}
+
+.danhgia-action-btn:hover {
+    text-decoration: underline;
+    opacity: 0.8;
+}
+
+.edit-btn {
+
+    color: #1D4ED8; 
+}
+
+
+.delete-btn {
+    color: #EF4444; 
+}
+
+/* ================= CSS HÌNH ẢNH ĐÁNH GIÁ ================= */
+.danhgia-item-images {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.danhgia-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    transition: transform 0.2s ease;
+}
+
+
+.danhgia-img:hover {
+    transform: scale(1.05);
+}
+
+/* ================= CSS PHẢN HỒI CỦA SHOP ================= */
+.danhgia-item-reply {
+    margin-top: 15px;
+    padding: 10px 15px;
+    background-color: #f9fafb;
+    border-left: 4px solid #1D4ED8;
+    border-radius: 4px;
+}
+
+.danhgia-reply-header {
+    font-weight: bold;
+    color: #1D4ED8;
+    margin-bottom: 5px;
+}
+
+.danhgia-reply-time {
+    font-size: 12px;
+    color: #6B7280;
+    font-weight: normal;
+    margin-left: 10px;
+}
+
+.danhgia-reply-text {
+    font-size: 14px;
+    color: #374151;
+    margin: 0;
+}
+
+/* THONG BAO */
+.danh-gia {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    font-family: 'Inter', sans-serif;
+    background-color: #10B981; /* Màu xanh thành công */
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-weight: 500;
+    font-size: 14px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+}

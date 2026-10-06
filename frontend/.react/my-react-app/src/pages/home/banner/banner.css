@@ -1,0 +1,192 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.banner {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin:32px 60px;
+ 
+}
+
+.banner-left {
+  position: relative;
+  width: 856px;
+  height: 360px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #000; /* Màu nền lót phòng khi ảnh tải chậm */
+}
+
+/* Định dạng cho ảnh chính nằm trọn trong khung */
+.banner-img-main {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Hoặc chỉnh thành 'contain' nếu bạn muốn hiển thị toàn bộ chiều dài của ảnh mẫu */
+  display: block;
+}
+
+ 
+.banner_right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Từng ô banner nhỏ bên phải */
+.banner_right_item {
+  width: 320px;
+  height: 172px;
+  border-radius: 8px;
+  overflow: hidden; /* Cắt gọn phần tràn viền khi bo góc */
+}
+
+.banner_right_item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Giúp ảnh không bị méo tỷ lệ */
+  display: block;
+  transition: transform 0.3s ease; /* Hiệu ứng phóng to nhẹ khi rê chuột vào */
+}
+
+.banner_right_item img:hover {
+  transform: scale(1.03);
+}
+
+.banner_right_top {
+  padding-bottom: 0; /* Đã dùng gap ở khung .banner nên bỏ padding thừa */
+}
+ 
+
+.banner-content {
+  position: absolute;
+  top: 50%;
+  left: 40px;
+  transform: translateY(-50%); /* căn giữa theo chiều dọc */
+  max-width: 400px;
+  z-index: 10; /* đảm bảo nội dung nổi lên trên ảnh */
+}
+
+.banner-tag {
+  display: inline-block;
+  background-color: #DC2626;
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.banner-title {
+  color: #FFFFFF;
+  font-family: 'Sora', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 12px 0;
+}
+
+.banner-desc {
+  color: #E5E7EB;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  margin: 0 0 20px 0;
+}
+
+.banner-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-primary {
+  background-color: #DC2626;
+  color: #FFFFFF;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: #FFFFFF;
+  border: 1px solid #FFFFFF;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+
+.banner-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #FFFFFF;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 22px;
+  z-index: 20; /* cao hơn banner-content để luôn bấm được */
+  transition: background-color 0.2s ease;
+}
+
+.banner-nav:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.banner-nav-prev {
+  left: 16px;
+}
+
+.banner-nav-next {
+  right: 16px;
+}
+
+.banner-dots {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 20;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dot.active {
+  background-color: #FFFFFF;
+}
+
+.banner_right_item img {
+    width: 320px;
+    height: 172px;
+    border-radius: 8px;
+
+}
+
+.banner_right_top{
+    padding-bottom: 16px;
+}
+

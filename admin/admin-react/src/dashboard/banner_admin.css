@@ -1,0 +1,253 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.banner-container {
+    margin: 32px;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+}
+
+.banner-header {
+    margin-bottom: 24px;
+}
+
+.banner-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+}
+
+.banner-header p {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+}
+
+/* KHỐI FORM THÊM MỚI */
+.banner-form-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid #f1f5f9;
+    margin-bottom: 24px;
+}
+
+.banner-form-card h3 {
+    margin: 0 0 20px 0;
+    font-size: 16px;
+    color: #1e293b;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 10px;
+}
+
+.banner-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.banner-input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 6px;
+}
+
+.banner-form-card input, .banner-form-card select, .banner-form-card textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #1e293b;
+    outline: none;
+    transition: border-color 0.2s;
+    background-color: #fff;
+    box-sizing: border-box;
+}
+
+.banner-form-card input:focus, .banner-form-card select:focus, .banner-form-card textarea:focus {
+    border-color: #2563eb;
+}
+
+.banner-text-box {
+    margin-top: 16px;
+    background: #f8fafc;
+    padding: 16px;
+    border: 1px dashed #94a3b8;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.text-box-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.banner-upload-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.banner-file-btn {
+    background: #f1f5f9;
+    border: 1px dashed #cbd5e1;
+    padding: 10px 20px;
+    border-radius: 6px;
+    color: #475569;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.banner-file-btn:hover {
+    background: #e2e8f0;
+    border-color: #94a3b8;
+}
+
+.banner-preview-img {
+    height: 50px;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    object-fit: cover;
+}
+
+.banner-submit-btn {
+    margin-left: auto;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.2s;
+}
+
+.banner-submit-btn:hover {
+    background: #1d4ed8;
+}
+
+/* BẢNG DANH SÁCH BANNER */
+.banner-list-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid #f1f5f9;
+}
+
+.banner-list-card h3 {
+    margin: 0 0 20px 0;
+    font-size: 16px;
+    color: #1e293b;
+}
+
+.banner-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.banner-table th {
+    text-align: left;
+    padding: 12px;
+    font-size: 13px;
+    color: #64748b;
+    border-bottom: 1px solid #e2e8f0;
+    font-weight: 600;
+}
+
+.banner-table td {
+    padding: 16px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.banner-table-img {
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid #f1f5f9;
+}
+
+.banner-table-img.lg { width: 120px; height: 50px; }
+.banner-table-img.sm { width: 80px; height: 50px; }
+
+.banner-link-text {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+.banner-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.banner-badge.slider_chinh { background: #eff6ff; color: #2563eb; }
+.banner-badge.phu_tren { background: #fefce8; color: #eab308; }
+.banner-badge.phu_duoi { background: #f0fdf4; color: #16a34a; }
+
+/* Nút Toggle Bật/Tắt (Tái sử dụng style cài đặt) */
+.banner-toggle {
+    width: 44px;
+    height: 24px;
+    background-color: #cbd5e1;
+    border-radius: 12px;
+    border: none;
+    position: relative;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.banner-toggle.on { background-color: #10b981; }
+.banner-toggle:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.banner-toggle-knob {
+    width: 18px;
+    height: 18px;
+    background-color: #fff;
+    border-radius: 50%;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    transition: 0.3s;
+}
+
+.banner-toggle.on .banner-toggle-knob {
+    left: 23px;
+}
+
+.banner-delete-btn {
+    background: transparent;
+    border: none;
+    color: #ef4444;
+    font-size: 20px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.banner-delete-btn:hover {
+    color: #b91c1c;
+}

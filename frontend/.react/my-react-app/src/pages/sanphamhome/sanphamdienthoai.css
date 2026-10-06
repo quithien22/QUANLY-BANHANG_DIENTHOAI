@@ -1,0 +1,252 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.spdienthoai{
+    margin: 40px 120px;
+
+}
+
+/* TITLE + XEM TẤT CẢ */
+.spdienthoai_title ul {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    list-style: none;
+    margin-bottom: 16px;
+}
+
+.spdienthoai_title li:first-child {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.spdienthoai_title span {
+    font-family: 'Sora', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: #111827;
+}
+
+.spdienthoai-viewall {
+    color: #E11D48;
+    font-size: 14px;
+    text-decoration: underline;
+    font-family: 'Inter', sans-serif;
+}
+
+.spdienthoai-list {
+    position: relative;
+    width: 100%;
+}
+
+.spdienthoai-list ul {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 16px;
+    padding: 0;
+    margin: 0;
+    /* CSS Grid mặc định align-items: stretch, nên các <li> cùng hàng sẽ
+       tự động cao bằng nhau - đây là điều kiện cần để phần fix bên dưới
+       (flex column + margin-top: auto trên nút) hoạt động đúng */
+}
+
+/* card san pham */
+.spdienthoai-card {
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 16px;
+    /* FIX GIẬT LAYOUT: biến card thành flex-column, chiếm đủ chiều cao ô
+       lưới (đã được grid kéo bằng nhau ở trên), để nút "Xem chi tiết"
+       có thể ghim xuống đáy bằng margin-top: auto phía dưới */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.spdienthoai-card_imgwrap {
+    position: relative;
+    margin-bottom: 12px;
+}
+
+.spdienthoai-card_imgwrap img {
+    width: 100%;
+    height: 160px;
+    object-fit: contain;
+}
+
+.spdienthoai-hear{
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+}
+
+.spdienthoai-card_imgwrap i{   
+    color: #1D4ED8;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.spdienthoai-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #1D4ED8;
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+/* FIX GIẬT LAYOUT: khung chứa tag luôn chiếm 1 chiều cao cố định dù có
+   tag hay không (JSX luôn render span này, chỉ nội dung bên trong là
+   điều kiện). Nhờ vậy card có tag và card không có tag vẫn thẳng hàng
+   ở phần tên/giá/rating/nút phía dưới. */
+.spdienthoai-card_tag-slot {
+    display: block;
+    min-height: 22px; /* = chiều cao dòng tag + margin-bottom cũ */
+    margin-bottom: 8px;
+}
+
+.spdienthoai-card_tag {
+    display: inline-block;
+    background-color: #EFF6FF;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: #1D4ED8;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    /* bỏ margin-bottom ở đây vì khung .spdienthoai-card_tag-slot bên ngoài
+       đã lo phần margin-bottom rồi, tránh cộng dồn 2 lần */
+}
+
+.spdienthoai-card_name {
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 8px;
+    min-height: 40px;
+    /* giữ chiều cao đều nhau dù tên dài/ngắn khác nhau */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    /* giới hạn tối đa 2 dòng, thừa thì hiện dấu ... */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.spdienthoai-card_price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.price-new {
+    color: #DC2626;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.price-old {
+    color: #9CA3AF;
+    font-size: 13px;
+    text-decoration: line-through;
+}
+
+.spdienthoai-card_rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #6B7280;
+    margin-bottom: 12px;
+}
+
+.spdienthoai-card_rating i {
+    color: #FBBF24;
+    font-size: 14px;
+}
+
+.spdienthoai-card_btn {
+    width: 100%;
+    background-color: transparent;
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    border: 1px solid #1D4ED8;
+    color: #1D4ED8;
+    padding: 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    /* FIX GIẬT LAYOUT: luôn dính đáy card, bất kể nội dung phía trên
+       (tag/tên 1 dòng hay 2 dòng) cao thấp khác nhau bao nhiêu */
+    margin-top: auto;
+}
+
+.spdienthoai-card_btn:hover {
+    background-color: #1D4ED8;
+    color: #FFFFFF;
+}
+
+.spdienthoai-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    color: #DC2626;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    z-index: 10;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
+}
+
+.spdienthoai-nav:hover {
+    background-color: #FEE2E2;
+}
+
+.spdienthoai-nav-prev {
+    left: -18px;
+}
+
+.spdienthoai-nav-next {
+    right: -18px;
+}
+
+.spdienthoai-nav:disabled {
+    background-color: #F3F4F6;
+    color: #9CA3AF;
+    cursor: not-allowed;
+    border-color: #E5E7EB;
+    box-shadow: none;
+}
+
+.spdienthoai-nav:disabled:hover {
+    background-color: #F3F4F6;
+}
+
+ 

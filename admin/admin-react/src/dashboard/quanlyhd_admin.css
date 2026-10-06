@@ -1,0 +1,535 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.donhang-page {
+    padding: 24px  ;
+}
+
+/* TIÊU ĐỀ */
+.donhang-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+
+.donhang-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.donhang-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #6B7280;
+}
+
+/* BỘ LỌC TRẠNG THÁI (TABS) */
+.donhang-filter-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    border: 1px solid #E5E7EB;
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4B5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    background-color: #F3F4F6;
+}
+
+/* Mặc định TẤT CẢ khi active dùng màu xanh dương đậm */
+.tab-tat-ca.active {
+    background-color: #1D4ED8;
+    border-color: #1D4ED8;
+    color: #FFFFFF;
+}
+
+/* Mỗi trạng thái active có màu riêng, khớp với badge trong bảng */
+.tab-cho-xac-nhan.active {
+    background-color: #FEF3C7;
+    border-color: #FBBF24;
+    color: #D97706;
+}
+
+.tab-da-xac-nhan.active {
+    background-color: #e8dbfe;
+    border-color: #a861fa;
+    color: #741dd8;
+}
+
+.tab-dang-giao.active {
+    background-color: #DBEAFE;
+    border-color: #60A5FA;
+    color: #1D4ED8;
+}
+
+.tab-hoan-tat.active {
+    background-color: #D1FAE5;
+    border-color: #34D399;
+    color: #059669;
+}
+
+.tab-da-huy.active {
+    background-color: #FEE2E2;
+    border-color: #F87171;
+    color: #DC2626;
+}
+
+/* TÌM KIẾM + CHỌN NGÀY */
+.donhang-toolbar {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.search-box {
+ 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #F3F4F6;
+    border-radius: 8px;
+    padding: 10px 14px;
+}
+
+.search-box i {
+    color: #9CA3AF;
+    font-size: 18px;
+}
+
+.search-box input {
+    width: 340px;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+}
+ 
+/* LOC THEO NGAY  */
+.date-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+}
+
+.date-box i {
+    color: #6B7280;
+    font-size: 16px;
+}
+
+
+.date-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+ 
+.date-label {
+    font-size: 14px;
+    color: #666;
+}
+
+ 
+.date-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+}
+
+ 
+.btn-clear-date {
+    border: none;
+    background: #eee;
+    cursor: pointer;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #555;
+    transition: background 0.2s ease;
+}
+
+.btn-clear-date:hover {
+    background: #d1d5db;
+}
+
+/* BẢNG ĐƠN HÀNG */
+.donhang-table {
+    width: 100%;
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.donhang-table thead {
+    background-color: #F9FAFB;
+}
+
+.donhang-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.donhang-table td {
+    padding: 14px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+    border-bottom: 1px solid #F3F4F6;
+}
+
+.donhang-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.donhang-table tbody tr:hover {
+    background-color: #F9FAFB;
+}
+
+.ma-don {
+    color: #1D4ED8;
+    font-weight: 600;
+}
+
+.khach-hang-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ten-khach {
+    font-weight: 600;
+    color: #111827;
+}
+
+.sdt-khach {
+    font-size: 12px;
+    color: #9CA3AF;
+}
+
+.tong-tien {
+    font-weight: 700;
+    color: #111827;
+}
+
+
+/* KHI DON HANG DA HUY THI KHOND DUOC QUYEN CHINH SUA*/
+.order-status {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    outline: none;
+    transition: opacity 0.3s ease;  
+}
+
+ 
+.order-status:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+ 
+.modal-order-status {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    color: #000;
+}
+
+.modal-order-status:disabled {
+    cursor: not-allowed;
+    background-color: #f3f4f6;  
+    color: #9ca3af;  
+    border-color: #d1d5db;
+}
+
+/* TRẠNG THÁI - BADGE MÀU */
+.trang-thai {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.trang-thai-cho-xac-nhan {
+    background-color: #FEF3C7;
+    color: #D97706;
+}
+
+.trang-thai-dang-giao {
+    background-color: #DBEAFE;
+    color: #1D4ED8;
+}
+
+.trang-thai-hoan-tat {
+    background-color: #D1FAE5;
+    color: #059669;
+}
+
+.trang-thai-da-huy {
+    background-color: #FEE2E2;
+    color: #DC2626;
+}
+
+.btn-chi-tiet {
+    padding: 6px 14px;
+    border: 1px solid #E5E7EB;
+    background-color: #FFFFFF;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-chi-tiet:hover {
+    background-color: #F3F4F6;
+}
+
+/* FOOTER PHÂN TRANG */
+.donhang-page-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+}
+
+.donhang-page-pagination span{
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #6B7280;
+}
+
+.donhang-pagesp-pagination{
+    display: flex;
+    gap: 8px;
+}
+.donhang-page-page_btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #E5E7EB;
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.donhang-page-page_btn:hover {
+    background-color: #F3F4F6;
+}
+
+.donhang-page-page_btn.active {
+    background-color: #1D4ED8;
+    border-color: #1D4ED8;
+    color: #FFFFFF;
+}
+
+.donhang-page-page_btn:disabled {
+    color: #D1D5DB;
+    cursor: not-allowed;
+    background-color: #F9FAFB;
+}
+
+
+/* CSS CHO MODAL (POPUP CHI TIẾT) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;  
+}
+
+ 
+.modal-content {
+    background-color: #ffffff;
+    width: 500px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.3s ease;  
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.modal-header h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #111827;
+    margin: 0;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #9CA3AF;
+}
+
+.btn-close:hover { color: #EF4444; }
+
+.modal-body {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.modal-body strong {
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.modal-body p {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: #4B5563;
+}
+
+.modal-body-img {
+    display: flex;
+    align-items: center;
+}
+
+.modal-body-img img{
+    width: 36px;
+    height: 36px;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #E5E7EB;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-cancel {
+    padding: 8px 16px;
+    background-color: #F3F4F6;
+    color: #374151;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-cancel:hover { background-color: #E5E7EB; }
+
+ 
+
+/* thong bao  */
+.toast-notification {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    font-family: 'Inter', sans-serif;
+    background-color: #10B981; /* Màu xanh thành công */
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-weight: 500;
+    font-size: 14px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+}
+
+/* Hiệu ứng trượt vào từ bên phải */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Hiệu ứng mờ dần khi ẩn */
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}

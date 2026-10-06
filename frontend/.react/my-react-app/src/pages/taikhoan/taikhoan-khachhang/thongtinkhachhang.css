@@ -1,0 +1,441 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+@import url('https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css');
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.taikhoan-page {
+    margin: 32px 120px;
+}
+
+.taikhoan-breadcrumb{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.taikhoan-breadcrumb_1{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #4B5563;
+    cursor: pointer;
+
+}
+
+
+.taikhoan-breadcrumb_2{
+    font-family: 'Sora', sans-serif;
+    font-weight: bold;
+    font-size: 13px;
+    color: #1D4ED8;
+    cursor: pointer;
+
+}
+
+.taikhoan-content{
+    margin: 32px 0;
+    display: flex;
+    width: 100%;
+    gap: 32px;
+}
+
+.taikhoan-sidebar-wrap{
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    width: 20%;
+    height: fit-content;
+}
+
+.taikhoan-sidebar_user{
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    border-bottom: 1px solid #E5E7EB;
+    padding-bottom: 16px;
+}
+
+.taikhoan-sidebar_userinfo{
+    display: flex;
+    flex-direction: column;
+}
+
+.taikhoan-sidebar_avatar  {
+    width: 48px;
+    height: 48px;
+    background-color: #EFF6FF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 24px;
+     
+}
+
+.taikhoan-sidebar_avatar  {
+    color: #1D4ED8;
+    font-family: 'Sora', sans-serif;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.taikhoan-sidebar_username{
+    font-family: 'Sora', sans-serif;
+    font-weight: bold;
+    font-size: 15px;
+    color: #111827;
+}
+
+.taikhoan-sidebar_rank{
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #4B5563;
+}
+
+.active  {
+    margin-top: 16px;
+    background-color: #EFF6FF;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: #1D4ED8;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    font-weight: bold;
+}
+
+.active i {
+    color: #1D4ED8;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    font-weight: bold;
+}
+
+.active span {
+    color: #1D4ED8;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    font-weight: bold;
+}
+
+.taikhoan-sidebar_item {
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    color: #111827;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    
+}
+
+.taikhoan-sidebar_item i{
+    color: #111827;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    
+}
+
+.taikhoan-sidebar_logout {
+    color: #E11D48; 
+    font-weight: bold;
+}
+
+.taikhoan-sidebar_logout i{
+    color: #E11D48;
+    font-weight: bold;
+}
+
+.taikhoan-main {
+    width: 80%;
+}
+
+.taikhoan-box{
+    background-color: #ffffff;
+    padding: 32px;
+    border-radius: 12px;
+    height: fit-content;
+    margin-top: 24px;
+}
+
+.taikhoan-box_title{
+    color: #111827;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: 'Sora', sans-serif;
+     
+}
+
+/* ==========================================================================
+   KHỐI THÔNG TIN CHỈ-XEM (thay cho input disabled cũ)
+   Mỗi mục là 1 cặp label nhỏ / giá trị to, không còn khung giống ô nhập liệu,
+   chỉ có 1 đường kẻ mảnh phía dưới để phân tách - giống kiểu "thẻ thông tin"
+   thay vì "biểu mẫu".
+   ========================================================================== */
+.tt-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px 48px;
+    margin-top: 24px;
+}
+
+.tt-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #F3F4F6;
+}
+
+.tt-info-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.tt-info-value {
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.tt-value-cam {
+    color: #D97706;
+}
+
+.tt-value-xanh {
+    color: #059669;
+}
+
+.tt-badge {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.tt-badge-xanh {
+    background-color: #D1FAE5;
+    color: #059669;
+}
+
+.tt-badge-do {
+    background-color: #FEE2E2;
+    color: #DC2626;
+}
+
+.taikhoan-box_row-padding{
+    padding-top: 24px;
+    padding-bottom: 16px;
+}
+ 
+
+.taikhoan-box_row{
+    display: flex;
+    width: 100%;
+    gap: 16px;
+}
+
+.taikhoan-box_field {
+    width: 50%;
+    display: flex;
+    flex-direction: column;  
+}
+
+.taikhoan-box_field input{
+    padding: 12px 12px;
+    border-radius: 8px;
+    background-color: #F3F4F6;
+    border: none;  
+    outline: none;   
+}
+
+.taikhoan-box_field span {
+    color: #4B5563;
+    font-size: 13px;
+    font-weight: bold;
+    font-family: 'Inter', sans-serif;
+    padding-bottom: 8px;
+}
+
+.taikhoan-box_btnwrap {
+    padding-top: 24px;
+}
+
+.taikhoan-box_btn{
+    padding: 12px 24px;
+    background-color: #1D4ED8;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    font-family: 'Sora', sans-serif;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+}
+
+.taikhoan-box_form-password{
+    display: flex;
+    justify-content: space-around;
+    gap: 16px;
+}
+
+.taikhoan-box_form-password-padding{
+    margin: 20px 0;
+    
+}
+
+/* ==========================================================================
+   CSS CHO MODAL CẬP NHẬT THÔNG TIN
+   ========================================================================== */
+
+.tk-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.tk-modal-container {
+    background-color: white;
+    padding: 25px;
+    border-radius: 8px;
+    width: 700px;
+    max-width: 95%;
+}
+
+.tk-modal-header {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.tk-modal-header h3 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.tk-modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.tk-modal-group label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: 500;
+}
+
+.tk-modal-group input,
+.tk-modal-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    font-family: inherit;
+}
+
+.tk-modal-group input:focus,
+.tk-modal-group select:focus {
+    border-color: #1d4ed8;
+}
+
+.tk-input-disabled {
+    background-color: #f1f1f1;
+    color: #6B7280;
+}
+
+.tk-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 25px;
+    gap: 10px;
+}
+
+.tk-btn-close {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 4px;
+    color: #333;
+    font-weight: 500;
+}
+
+.tk-btn-close:hover {
+    background-color: #f9f9f9;
+}
+
+.tk-btn-save {
+    padding: 10px 20px;
+    background-color: #1d4ed8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.tk-btn-save:hover {
+    background-color: #1e40af;
+}
+
+/* AN HIEN ICON EYE */
+.tk-password-wrapper {
+    position: relative;
+}
+
+.tk-password-wrapper .tk-password-input {
+    width: 100%;
+    padding-right: 40px; 
+    padding: 12px 12px;
+    border-radius: 8px;
+    background-color: #F3F4F6;
+    border: none;
+    outline: none;
+}
+
+.tk-password-wrapper .tk-password-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    color: #666;
+}
+
+.tk-password-wrapper .tk-password-icon:hover {
+    color: #1d4ed8; 
+}

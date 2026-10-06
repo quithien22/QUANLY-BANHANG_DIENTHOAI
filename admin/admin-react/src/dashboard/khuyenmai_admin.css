@@ -1,0 +1,551 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.km-container {
+    margin: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.km-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.km-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.km-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #6B7280;
+}
+
+/* TABS */
+.km-tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid #dee2e6;
+    padding: 0 10px;
+}
+
+.km-tab {
+    background-color: transparent;
+    border: none;
+    padding: 12px 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: #6c757d;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease-in-out;
+}
+
+.km-tab:hover {
+    color: #0d6efd;
+    background-color: #f8f9fa;
+    border-radius: 6px 6px 0 0;
+}
+
+.km-tab.active {
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+.km-tab.active::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #0d6efd;
+    border-radius: 4px 4px 0 0;
+}
+
+.km-tab-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* TOOLBAR (Search + nut them) */
+.km-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.km-search {
+    display: flex;
+    align-items: center;
+    border: 1px solid #E5E7EB;
+    padding: 8px 16px;
+    gap: 8px;
+    border-radius: 6px;
+    width: 320px;
+}
+
+.km-search i {
+    color: #9CA3AF;
+    font-size: 14px;
+}
+
+.km-search input {
+    width: 100%;
+    outline: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+}
+
+.btn-add-km {
+    padding: 10px 18px;
+    background-color: #1D4ED8;
+    border-radius: 6px;
+    border: none;
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    color: #ffffff;
+    font-weight: 500;
+    cursor: pointer;
+}
+.btn-add-km:hover {
+    background-color: #1E40AF;
+}
+
+/* BANG CHUONG TRINH KHUYEN MAI */
+.km-table {
+    width: 100%;
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.km-table th {
+    text-align: center;
+    padding: 12px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    border-bottom: 1px solid #E5E7EB;
+    background-color: #F9FAFB;
+    font-family: 'Inter', sans-serif;
+}
+
+.km-table td {
+    text-align: center;
+    padding: 14px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+    border-bottom: 1px solid #F3F4F6;
+    vertical-align: middle;
+    font-family: 'Inter', sans-serif;
+}
+
+.km-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.km-table tbody tr:hover {
+    background-color: #F9FAFB;
+}
+
+.km-ten-ct {
+    font-weight: 600;
+    color: #111827;
+}
+
+.km-muc-giam {
+    font-weight: 700;
+    color: #1D4ED8;
+}
+
+/* BADGE TRANG THAI (dung chung cho ca 2 bang) */
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badge-green {
+    background-color: #D1FAE5;
+    color: #059669;
+}
+
+.badge-blue {
+    background-color: #DBEAFE;
+    color: #1D4ED8;
+}
+
+.badge-gray {
+    background-color: #F3F4F6;
+    color: #6B7280;
+}
+
+/* NUT SUA / XOA */
+.km-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-edit-km,
+.btn-delete-km {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 6px;
+    background-color: transparent;
+    color: #6B7280;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-edit-km:hover {
+    background-color: #EFF6FF;
+    color: #1D4ED8;
+}
+
+.btn-delete-km:hover {
+    background-color: #FEF2F2;
+    color: #DC2626;
+}
+
+/* ================= FLASH SALE ================= */
+.km-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.km-section-title {
+    display: block;
+    font-family: 'Sora', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.btn-add-khung-gio {
+    padding: 9px 18px;
+    background-color: #FFFFFF;
+    border: 1px solid #1D4ED8;
+    border-radius: 6px;
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    color: #1D4ED8;
+    font-weight: 500;
+    cursor: pointer;
+}
+.btn-add-khung-gio:hover {
+    background-color: #EFF6FF;
+}
+
+.km-flashsale-card {
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background-color: #FFFFFF;
+}
+
+.km-flashsale-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.km-flashsale-gio {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.km-flashsale-khung {
+    font-family: 'Sora', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1D4ED8;
+}
+
+.km-flashsale-ngay {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #9CA3AF;
+}
+
+.km-flashsale-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #E5E7EB;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.km-flashsale-table th {
+    text-align: left;
+    padding: 10px 14px;
+    background-color: #F9FAFB;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.km-flashsale-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #F3F4F6;
+    vertical-align: middle;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+}
+
+.km-flashsale-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.km-product-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    background-color: #F3F4F6;
+    border: 1px solid #E5E7EB;
+}
+
+.km-ten-sp {
+    font-weight: 600;
+    color: #111827;
+}
+
+.km-gia-niem-yet {
+    color: #9CA3AF;
+    text-decoration: line-through;
+}
+
+.km-gia-flashsale {
+    color: #DC2626;
+    font-weight: 700;
+}
+
+/* Thanh tien do hoan thanh */
+.km-progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 220px;
+}
+
+.km-progress-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.km-da-ban {
+    font-size: 12px;
+    color: #6B7280;
+}
+
+.km-progress-track {
+    width: 100%;
+    height: 5px;
+    background-color: #FEE2E2;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.km-progress-fill {
+    height: 100%;
+    background-color: #DC2626;
+    border-radius: 999px;
+}
+
+.km-gioi-han {
+    font-size: 12px;
+    color: #6B7280;
+    white-space: nowrap;
+}
+
+.btn-them-sp-khung-gio {
+    width: 100%;
+    padding: 10px;
+    background-color: #EFF6FF;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1D4ED8;
+    cursor: pointer;
+}
+.btn-them-sp-khung-gio:hover {
+    background-color: #DBEAFE;
+}
+
+
+/* ================== MODAL STYLES ================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;  
+}
+
+.modal-content {
+    background-color: #fff;
+    width: 500px;
+    max-width: 90%;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    font-family: 'Inter', sans-serif;
+ 
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #888;
+}
+
+.btn-close:hover {
+    color: red;
+}
+
+.modal-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+}
+
+.form-group-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-group label {
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #111827;
+}
+
+.form-group input, 
+.form-group select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+}
+
+.form-group input:focus {
+    border-color: #007bff;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-cancel {
+    padding: 8px 16px;
+    background-color: #ffffff;
+    color: #111827;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-cancel:hover {
+    background-color: #e2e2e2;
+}
+
+.btn-save {
+    padding: 8px 16px;
+    background-color: #1D4ED8;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-save:hover {
+    background-color: #547dee;
+}

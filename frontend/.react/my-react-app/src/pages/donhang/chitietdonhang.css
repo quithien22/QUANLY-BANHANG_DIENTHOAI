@@ -1,0 +1,340 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+@import url('https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css');
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.chitietdonhang-page {
+    margin: 32px 120px;
+}
+
+.chitietdonhang-breadcrumb{
+    display: flex;
+    gap: 8px;
+}
+
+.chitietdonhang-breadcrumb_item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.chitietdonhang-breadcrumb_item-tc{
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #4B5563;
+    cursor: pointer;
+}
+.chitietdonhang-breadcrumb_item i {
+     font-size: 16px;
+}
+
+.chitietdonhang-breadcrumb_item-dh{
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: #1D4ED8;
+    cursor: pointer;
+}
+
+.chitietdonhang-container {
+    margin: 32px 0;
+    display: flex;
+    width: 100%;
+    gap: 32px;
+}
+
+.chitietdonhang-main{
+    width: 80%;
+     
+}
+
+.chitietdonhang-status_box {
+    background-color: #ffffff;
+    padding: 32px;
+    border-radius: 16px;
+
+}
+
+.chitietdonhang-status_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chitietdonhang-status_title{
+    display: flex;
+    flex-direction: column;
+}
+
+.chitietdonhang-status_id{
+    font-family: 'Sora', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #111827;
+}
+
+.chitietdonhang-status_date{
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    color: #4B5563;
+}
+
+.chitietdonhang-status_badge{
+    padding: 6px 12px;
+    background-color: #FEF3C7;
+    border-radius: 6px;
+    color: #F59E0B;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/* Container bao bọc toàn bộ timeline */
+.chitietdonhang-timeline {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;  
+    margin: 24px 0;
+}
+
+
+.chitietdonhang-timeline_step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;  
+    width: 100px;  
+    gap: 8px;
+}
+
+/* ĐƯỜNG KẺ NGANG */
+.chitietdonhang-timeline_line {
+    flex: 1;  
+    background-color: #1D4ED8; 
+    margin-top: 14px;  
+    border-radius: 4px;  
+}
+
+.chitietdonhang-timeline_line.pending {
+    background-color: #E5E7EB;
+}
+
+.chitietdonhang-timeline_step i {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
+    background-color: #1D4ED8;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: bold;
+    font-family: 'Sora', sans-serif;
+}
+
+ 
+.chitietdonhang-timeline_text {
+    color: #111827;
+    font-size: 13px;
+    font-weight: bold;
+    font-family: 'Inter', sans-serif;
+}
+
+.chitietdonhang-timeline_time {
+    color: #4B5563;
+    font-size: 11px; 
+    font-family: 'Inter', sans-serif;
+}
+.chitietdonhang-timeline_line {
+    border-top: 1px solid #1D4ED8;
+}
+
+.chitietdonhang-product_box {
+    background-color: #ffffff;
+    margin-top: 24px;
+    border-radius: 16px;
+    padding: 32px;
+}
+
+.chitietdonhang-product_headertitle {
+    color: #111827;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: 'Sora', sans-serif;
+}
+
+.chitietdonhang-product_item {
+    padding: 20px 0;
+}
+
+.chitietdonhang-product_info img {
+    width: 80px;
+    min-height: 80px;
+}
+
+.chitietdonhang-product_item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #E5E7EB;
+    
+}
+.chitietdonhang-product_info{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.chitietdonhang-product_details {
+    display: flex;
+    flex-direction: column;
+
+}
+
+.chitietdonhang-product_name{
+    color: #111827;
+    font-size: 15px;
+    font-weight: bold;
+    font-family: 'Sora', sans-serif;
+}
+
+.chitietdonhang-product_qty{
+    color: #4B5563;
+    font-size: 13px; 
+    font-family: 'Inter', sans-serif;
+}
+ 
+.chitietdonhang-product_price_wrap{
+    display: flex;
+    flex-direction: column;
+
+}
+
+.chitietdonhang-product_price_current{
+    color: #E11D48;
+    font-size: 15px;
+    font-weight: bold;
+    font-family: 'Sora', sans-serif
+}
+
+.chitietdonhang-product_price_old{
+    color: #4B5563;
+    font-size: 13px; 
+    font-family: 'Inter', sans-serif;
+    text-decoration: line-through;
+}
+
+.chitietdonhang-product_footer {
+    padding-top: 20px;
+}
+
+.chitietdonhang-footer_layout{
+    display: flex;
+    justify-content: space-between;
+}
+
+.chitietdonhang-footer_layout li{
+    display: flex;
+    gap: 12px;
+
+}
+
+.chitietdonhang-footer_totalwrap {
+    display: flex;
+    align-items: center;
+}
+
+.chitietdonhang-footer_actions button{
+    padding: 10px 16px;
+    font-size: 13px; 
+    font-weight: bold;
+    font-family: 'Inter', sans-serif;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.chitietdonhang-btn_cancel{
+    border: 1px solid #E11D48;
+    color: #E11D48;
+    
+}
+
+.chitietdonhang-btn_chat{
+    border: 1px solid #1D4ED8;
+    color: #1D4ED8; 
+}
+
+.chitietdonhang-footer_totallabel{
+    color: #4B5563;
+    font-size: 14px; 
+    font-family: 'Inter', sans-serif;
+}
+
+.chitietdonhang-footer_totalprice{
+    color: #E11D48;
+    font-size: 22px; 
+    font-family: 'Sora', sans-serif;
+    font-weight: bold;
+}
+
+.chitietdonhang-sidebar{
+    background-color: #ffffff;
+    padding: 24px;
+    height: fit-content;
+    border-radius: 16px;
+}
+
+.chitietdonhang-customer_header{
+    color: #111827;
+    font-size: 15px; 
+    font-family: 'Sora', sans-serif;
+    font-weight: bold;
+    padding-bottom: 14px;
+}
+
+.chitietdonhang-customer_row-pad {
+    padding-bottom: 12px;
+}
+.chitietdonhang-customer_row{
+     display: flex;
+     flex-direction: column;
+   
+}
+
+.hitietdonhang-customer_label{
+    color: #4B5563;
+    font-size: 12px; 
+    font-family: 'Inter', sans-serif;  
+}
+
+.chitietdonhang-customer_value_bold {
+    color: #111827;
+    font-size: 14px; 
+    font-family: 'Sora', sans-serif;  
+    font-weight: bold;
+}
+
+.chitietdonhang-customer_value{
+    color: #111827;
+    font-size: 14px; 
+    font-family: 'Inter', sans-serif;     
+}
+
+.chitietdonhang-customer_value_highlight {
+    color: #1D4ED8;
+    font-size: 14px; 
+    font-family: 'Inter', sans-serif;     
+    font-weight: bold;
+}

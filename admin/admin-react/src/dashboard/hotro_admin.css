@@ -1,0 +1,208 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+@import url('https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css');
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+ 
+.hotro-admin-container {
+    margin: 32px;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+   
+}
+
+.hotro-header {
+    margin-bottom: 24px;
+}
+
+.hotro-header h2 {
+    font-size: 24px;
+    margin: 0 0 4px 0;
+    font-weight: 700;
+    font-family: 'Sora', sans-serif;
+    color: #1e293b;
+}
+
+.hotro-header p {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0;
+}
+
+.hotro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;  
+    gap: 24px;
+    align-items: start;
+}
+
+/* =================CARD & FORM (CỘT TRÁI)========================*/
+.hotro-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.hotro-card h3 {
+    margin: 0 0 20px 0;
+    font-size: 16px;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 12px;
+    color: #1e293b;
+    font-family: 'Sora', sans-serif;
+}
+
+.mt-20 {
+    margin-top: 24px;
+}
+
+.hotro-input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 16px 0 6px 0;
+    color: #475569;
+}
+
+.hotro-input-group input,
+.hotro-input-group select,
+.hotro-input-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    margin-bottom: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #1e293b;
+    transition: border-color 0.2s ease;
+}
+
+.hotro-input-group input:focus,
+.hotro-input-group select:focus,
+.hotro-input-group textarea:focus {
+    border-color: #2563eb;
+}
+
+.hotro-input-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.btn-add {
+    display: flex;
+    justify-content: center;
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 12px;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.2s ease;
+}
+
+.btn-add:hover {
+    background: #1d4ed8;
+}
+ 
+  
+/* ============== DANH SÁCH & PREVIEW  ==========================   */
+.preview-category {
+    margin-bottom: 24px;
+}
+
+.category-title {
+    font-size: 15px;
+    color: #2563eb;
+    margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Sora', sans-serif;
+}
+
+.preview-question-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.question-item {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    transition: border-color 0.2s ease;
+}
+
+.question-item:hover {
+    border-color: #94a3b8;
+}
+
+.question-text {
+    flex-grow: 1;
+}
+
+.question-text strong {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #0f172a;
+}
+
+.question-text p {
+    font-size: 13px;
+    color: #475569;
+    margin: 0;
+    line-height: 1.6;
+    white-space: pre-line; /* Giữ lại các khoảng xuống dòng của textarea */
+}
+
+.btn-delete {
+    background: #fef2f2;
+    color: #ef4444;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;  
+}
+
+.btn-delete:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+    border-color: #f87171;
+}
+
+.question-empty {
+    font-size: 13px;
+    color: #94a3b8;
+    font-style: italic;
+    padding: 10px 0;
+}

@@ -1,0 +1,280 @@
+
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.login-page {
+    margin: 40px 120px;
+}
+
+.login-header-left ul {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.login-logo {
+    font-family: 'Sora', sans-serif;
+    font-weight: 800;
+    font-size: 25px;
+    color: #1D4ED8;
+    cursor: pointer;
+}
+
+.login-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.login-page-login {
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: #111827;
+}
+
+.login-header-right li {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: "Inter",sans-serif;
+    font-size: 18px;
+    color: #6B7280;  
+}
+
+.login-header-right li:hover {
+    color: #1D4ED8;
+}
+ 
+.login-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 0;
+    gap: 64px;
+}
+
+.login-content {
+    width: 100%;
+}
+
+.login-intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 700px;
+    gap: 12px;
+    background-color: #1D4ED8;
+    height: 520px;
+    border-radius: 16px;
+    padding: 48px 48px;
+}
+
+.intro-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.login-intro img {
+    text-align: center;
+    width: 564px;
+    height: 250px;
+    border-radius: 12px;
+}
+
+.intro-brand {
+    font-family: 'Sora', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: #ffffff;
+    margin-top: 15px;
+}
+
+.intro-title {
+    font-family: 'Sora', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: #111827;
+    margin-top: 4px;
+}
+
+.intro-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: #ffffff;
+    line-height: 1.6;
+    margin-top: 8px;
+}
+
+.login-box {
+    width: 480px;
+    height: 520px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 48px 48px;
+}
+
+.login-box-header {
+    text-align: center;
+    font-family: 'Sora', sans-serif;
+    font-weight: 800;
+    font-size: 25px;
+    color: #1D4ED8;
+
+}
+
+.login-form {
+    margin-top: 16px;
+}
+
+.login-form ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.input-field {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #111827;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-field::placeholder {
+    color: #9CA3AF;
+}
+
+.input-field:focus {
+    border-color: #1D4ED8;
+    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 12px;
+    background-color: #1D4ED8;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-submit:hover {
+    background-color: #1E40AF;
+}
+
+.login-forgot-pass {
+    text-align: right;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #1D4ED8;
+    margin-top: 12px;
+    cursor: pointer;
+}
+
+.login-forgot-pass:hover {
+    text-decoration: underline;
+}
+
+/* DIVIDER "HOẶC" */
+.login-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #9CA3AF;
+    margin: 20px 0;
+}
+
+.login-divider::before,
+.login-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: #E5E7EB;
+}
+
+.login-divider::before {
+    margin-right: 12px;
+}
+
+.login-divider::after {
+    margin-left: 12px;
+}
+
+/* NÚT SOCIAL */
+.social-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #E5E7EB;
+    background-color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-social:hover {
+    background-color: #F9FAFB;
+}
+
+.social-buttons img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+/* PROMPT ĐĂNG KÝ */
+.login-register-prompt {
+    text-align: center;
+    margin-top: 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #6B7280;
+}
+
+.register-link {
+    color: #1D4ED8;
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 4px;
+}
+
+.register-link:hover {
+    text-decoration: underline;
+}

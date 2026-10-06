@@ -1,0 +1,113 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+
+}
+
+.footer{
+   margin-top: 40px ; 
+   background-color: #111827;
+   
+}
+
+.footer ul{
+    display: flex;
+    justify-content: space-around;
+    margin: 0 120px;
+    padding: 50px 0;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+   
+}
+
+.footer-column_link:hover {
+    color: #1D4ED8;
+}
+
+.footer-column_title{
+    font-family: 'Sora', sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+
+.footer-column_link{
+    font-family: 'Inter', sans-serif;
+    color: #9CA3AF;
+    font-size: 13px;  
+    padding-right: 5px;
+}
+
+.footer-column_link_span{
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+
+.footer-column_cuahang{
+    text-decoration: underline;
+}
+
+.footer-column_pay{
+    display: flex;
+    flex-direction: row;  
+    flex-wrap: wrap;       
+    gap: 12px;
+}
+
+.footer-payment_item{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #FFFFFF;
+    border-radius: 5px;
+    padding: 5px 5px;
+}
+
+.footer-payment_item span {
+    font-family: 'Inter', sans-serif;
+    color: #111827;
+    font-size: 13px;  
+    padding-right: 5px;
+    font-weight: 400;
+}
+
+.footer-payment_icon{
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+}
+ 
+.footer-bottom ul {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+     font-family: 'Inter', sans-serif;
+    color: #9CA3AF;
+    font-size: 13px;  
+    padding-right: 5px;
+}
+
+.footer-bottom_links {
+    display: flex;
+    gap: 12px;
+}
+
+.footer-bottom_list li :hover {
+    color: #1D4ED8;
+}
+

@@ -1,0 +1,440 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.cd-container {
+    margin: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.cd-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cd-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.cd-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #6B7280;
+}
+
+/* LAYOUT: MENU TRAI + NOI DUNG PHAI */
+.cd-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.cd-menu {
+    width: 260px;
+    flex-shrink: 0;
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cd-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: none;
+    background-color: transparent;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6B7280;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease-in-out;
+}
+
+.cd-menu-item i {
+    font-size: 16px;
+}
+
+.cd-menu-item:hover {
+    background-color: #F9FAFB;
+    color: #374151;
+}
+
+.cd-menu-item.active {
+    background-color: #EFF6FF;
+    color: #1D4ED8;
+    font-weight: 600;
+}
+
+/* NOI DUNG */
+.cd-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.cd-card {
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.cd-card-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
+}
+
+/* AVATAR */
+.cd-avatar-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.cd-avatar-wrap {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+}
+
+.cd-avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.cd-avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #F3F4F6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9CA3AF;
+    font-size: 26px;
+}
+
+.cd-avatar-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cd-avatar-buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cd-link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1D4ED8;
+    cursor: pointer;
+}
+.cd-link-btn:hover {
+    text-decoration: underline;
+}
+
+.cd-link-xoa {
+    color: #6B7280;
+    font-weight: 500;
+}
+
+.cd-hint {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #9CA3AF;
+}
+
+/* FIELD CHUNG */
+.cd-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cd-field label {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.cd-input-icon {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 10px 14px;
+}
+
+.cd-input-icon i {
+    color: #9CA3AF;
+    font-size: 15px;
+}
+
+.cd-input-icon input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+}
+
+.cd-icon-eye {
+    cursor: pointer;
+}
+.cd-icon-eye:hover {
+    color: #374151;
+}
+
+.cd-textarea {
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+    outline: none;
+    resize: vertical;
+}
+.cd-textarea:focus,
+.cd-input-icon:focus-within {
+    border-color: #1D4ED8;
+}
+
+/* DO MANH MAT KHAU */
+.cd-strength-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cd-strength-track {
+    width: 100%;
+    height: 5px;
+    background-color: #F3F4F6;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.cd-strength-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.2s ease-in-out;
+}
+
+.strength-do { background-color: #DC2626; }
+.strength-cam { background-color: #D97706; }
+.strength-xanhla { background-color: #059669; }
+
+.cd-strength-label-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.cd-strength-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.strength-text-do { color: #DC2626; }
+.strength-text-cam { color: #D97706; }
+.strength-text-xanhla { color: #059669; }
+
+/* UPLOAD LOGO */
+.cd-upload-box {
+    border: 1px dashed #D1D5DB;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #9CA3AF;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    background-color: #F9FAFB;
+}
+.cd-upload-box:hover {
+    background-color: #F3F4F6;
+}
+
+.cd-upload-box i {
+    font-size: 16px;
+}
+
+.cd-logo-preview {
+    max-height: 60px;
+    border-radius: 6px;
+}
+
+/* DON VI VAN CHUYEN */
+.cd-donvi-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+
+.cd-donvi-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cd-donvi-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cd-badge-donvi {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.dv-green { background-color: #D1FAE5; color: #059669; }
+.dv-blue { background-color: #DBEAFE; color: #1D4ED8; }
+.dv-orange { background-color: #FFEDD5; color: #C2410C; }
+
+.cd-donvi-ten {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+}
+
+/* TOGGLE SWITCH */
+.cd-toggle {
+    width: 40px;
+    height: 22px;
+    border-radius: 999px;
+    background-color: #D1D5DB;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    padding: 0;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.cd-toggle.on {
+    background-color: #1D4ED8;
+}
+
+.cd-toggle-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #FFFFFF;
+    transition: left 0.2s ease-in-out;
+}
+
+.cd-toggle.on .cd-toggle-knob {
+    left: 20px;
+}
+
+/* NUT LUU */
+.cd-btn-luu {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    background-color: #1D4ED8;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #FFFFFF;
+    cursor: pointer;
+}
+.cd-btn-luu:hover {
+    background-color: #1E40AF;
+}
+
+/* thong bao  */
+.cai-dat {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    font-family: 'Inter', sans-serif;
+    background-color: #10B981;  
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-weight: 500;
+    font-size: 14px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+}
+
+/* Hiệu ứng trượt vào từ bên phải */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Hiệu ứng mờ dần khi ẩn */
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}

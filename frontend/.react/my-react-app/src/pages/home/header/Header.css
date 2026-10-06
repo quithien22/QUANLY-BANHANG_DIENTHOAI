@@ -1,0 +1,246 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+                    /* TOP-BAR */
+.top-bar{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    height: 36px;
+    color: #ffffff;
+    background-color: #1D4ED8;
+}
+ 
+.top-bar-title i{
+    padding:0 8px 0 0 ;
+}
+
+.top-bar-contact ul {
+    display: flex; 
+    gap: 24px;
+}
+
+                    /* MAIN HEADER */
+
+.main-header{
+    display: flex;
+    justify-content: space-around;
+    justify-items: center;
+    height: 92px;
+    padding: 20px;
+}
+
+/* LOGO */
+.main-header-logo{
+    display: flex;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.main-header-logo img {
+    height: 40px;
+    width: 40px;
+}
+
+.main-header-logo-title-name{
+    font-family: 'Sora', sans-serif;
+    font-weight: 800;  
+    font-size: 20px;
+    color: #1D4ED8;
+   
+}
+
+.main-header-logo-title-n{
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #E11D48;
+}
+
+/* SEACRH */
+.main-header-search-form {
+  flex: 1;
+  max-width: 480px;
+  margin: 0 24px;
+}
+ 
+.main-header-search {
+  display: flex;
+  align-items: center;
+  height: 42px; 
+  margin: 0 24px;
+  background-color: #F3F4F6;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 0 4px 0 16px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Khi click vào ô input, cả thanh search sáng lên */
+.main-header-search:focus-within {
+  border-color: #1D4ED8;
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+  background-color: #FFFFFF;
+}
+
+.main-header-search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #111827;
+  padding: 16px 0;
+}
+
+.main-header-search input::placeholder {
+  color: #9CA3AF;
+}
+
+.main-header-search button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  border: none;
+  background-color: #1D4ED8;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.main-header-search button:hover {
+  background-color: #1E40AF; /* đậm hơn 1 chút khi hover */
+}
+
+.main-header-search button i {
+  color: #FFFFFF;
+  font-size: 18px;
+}
+
+/* ACTION */
+.header-action ul {
+    display: flex;
+    justify-items: center;
+    gap: 24px;
+}
+
+.action-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.action-item i {
+    font-size: 20px;
+    
+}
+
+.action-item-span1{
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+  
+}
+
+.action-item-mau {
+    color: #4B5563;
+}
+
+.action-item-span2{
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    
+}
+.action-item-span2_mau{
+   color: #111827; 
+}
+.header-action_giohang{
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    background-color: #EFF6FF;
+    color: #1D4ED8;
+}
+
+.header-action_donhang i {
+    color: #1D4ED8;
+}
+
+/* NAV-BAR */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  padding-left: 200px;  
+  background-color: #FFFFFF;
+  border-top: 1px solid #E5E7EB;
+  height: 48px;
+}
+
+.nav-bar ul {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+ 
+}
+
+.nav-bar li {
+  position: relative;
+}
+
+.nav-bar a {
+  display: block;
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: 111827;
+  text-decoration: none;
+  padding: 8px 4px;
+  transition: color 0.2s ease;
+}
+
+.nav-bar a:hover {
+  color: #1D4ED8;
+}
+
+/* Trạng thái đang active   */
+.nav-bar a.active {
+  color: #1D4ED8;
+  font-weight: 600;
+}
+
+/* Gạch chân dưới mục đang active */
+.nav-bar a.active::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #1D4ED8;
+}
+
+/* Mục "Khuyến mãi HOT" - nổi bật màu đỏ */
+.nav-bar li.nav-highlight a {
+  color: #DC2626;
+  font-weight: 600;
+}
+
+.nav-bar li.nav-highlight a:hover {
+  color: #B91C1C;
+}

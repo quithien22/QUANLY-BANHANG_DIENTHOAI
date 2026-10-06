@@ -1,0 +1,364 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.dg-admin-container {
+    margin: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* HEADER */
+.dg-admin-header-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.dg-admin-header-title {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dg-admin-title-main {
+    font-family: 'Sora', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.dg-admin-title-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #6B7280;
+}
+
+.dg-admin-filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    background-color: #FFFFFF;
+}
+
+.dg-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: #1D4ED8;
+    cursor: pointer;
+}
+
+.dg-checkbox-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+}
+
+/* BO LOC SAO */
+.dg-admin-filter-stars {
+    display: flex;
+    gap: 8px;
+}
+
+.dg-btn-filter {
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid #E5E7EB;
+    background-color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+
+.dg-btn-filter:hover {
+    background-color: #F3F4F6;
+}
+
+.dg-btn-filter.active {
+    background-color: #1D4ED8;
+    border-color: #1D4ED8;
+    color: #FFFFFF;
+}
+
+/* DANH SACH DANH GIA */
+.dg-admin-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.dg-admin-empty {
+    text-align: center;
+    padding: 40px 0;
+    color: #9CA3AF;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+}
+
+.dg-admin-item {
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* SAN PHAM DUOC DANH GIA */
+.dg-item-product-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dg-product-img {
+    width: 22px;
+    height: 22px;
+    object-fit: cover;
+    border-radius: 4px;
+    background-color: #F3F4F6;
+}
+
+.dg-product-name {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1D4ED8;
+    cursor: pointer;
+}
+.dg-product-name:hover {
+    text-decoration: underline;
+}
+
+.dg-item-time {
+    margin-left: auto;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #9CA3AF;
+}
+
+/* KHACH HANG + SAO */
+.dg-item-customer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dg-item-customer-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dg-customer-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #F3F4F6;
+}
+
+.dg-customer-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.dg-customer-name {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.dg-customer-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #9CA3AF;
+}
+
+.dg-customer-stars {
+    display: flex;
+    gap: 2px;
+}
+
+.dg-star-icon {
+    font-size: 15px;
+    color: #D1D5DB;
+}
+
+.dg-star-icon.bxs-star {
+    color: #F59E0B;
+}
+
+/* NOI DUNG DANH GIA */
+.dg-item-content {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #374151;
+}
+
+/* ANH DANH GIA */
+.dg-review-images {
+    display: flex;
+    gap: 8px;
+}
+
+.dg-review-img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #E5E7EB;
+    background-color: #F3F4F6;
+    cursor: pointer;
+}
+
+/* PHAN HOI DA GUI */
+.dg-reply-existing {
+    background-color: #F9FAFB;
+    border-left: 3px solid #1D4ED8;
+    border-radius: 6px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dg-reply-existing-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1D4ED8;
+}
+
+.dg-reply-existing p {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+    line-height: 1.5;
+}
+
+/* O NHAP PHAN HOI */
+.dg-item-reply-section {
+    display: flex;
+}
+
+.dg-reply-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #93C5FD;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+    outline: none;
+    background-color: #F8FAFF;
+}
+
+.dg-reply-input::placeholder {
+    color: #9CA3AF;
+}
+
+.dg-reply-input:focus {
+    border-color: #1D4ED8;
+    background-color: #FFFFFF;
+}
+
+/* NUT HANH DONG */
+.dg-item-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.dg-btn-action {
+    padding: 9px 18px;
+    border-radius: 6px;
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+
+.dg-btn-reply {
+    background-color: #1D4ED8;
+    border: 1px solid #1D4ED8;
+    color: #FFFFFF;
+}
+.dg-btn-reply:hover {
+    background-color: #1E40AF;
+}
+.dg-btn-reply:disabled {
+    background-color: #93C5FD;
+    border-color: #93C5FD;
+    cursor: not-allowed;
+}
+
+.dg-btn-hide {
+    background-color: #FFFFFF;
+    border: 1px solid #EF4444;
+    color: #EF4444;
+}
+.dg-btn-hide:hover {
+    background-color: #FEF2F2;
+}
+
+
+/* thong bao  */
+.danh-gia {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    font-family: 'Inter', sans-serif;
+    background-color: #10B981; /* Màu xanh thành công */
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-weight: 500;
+    font-size: 14px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+}
+
+/* Hiệu ứng trượt vào từ bên phải */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Hiệu ứng mờ dần khi ẩn */
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}

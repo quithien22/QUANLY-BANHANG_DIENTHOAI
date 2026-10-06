@@ -1,0 +1,478 @@
+@import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.vc-container {
+    margin: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.vc-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.vc-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.vc-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #6B7280;
+}
+
+/* BO LOC TRANG THAI */
+.vc-filter-tabs {
+    display: flex;
+    gap: 8px;
+}
+
+.vc-filter-btn {
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1px solid #E5E7EB;
+    background-color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+
+.vc-filter-btn:hover {
+    background-color: #F3F4F6;
+}
+
+.vc-filter-btn.active {
+    background-color: #1D4ED8;
+    border-color: #1D4ED8;
+    color: #FFFFFF;
+}
+
+/* BANG VAN CHUYEN */
+.vc-table {
+    width: 100%;
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.vc-table th {
+    text-align: center;
+    padding: 12px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    border-bottom: 1px solid #E5E7EB;
+    background-color: #F9FAFB;
+}
+
+.vc-table td {
+    text-align: center;
+    padding: 14px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+    border-bottom: 1px solid #F3F4F6;
+    vertical-align: middle;
+}
+
+.vc-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.vc-table tbody tr:hover {
+    background-color: #F9FAFB;
+}
+
+.vc-trong {
+    text-align: center;
+    padding: 24px 0;
+    color: #9CA3AF;
+}
+
+.vc-ma-don {
+    font-weight: 700;
+    color: #1D4ED8;
+}
+
+/* DON VI VAN CHUYEN */
+.vc-dvvc-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vc-badge-dvvc {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.dvvc-blue { background-color: #DBEAFE; color: #1D4ED8; }
+.dvvc-cyan { background-color: #CFFAFE; color: #0E7490; }
+.dvvc-red { background-color: #FEE2E2; color: #DC2626; }
+.dvvc-orange { background-color: #FFEDD5; color: #C2410C; }
+.dvvc-purple { background-color: #EDE9FE; color: #7C3AED; }
+.dvvc-gray { background-color: #F3F4F6; color: #6B7280; }
+
+.vc-dvvc-ten {
+    color: #374151;
+}
+
+/* NGUOI NHAN */
+.vc-nguoinhan {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.vc-nguoinhan-ten {
+    font-weight: 600;
+    color: #111827;
+}
+
+.vc-nguoinhan-sdt {
+    font-size: 12px;
+    color: #9CA3AF;
+}
+
+/* TRANG THAI (chu mau, khong nen) */
+.vc-trangthai {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px;
+    border-radius: 20px;
+}
+
+.trangthai-cam{ 
+    color: #D97706;
+    background-color:#f2c087 ;
+ }
+.trangthai-xanh { 
+    color: #1D4ED8; 
+    background-color:#a8befc ;
+}
+.trangthai-do { 
+    color: #DC2626; 
+    background-color:#ffafaf ;
+    
+}
+.trangthai-xanhla { 
+    color: #059669; 
+    background-color:#a8f8df;
+}
+
+/* NUT SUA / CHI TIET */
+.vc-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.vc-btn-sua,
+.vc-btn-chitiet {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease-in-out;
+}
+
+.vc-btn-sua {
+    background-color: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    color: #1D4ED8;
+}
+.vc-btn-sua:hover {
+    background-color: #DBEAFE;
+}
+
+.vc-btn-chitiet {
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    color: #374151;
+}
+.vc-btn-chitiet:hover {
+    background-color: #F3F4F6;
+}
+
+/* ================= MODAL DUNG CHUNG ================= */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(17, 24, 39, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-box-vc {
+    width: 520px;
+    max-width: 92vw;
+    max-height: 88vh;
+    overflow-y: auto;
+    background-color: #FFFFFF;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.modal-header h3 {
+    font-family: 'Sora', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.modal-header button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #6B7280;
+    cursor: pointer;
+    line-height: 0;
+}
+.modal-header button:hover {
+    color: #111827;
+}
+
+.modal-row {
+    display: flex;
+    gap: 16px;
+}
+
+.modal-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.modal-field label {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.modal-field select,
+.modal-field input {
+    padding: 9px 12px;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #374151;
+    outline: none;
+    background-color: #FFFFFF;
+}
+
+.modal-field select:focus,
+.modal-field input:focus {
+    border-color: #1D4ED8;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #E5E7EB;
+}
+
+.btn-cancel,
+.btn-save {
+    padding: 9px 20px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-cancel {
+    background-color: #F3F4F6;
+    color: #374151;
+}
+.btn-cancel:hover {
+    background-color: #E5E7EB;
+}
+
+.btn-save {
+    background-color: #1D4ED8;
+    color: #FFFFFF;
+}
+.btn-save:hover {
+    background-color: #1E40AF;
+}
+
+/* MODAL CHI TIET - danh sach thong tin dang nhan/gia tri */
+.vc-chitiet-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.vc-chitiet-dong {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #F3F4F6;
+}
+
+.vc-chitiet-dong:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.vc-chitiet-nhan {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #6B7280;
+}
+
+.vc-chitiet-giatri {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+}
+
+
+/* FOOTER PHÂN TRANG */
+.vc-page-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+}
+
+.vc-page-pagination span{
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #6B7280;
+}
+
+.vc-pagesp-pagination{
+    display: flex;
+    gap: 8px;
+}
+
+.vc-page-page_btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #E5E7EB;
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.vc-page-page_btn:hover {
+    background-color: #F3F4F6;
+}
+
+.vc-page-page_btn.active {
+    background-color: #1D4ED8;
+    border-color: #1D4ED8;
+    color: #FFFFFF;
+}
+
+.vc-page-page_btn:disabled {
+    color: #D1D5DB;
+    cursor: not-allowed;
+    background-color: #F9FAFB;
+}
+
+
+/* thong bao  */
+.van-chuyen {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    font-family: 'Inter', sans-serif;
+    background-color: #10B981;  
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-weight: 500;
+    font-size: 14px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+}
+
+/* Hiệu ứng trượt vào từ bên phải */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Hiệu ứng mờ dần khi ẩn */
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
