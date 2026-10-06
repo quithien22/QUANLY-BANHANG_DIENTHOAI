@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import "./diachinhanhang.css";
+import { Link } from "react-router-dom";
+
 
 function DiaChiNhanHang() {
     const nguoiDung = JSON.parse(localStorage.getItem("userData") || "null");
@@ -145,100 +147,109 @@ function DiaChiNhanHang() {
                 </div>
             )}
 
-       
-
-            {/* CỘT TRÁI: DANH SÁCH ĐỊA CHỈ */}
-            <div className="dc-left-panel">
-                <div className="dc-header">
-                    <h2 className="dc-title">Địa chỉ của tôi</h2>
-                    {/* Bấm nút này sẽ reset form bên phải về trạng thái Thêm */}
-                    <button className="dc-btn-add" onClick={kichHoatThemMoi}>
-                        <i className="bx bx-plus"></i> Thêm địa chỉ mới
-                    </button>
-                </div>
-
-                <div className="dc-list-container">
-                    {dangTai ? (
-                        <div className="dc-empty">Đang tải danh sách...</div>
-                    ) : dsDiaChi.length === 0 ? (
-                        <div className="dc-empty">Bạn chưa lưu địa chỉ nào.</div>
-                    ) : (
-                        dsDiaChi.map((dc) => (
-                            <div key={dc.maDiaChi} className={`dc-card ${dc.macDinh ? "dc-card-default" : ""}`}>
-                                <div className="dc-info">
-                                    <div className="dc-name-row">
-                                        <span className="dc-name">{dc.hoTenNguoiNhan}</span>
-                                        <span className="dc-divider">|</span>
-                                        <span className="dc-phone">{dc.SDT}</span>
-                                        {dc.macDinh === true && <span className="dc-badge">Mặc định</span>}
-                                    </div>
-                                    <div className="dc-address-text">{dc.diaChiChiTiet}</div>
-                                </div>
-
-                                <div className="dc-actions">
-                                    <div className="dc-action-links">
-                                        {/* Bấm Sửa sẽ đẩy dữ liệu sang cột bên phải */}
-                                        <span className="dc-link-edit" onClick={() => kichHoatSua(dc)}>Cập nhật</span>
-                                        <span className="dc-link-del" onClick={() => xuLyXoaDiaChi(dc.maDiaChi)}>Xóa</span>
-                                    </div>
-                                    {!dc.macDinh && (
-                                        <button className="dc-btn-set-default" onClick={() => xuLyDatMacDinh(dc.maDiaChi)}>
-                                            Thiết lập mặc định
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        ))
-                    )}
-                </div>
+            <div className="spyeuthich-breadcrumb">
+                <Link to="/home"><span className="dc-breadcrumb_home">Trang chủ</span></Link>
+                <i className="bx bx-chevron-right dc-breadcrumb-icon"></i>
+                <Link to="/home/tai-khoan"><span className="dc-breadcrumb_link">Tài khoản</span></Link>
+                <i className="bx bx-chevron-right dc-breadcrumb-icon"></i>
+                <span className="dc-breadcrumb_current">Địa chỉ nhận hàng</span>
             </div>
 
-            {/* CỘT PHẢI: FORM NHẬP LIỆU */}
-            <div className="dc-right-panel">
-                <div className="dc-form-box">
-                    <h3 className="dc-form-title">
-                        {isEditing ? "Cập nhật địa chỉ" : "Thêm địa chỉ mới"}
-                    </h3>
 
-                    <div className="dc-input-group">
-                        <label>Họ và tên người nhận</label>
-                        <input
-                            type="text"
-                            placeholder="Nhập họ và tên"
-                            value={formDiaChi.hoTenNguoiNhan}
-                            onChange={(e) => setFormDiaChi({ ...formDiaChi, hoTenNguoiNhan: e.target.value })}
-                        />
-                    </div>
-
-                    <div className="dc-input-group">
-                        <label>Số điện thoại</label>
-                        <input
-                            type="text"
-                            placeholder="Nhập số điện thoại"
-                            value={formDiaChi.SDT}
-                            onChange={(e) => setFormDiaChi({ ...formDiaChi, SDT: e.target.value })}
-                        />
-                    </div>
-
-                    <div className="dc-input-group">
-                        <label>Địa chỉ chi tiết</label>
-                        <textarea
-                            placeholder="Số nhà, tên đường, phường/xã, quận/huyện..."
-                            rows="4"
-                            value={formDiaChi.diaChiChiTiet}
-                            onChange={(e) => setFormDiaChi({ ...formDiaChi, diaChiChiTiet: e.target.value })}
-                        ></textarea>
-                    </div>
-
-                    <div className="dc-form-actions">
-                        {isEditing && (
-                            <button className="dc-btn-cancel" onClick={kichHoatThemMoi}>
-                                Hủy sửa
-                            </button>
-                        )}
-                        <button className="dc-btn-save" onClick={xuLyLuuDiaChi}>
-                            {isEditing ? "Lưu thay đổi" : "Lưu địa chỉ"}
+            <div className="form_diachi">
+                {/* CỘT TRÁI: DANH SÁCH ĐỊA CHỈ */}
+                <div className="dc-left-panel">
+                    <div className="dc-header">
+                        <h2 className="dc-title">Địa chỉ của tôi</h2>
+                        {/* Bấm nút này sẽ reset form bên phải về trạng thái Thêm */}
+                        <button className="dc-btn-add" onClick={kichHoatThemMoi}>
+                            <i className="bx bx-plus"></i> Thêm địa chỉ mới
                         </button>
+                    </div>
+
+                    <div className="dc-list-container">
+                        {dangTai ? (
+                            <div className="dc-empty">Đang tải danh sách...</div>
+                        ) : dsDiaChi.length === 0 ? (
+                            <div className="dc-empty">Bạn chưa lưu địa chỉ nào.</div>
+                        ) : (
+                            dsDiaChi.map((dc) => (
+                                <div key={dc.maDiaChi} className={`dc-card ${dc.macDinh ? "dc-card-default" : ""}`}>
+                                    <div className="dc-info">
+                                        <div className="dc-name-row">
+                                            <span className="dc-name">{dc.hoTenNguoiNhan}</span>
+                                            <span className="dc-divider">|</span>
+                                            <span className="dc-phone">{dc.SDT}</span>
+                                            {dc.macDinh === true && <span className="dc-badge">Mặc định</span>}
+                                        </div>
+                                        <div className="dc-address-text">{dc.diaChiChiTiet}</div>
+                                    </div>
+
+                                    <div className="dc-actions">
+                                        <div className="dc-action-links">
+                                            {/* Bấm Sửa sẽ đẩy dữ liệu sang cột bên phải */}
+                                            <span className="dc-link-edit" onClick={() => kichHoatSua(dc)}>Cập nhật</span>
+                                            <span className="dc-link-del" onClick={() => xuLyXoaDiaChi(dc.maDiaChi)}>Xóa</span>
+                                        </div>
+                                        {!dc.macDinh && (
+                                            <button className="dc-btn-set-default" onClick={() => xuLyDatMacDinh(dc.maDiaChi)}>
+                                                Thiết lập mặc định
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+
+                {/* CỘT PHẢI: FORM NHẬP LIỆU */}
+                <div className="dc-right-panel">
+                    <div className="dc-form-box">
+                        <h3 className="dc-form-title">
+                            {isEditing ? "Cập nhật địa chỉ" : "Thêm địa chỉ mới"}
+                        </h3>
+
+                        <div className="dc-input-group">
+                            <label>Họ và tên người nhận</label>
+                            <input
+                                type="text"
+                                placeholder="Nhập họ và tên"
+                                value={formDiaChi.hoTenNguoiNhan}
+                                onChange={(e) => setFormDiaChi({ ...formDiaChi, hoTenNguoiNhan: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="dc-input-group">
+                            <label>Số điện thoại</label>
+                            <input
+                                type="text"
+                                placeholder="Nhập số điện thoại"
+                                value={formDiaChi.SDT}
+                                onChange={(e) => setFormDiaChi({ ...formDiaChi, SDT: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="dc-input-group">
+                            <label>Địa chỉ chi tiết</label>
+                            <textarea
+                                placeholder="Số nhà, tên đường, phường/xã, quận/huyện..."
+                                rows="4"
+                                value={formDiaChi.diaChiChiTiet}
+                                onChange={(e) => setFormDiaChi({ ...formDiaChi, diaChiChiTiet: e.target.value })}
+                            ></textarea>
+                        </div>
+
+                        <div className="dc-form-actions">
+                            {isEditing && (
+                                <button className="dc-btn-cancel" onClick={kichHoatThemMoi}>
+                                    Hủy sửa
+                                </button>
+                            )}
+                            <button className="dc-btn-save" onClick={xuLyLuuDiaChi}>
+                                {isEditing ? "Lưu thay đổi" : "Lưu địa chỉ"}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

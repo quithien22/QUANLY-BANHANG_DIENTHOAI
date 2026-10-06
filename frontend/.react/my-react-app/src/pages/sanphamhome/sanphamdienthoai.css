@@ -109,6 +109,7 @@
     font-weight: 600;
     padding: 3px 8px;
     border-radius: 4px;
+    z-index: 10;
 }
 
 /* FIX GIẬT LAYOUT: khung chứa tag luôn chiếm 1 chiều cao cố định dù có
@@ -249,4 +250,20 @@
     background-color: #F3F4F6;
 }
 
- 
+.spdienthoai-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); 
+    transition: transform 0.3s ease, box-shadow 0.3s ease; 
+}
+
+
+.spdienthoai-card_imgwrap {
+    overflow: hidden; 
+}
+
+.spdienthoai-card_imgwrap img {
+    transition: transform 0.4s ease; 
+}
+
+.spdienthoai-card:hover .spdienthoai-card_imgwrap img {
+    transform: scale(1.08);
+}

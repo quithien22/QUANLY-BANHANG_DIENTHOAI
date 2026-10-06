@@ -57,9 +57,9 @@ function SanPhamYeuThich() {
         <div className="spyeuthich-page">
             <div className="spyeuthich-breadcrumb">
                 <Link to="/home"><span className="spyeuthich-breadcrumb_home">Trang chủ</span></Link>
-                &gt;
+                <i className="bx bx-chevron-right doitra-breadcrumb-icon"></i>
                 <Link to="/tai-khoan"><span className="spyeuthich-breadcrumb_link">Tài khoản</span></Link>
-                &gt;
+                <i className="bx bx-chevron-right doitra-breadcrumb-icon"></i>
                 <span className="spyeuthich-breadcrumb_current">Sản phẩm yêu thích</span>
             </div>
 

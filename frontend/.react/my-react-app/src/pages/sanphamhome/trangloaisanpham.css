@@ -79,6 +79,7 @@
     font-weight: 600;
     padding: 3px 8px;
     border-radius: 4px;
+    z-index: 10;
 }
 
 /* FIX GIẬT LAYOUT: khung chứa tag luôn chiếm 1 chiều cao cố định dù có
@@ -225,3 +226,25 @@
     cursor: not-allowed;
     background-color: #F9FAFB;
 }
+
+
+ .tlsp-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+ 
+.tlsp-card_imgwrap {
+    position: relative; 
+    overflow: hidden;  
+}
+
+.tlsp-card_imgwrap img {
+    transition: transform 0.4s ease;
+}
+
+.tlsp-card:hover .tlsp-card_imgwrap img {
+    transform: scale(1.08);  
+}
+ 
+ 

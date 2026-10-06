@@ -218,6 +218,7 @@
     font-weight: 600;
     padding: 3px 8px;
     border-radius: 4px;
+    z-index: 10;
 }
 
 /* khung chứa tag luôn chiếm chỗ cố định, dù có tag hay không */
@@ -348,4 +349,24 @@
     color: #D1D5DB;
     cursor: not-allowed;
     background-color: #F9FAFB;
+}
+
+
+
+.chitiethangsp-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); 
+    transition: transform 0.3s ease, box-shadow 0.3s ease; 
+}
+ 
+
+.chitiethangsp-card_imgwrap {
+    overflow: hidden; 
+}
+
+.chitiethangsp-card_imgwrap img {
+    transition: transform 0.4s ease; 
+}
+
+.chitiethangsp-card:hover .chitiethangsp-card_imgwrap img {
+    transform: scale(1.08); 
 }

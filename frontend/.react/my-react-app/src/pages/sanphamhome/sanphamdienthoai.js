@@ -155,7 +155,7 @@ function DanhSachSanPhamTheoLoai({ tieuDe, maLSP }) {
                                     <span>({product.soLuongDanhGia || 0} đánh giá)</span>
                                 </div>
 
-                                <Link to={`/chi-tiet-san-pham/${product.maSP}`}>
+                                <Link to={`/home/hang/chi-tiet-san-pham/${product.maSP}`}>
                                     <button className="spdienthoai-card_btn">Xem chi tiết</button>
                                 </Link>
 

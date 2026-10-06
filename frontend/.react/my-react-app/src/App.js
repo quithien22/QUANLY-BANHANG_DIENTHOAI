@@ -5,7 +5,7 @@ import './App.css';
 import Header from './pages/home/header/Header';
 import Login from './pages/login/login';
 import Register from './pages/register/register';
-import Support from './cpmsupport/support';
+import Support from './pages/hotro/support';
 import Banner from './pages/home/banner/banner';
 import SanPhamNoiBat from "./pages/home/danhmuc/spnoibat";
 import Flashsale from "./pages/home/flashsale/FlashSale";
