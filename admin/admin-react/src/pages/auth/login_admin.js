@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./login_admin.css";
-import bannerimages from '../images-admin/baner-login.png';
+import bannerimages from '../../images-admin/baner-login.png';
 import axios from "axios";
-import myVideo from "../assets/back_ground_admin.mp4";
+import myVideo from "../../assets/back_ground_admin.mp4";
 import Swal from 'sweetalert2';
 
 function LoginAdmin() {

@@ -3,6 +3,7 @@ import "./tienhanhdathang.css";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 
+
 function TienHanhDatHang() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -84,6 +85,26 @@ function TienHanhDatHang() {
         }, 2500);
     };
 
+    // CHUYỂN KHÁCH SANG TRANG THANH TOÁN MOMO
+    const thanhToanMoMo = async (maHoaDon, soTien) => {
+        try {
+            const res = await axios.post("http://localhost:8080/api/payment/momo", {
+                amount: soTien,
+                orderId: maHoaDon
+            });
+            if (res.data?.payUrl) {
+                window.location.href = res.data.payUrl;
+            } else {
+                alert(`Đơn hàng ${maHoaDon} đã được tạo nhưng chưa mở được cổng MoMo (${res.data?.message || "lỗi không xác định"}). Vui lòng liên hệ cửa hàng.`);
+                navigate("/home");
+            }
+        } catch (error) {
+            console.error("Lỗi tạo thanh toán MoMo:", error);
+            alert(`Đơn hàng ${maHoaDon} đã được tạo nhưng không kết nối được MoMo. Vui lòng liên hệ cửa hàng.`);
+            navigate("/home");
+        }
+    };
+
     // 4. HÀM XỬ LÝ ĐẶT HÀNG GỌI API
     const handleDatHang = async () => {
         if (!hoTen || !sdt || !diaChi) {
@@ -105,6 +126,10 @@ function TienHanhDatHang() {
             const response = await axios.post("http://localhost:8080/api/hoadon/dat-hang", payload);
 
             if (response.data.success) {
+                if (phuongThuc === "momo") {
+                    await thanhToanMoMo(response.data.maHoaDon, response.data.tongTien);
+                    return;
+                }
                 hienThiThongBaoTC("Đặt hàng thành công!");
                 // Nếu khách sửa địa chỉ trực tiếp trên form và chưa có trong sổ -> Có thể gọi thêm API Thêm địa chỉ mới ở đây nếu muốn
             }
@@ -192,12 +217,16 @@ function TienHanhDatHang() {
                                 </li>
                                 {/* Phương thức Ví điện tử */}
                                 <li className="thdathang-payment-item">
-                                    <button className="thdathang-payment-item-btn" onClick={() => setPhuongThuc("momo")} style={{ border: phuongThuc === "momo" ? "2px solid #1D4ED8" : "1px solid #E5E7EB" }}>
+                                    <button
+                                        className="thdathang-payment-item-btn"
+                                        onClick={() => setPhuongThuc("momo")}
+                                        style={{ border: phuongThuc === "momo" ? "2px solid #1D4ED8" : "1px solid #E5E7EB" }}
+                                    >
                                         <i className={`bx ${phuongThuc === 'momo' ? 'bxs-check-circle' : 'bx-circle'}`} style={{ color: phuongThuc === 'momo' ? '#1D4ED8' : '#9CA3AF' }} />
-                                        <i className="bx bx-qr-scan" />
+                                        <i className="bx bx-qr-scan" /> {/* Đổi icon thành quét mã QR */}
                                         <div className="thdathang-payment-content">
                                             <span className="thdathang-payment-name">Ví điện tử MoMo / VNPay</span>
-                                            <span className="thdathang-payment-desc">Nhập mã ưu đãi giảm thêm tối đa 500.000đ</span>
+                                            <span className="thdathang-payment-desc">Thanh toán an toàn qua ví điện tử</span>
                                         </div>
                                     </button>
                                 </li>

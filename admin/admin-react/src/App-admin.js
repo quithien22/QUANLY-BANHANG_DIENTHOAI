@@ -5,25 +5,23 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
-import CpnLoginAdmin from "./login-admin/login_admin";
-import DashBoard from './dashboard/dashboard_admin';
-import DanhMucSP from "./dashboard/danhmucsp_admin"
-import QuanLyDH from "./dashboard/quanlydh_admin"
-import KhachHang from './dashboard/khachhang_admin';
-import NhanVien_PhanQuyen from "./dashboard/nhanvien_phanquyen";
-import NhaCungCap_PhieuNhap from "./dashboard/nhacc_phieunhap";
-import KhuyenMai from './dashboard/khuyenmai_admin';
-import DanhGia from "./dashboard/danhgia_admin";
-import VanChuyen_Admin from './dashboard/vanchuyen_admin';
-import CaiDatHeThong from './dashboard/caidathethong_admin';
-import ChamCong from './dashboard/chamcong_admin';
-import SanPham from './dashboard/sanpham_admin';
-import DoiTraHang from './dashboard/doitrahang_admin';
-import ThongKe from './dashboard/thongke_admin';
-import Banner from './dashboard/banner_admin';
-import HoTro from './dashboard/hotro_admin';
-
- 
+import CpnLoginAdmin from "./pages/auth/login_admin";
+import DashBoard from './pages/Dashboard/dashboard_admin';
+import DanhMucSP from "./pages/sanpham/danhmucsp_admin"
+import QuanLyDH from "./pages/donhang/quanlydh_admin"
+import KhachHang from './pages/khachhang/khachhang_admin';
+import NhanVien_PhanQuyen from "./pages/nhansu/nhanvien_phanquyen";
+import NhaCungCap_PhieuNhap from "./pages/kho/nhacc_phieunhap";
+import KhuyenMai from './pages/marketing/khuyenmai_admin';
+import DanhGia from "./pages/khachhang/danhgia_admin";
+import VanChuyen_Admin from './pages/donhang/vanchuyen_admin';
+import CaiDatHeThong from './pages/hethong/caidathethong_admin';
+import ChamCong from './pages/nhansu/chamcong_admin';
+import SanPham from './pages/sanpham/sanpham_admin';
+import DoiTraHang from './pages/donhang/doitrahang_admin';
+import ThongKe from './pages/thongke/thongke_admin';
+import Banner from './pages/marketing/banner_admin';
+import HoTro from './pages/khachhang/hotro_admin';
 
  
 
@@ -57,8 +55,6 @@ function AdminContent() {
             <Route path="/admin/thong_ke" element={<ThongKe/>} /> 
             <Route path="/admin/banner" element={<Banner/>} /> 
             <Route path="/admin/ho_tro" element={<HoTro/>} /> 
-            
-
           </Routes>
         </main>
       </div>

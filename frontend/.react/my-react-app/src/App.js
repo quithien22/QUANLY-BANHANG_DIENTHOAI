@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
 
 import Header from './pages/home/header/Header';
@@ -20,6 +20,7 @@ import DanhGiaSanPhamSection from "./pages/sanpham/danhgia_page/danhgia";
 
 import ThemGioHang from "./pages/thanhtoan/themgiohang/themvaogiohang";
 import TienHanhDatHang from "./pages/thanhtoan/dathang/tienhanhdathang";
+import ThanhToanThanhCong from "./pages/thanhtoan/ketqua/thanhtoanthanhcong";
 
 import ThongTinkhachHang from './pages/taikhoan/taikhoan-khachhang/thongtinkhachhang';
 import ChiTietDonHang from'./pages/donhang/chitietdonhang';
@@ -58,6 +59,7 @@ function AppContent() {
       {!isAuthPage && <Header />}
       <main className="main-content">
         <Routes>
+          <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<Home />} />
           <Route path="/home/hang/:maThuongHieu" element={<SanPhamCacHang />} />
           <Route path="/home/hang/chi-tiet-san-pham/:id" element={<ChiTietSanPhamHang />} />
@@ -66,6 +68,7 @@ function AppContent() {
           <Route path="/register" element={<Register />} />
           <Route path="/home/themgiohang" element={<ThemGioHang />} />
           <Route path="/home/themgiohang/tienhanhdathang" element={<TienHanhDatHang />} />
+          <Route path="/thanh-toan-thanh-cong" element={<ThanhToanThanhCong />} />
           <Route path="/home/tai-khoan" element={<ThongTinkhachHang />} />
           <Route path="/home/don-hang" element={<ChiTietDonHang />} />
           <Route path="/home/tim-kiem" element={<SuLyThanhTimKiem />} />
@@ -77,6 +80,9 @@ function AppContent() {
           <Route path="/home/tai-khoan/dia-chi-nhan-hang" element={<DiaChiNhanHang />} />
           <Route path="/home/tai-khoan/lich-su-mua-hang" element={<LichSuMuaHang />} />
           <Route path="/home/danh-muc/:maLSP" element={<TrangLoaiSanPham />} />
+
+          {/* Đường dẫn không tồn tại -> về /home */}
+          <Route path="*" element={<Navigate to="/home" replace />} />
 
 
 

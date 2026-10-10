@@ -3,6 +3,16 @@ const sql = require('mssql');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
+
+//thanh toan
+const crypto = require('crypto');
+const axios = require('axios');
+
+// Doc khoa MoMo tu file .env (can: npm install dotenv). Neu chua cai thi bo qua, doc tu bien moi truong he thong.
+try { require('dotenv').config(); } catch (e) { console.warn('Chua cai dotenv - khong doc duoc file .env (npm install dotenv)'); }
+
+ 
+
 // hasing mat khau
 const bcrypt = require('bcrypt');
 
@@ -3594,6 +3604,122 @@ app.get('/api/khachhang/:maKH', async (req, res) => {
     }
 });
 
+
+
+
+// ======================================= THANH TOAN MOMO ==================================
+const MOMO_CONFIG = {
+    partnerCode: process.env.MOMO_PARTNER_CODE || '',
+    accessKey: process.env.MOMO_ACCESS_KEY || '',
+    secretKey: process.env.MOMO_SECRET_KEY || '',
+    endpoint: process.env.MOMO_ENDPOINT || 'https://test-payment.momo.vn/v2/gateway/api/create',
+    redirectUrl: process.env.MOMO_REDIRECT_URL || 'http://localhost:3000/thanh-toan-thanh-cong',
+    // Phai la URL public (ngrok...) thi MoMo moi goi duoc, localhost thi MoMo khong goi vao may ban
+    ipnUrl: process.env.MOMO_IPN_URL || 'http://localhost:8080/api/payment/momo-ipn',
+};
+
+// Kiem tra chu ky MoMo gui ve (dung chung cho IPN va trang redirect)
+function kiemTraChuKyMoMo(p) {
+    const raw = `accessKey=${MOMO_CONFIG.accessKey}&amount=${p.amount}&extraData=${p.extraData ?? ''}&message=${p.message}&orderId=${p.orderId}&orderInfo=${p.orderInfo}&orderType=${p.orderType}&partnerCode=${p.partnerCode}&payType=${p.payType}&requestId=${p.requestId}&responseTime=${p.responseTime}&resultCode=${p.resultCode}&transId=${p.transId}`;
+    const expected = crypto.createHmac('sha256', MOMO_CONFIG.secretKey).update(raw).digest('hex');
+    return expected === p.signature;
+}
+
+// Xu ly ket qua MoMo: kiem tra chu ky + so tien, neu thanh cong thi cap nhat bang ThanhToan
+async function xuLyKetQuaMoMo(p) {
+    if (!p || !p.signature || !MOMO_CONFIG.secretKey || !kiemTraChuKyMoMo(p)) {
+        return { hopLe: false, message: 'Chu ky khong hop le' };
+    }
+    const maHoaDon = String(p.orderId).split('_')[0];
+    const pool = await sql.connect(dbConfig);
+    const tt = await pool.request()
+        .input('maHoaDon', sql.VarChar(20), maHoaDon)
+        .query('SELECT soTien, trangThai FROM ThanhToan WHERE maHoaDon = @maHoaDon');
+    if (tt.recordset.length === 0) return { hopLe: false, message: 'Khong tim thay giao dich' };
+    if (Math.round(tt.recordset[0].soTien) !== Number(p.amount)) {
+        return { hopLe: false, message: 'So tien khong khop' };
+    }
+    const thanhCong = Number(p.resultCode) === 0;
+    if (thanhCong) {
+        await pool.request()
+            .input('maHoaDon', sql.VarChar(20), maHoaDon)
+            .query("UPDATE ThanhToan SET trangThai = 'da_thanh_toan', thoiGian = GETDATE() WHERE maHoaDon = @maHoaDon AND trangThai = 'cho_thanh_toan'");
+    }
+    return { hopLe: true, thanhCong, maHoaDon, message: p.message };
+}
+
+// MoMo goi ve server (server-to-server) khi giao dich xong
+app.post('/api/payment/momo-ipn', async (req, res) => {
+    try {
+        const kq = await xuLyKetQuaMoMo(req.body);
+        if (!kq.hopLe) console.warn('MoMo IPN khong hop le:', kq.message);
+        res.status(204).end();
+    } catch (err) {
+        console.error('Loi xu ly MoMo IPN:', err);
+        res.status(500).end();
+    }
+});
+
+// Trang redirect cua frontend goi len de xac nhan ket qua (dung khi chay localhost, IPN chua toi duoc)
+app.post('/api/payment/momo-xacnhan', async (req, res) => {
+    try {
+        const kq = await xuLyKetQuaMoMo(req.body);
+        if (!kq.hopLe) return res.status(400).json({ success: false, message: kq.message });
+        res.json({ success: true, thanhCong: kq.thanhCong, maHoaDon: kq.maHoaDon, message: kq.message });
+    } catch (err) {
+        console.error('Loi xac nhan MoMo:', err);
+        res.status(500).json({ success: false, message: 'Loi server: ' + err.message });
+    }
+});
+
+// Tao giao dich MoMo, tra ve payUrl de frontend chuyen khach sang trang thanh toan
+app.post('/api/payment/momo', async (req, res) => {
+   
+    const { amount: amountRaw, orderId: maHoaDon } = req.body;
+    if (!maHoaDon || !amountRaw) {
+        return res.status(400).json({ message: 'Thieu orderId hoac amount' });
+    }
+    if (!MOMO_CONFIG.partnerCode || !MOMO_CONFIG.accessKey || !MOMO_CONFIG.secretKey) {
+        return res.status(500).json({ message: 'Chua cau hinh MoMo trong file .env' });
+    }
+    const amount = Math.round(Number(amountRaw)); // MoMo yeu cau so nguyen
+    const orderId = `${maHoaDon}_${Date.now()}`;   // moi lan tao giao dich phai co orderId rieng
+
+    // 2. Cấu hình tài khoản Sandbox
+    const { partnerCode, accessKey, secretKey } = MOMO_CONFIG; 
+            
+            
+    
+    const redirectUrl = MOMO_CONFIG.redirectUrl;
+    const ipnUrl = MOMO_CONFIG.ipnUrl; 
+    
+    const requestType = "captureWallet";
+    const extraData = ""; 
+    const orderInfo = `Thanh toan don hang ${maHoaDon}`;
+    const requestId = partnerCode + new Date().getTime();
+
+    // 3. Tạo chữ ký số
+    const rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=${extraData}&ipnUrl=${ipnUrl}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
+    
+    const signature = crypto.createHmac('sha256', secretKey)
+                            .update(rawSignature)
+                            .digest('hex');
+
+    // 4. Đóng gói dữ liệu gửi sang MoMo
+    const requestBody = {
+        partnerCode, accessKey, requestId, amount, orderId, orderInfo, redirectUrl, ipnUrl, extraData, requestType, signature, lang: 'vi'
+    };
+
+    try {
+        const result = await axios.post(MOMO_CONFIG.endpoint, requestBody).catch((e) => {
+            console.error('Loi goi MoMo:', e.response?.data || e.message);
+            throw e;
+        });
+        res.status(200).json(result.data);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 
 
