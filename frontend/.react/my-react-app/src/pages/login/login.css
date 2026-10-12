@@ -185,12 +185,37 @@
     background-color: #1E40AF;
 }
 
+/* HÀNG GHI NHỚ ĐĂNG NHẬP + QUÊN MẬT KHẨU */
+.login-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+}
+
+.login-remember {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #4B5563;
+    cursor: pointer;
+    user-select: none;
+}
+
+.login-remember input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: #1D4ED8;
+    cursor: pointer;
+}
+
 .login-forgot-pass {
     text-align: right;
     font-family: 'Inter', sans-serif;
     font-size: 13px;
     color: #1D4ED8;
-    margin-top: 12px;
     cursor: pointer;
 }
 

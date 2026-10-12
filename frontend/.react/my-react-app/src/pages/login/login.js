@@ -6,14 +6,42 @@ import './login.css';
 
 import anhbanner from '../../images/banner_samsungs26ul.png';
 import Footer from "../footer/footer";
+import LoginGoogle from './login_google';
 
 function Login() {
     const navigate = useNavigate();
 
     // 1. KHAI BÁO STATE LƯU DỮ LIỆU INPUT
-    const [taiKhoan, setTaiKhoan] = useState(""); // Dùng chung cho cả Email hoặc SĐT
+    // Nếu lần trước có tick "Ghi nhớ đăng nhập" thì tự điền sẵn tài khoản (KHÔNG lưu mật khẩu)
+    const [taiKhoan, setTaiKhoan] = useState(localStorage.getItem("taiKhoanGhiNho") || ""); // Dùng chung cho cả Email hoặc SĐT
     const [matKhau, setMatKhau] = useState("");
+    const [ghiNho, setGhiNho] = useState(localStorage.getItem("ghiNhoDangNhap") === "1");
     const [thongBaoLoi, setThongBaoLoi] = useState(""); // State hiển thị lỗi màu đỏ
+
+    // XỬ LÝ ĐĂNG NHẬP BẰNG GOOGLE (Backend đã xác thực, trả về userInfo)
+    const xuLyDangNhapGoogleThanhCong = (userInfo) => {
+        setThongBaoLoi("");
+        localStorage.setItem("userData", JSON.stringify(userInfo));
+
+        if (ghiNho) {
+            localStorage.setItem("ghiNhoDangNhap", "1");
+        } else {
+            localStorage.removeItem("ghiNhoDangNhap");
+        }
+        // Đăng nhập Google không dùng mật khẩu nên không nhớ sẵn tài khoản ở ô nhập
+        localStorage.removeItem("taiKhoanGhiNho");
+        sessionStorage.setItem("phienDangNhap", "1");
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Thành công!',
+            text: 'Đăng nhập bằng Google thành công.',
+            showConfirmButton: false,
+            timer: 1500
+        }).then(() => {
+            navigate("/home");
+        });
+    };
 
     const xuLyDangNhap = async (e) => {
         e.preventDefault();
@@ -58,6 +86,18 @@ function Login() {
                 // Lưu thông tin khách hàng vào trình duyệt
                 localStorage.setItem("userData", JSON.stringify(response.data.userInfo));
 
+                // Xử lý ghi nhớ đăng nhập
+                if (ghiNho) {
+                    // Giữ đăng nhập lâu dài + nhớ tài khoản cho lần sau
+                    localStorage.setItem("ghiNhoDangNhap", "1");
+                    localStorage.setItem("taiKhoanGhiNho", taiKhoan.trim());
+                } else {
+                    // Chỉ giữ đăng nhập trong phiên hiện tại (đóng trình duyệt sẽ tự đăng xuất)
+                    localStorage.removeItem("ghiNhoDangNhap");
+                    localStorage.removeItem("taiKhoanGhiNho");
+                }
+                sessionStorage.setItem("phienDangNhap", "1");
+
                 // Hiển thị Tick xanh thành công
                 Swal.fire({
                     icon: 'success',
@@ -99,7 +139,7 @@ function Login() {
                     <div className='login-header-left'>
                         <ul>
                             <li className='login-logo'>
-                                <span>ThiệnStore</span>
+                                <span>6AEStore</span>
                             </li>
                             <li className='login-page-login'>Đăng nhập</li>
                         </ul>
@@ -121,7 +161,7 @@ function Login() {
                     <div className='login-intro'>
                         <img src={anhbanner} alt="Banner" className="intro-img" />
                         <div className="intro-overlay">
-                            <span className='intro-brand'>ThiệnStore</span>
+                            <span className='intro-brand'>6AEStore</span>
                             <span className='intro-title'>ĐĂNG NHẬP THÀNH VIÊN</span>
                             <span className='intro-desc'>
                                 Tích điểm Smember, nhận ngập tràn ưu đãi<br /> giảm giá độc quyền, quà tặng sinh nhật cực chất.
@@ -170,7 +210,18 @@ function Login() {
                                 </li>
                             </ul>
 
-                            <div className='login-forgot-pass'>Quên mật khẩu</div>
+                            <div className='login-options'>
+                                <label className='login-remember'>
+                                    <input
+                                        type="checkbox"
+                                        checked={ghiNho}
+                                        onChange={(e) => setGhiNho(e.target.checked)}
+                                    />
+                                    <span>Ghi nhớ đăng nhập</span>
+                                </label>
+
+                                <div className='login-forgot-pass'>Quên mật khẩu</div>
+                            </div>
 
                             <div className='login-divider'>Hoặc</div>
 
@@ -180,11 +231,11 @@ function Login() {
                                         <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" alt="Facebook" />
                                         Facebook
                                     </button>
-
-                                    <button type="button" className='btn-social google'>
-                                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQg8osQDK0Kmjxoan7eh04xI0Ya0KLVhnA3UsydJwtLNQ&s" alt="Google" />
-                                        Google
-                                    </button>
+                                    
+                                    <LoginGoogle
+                                        onSuccess={xuLyDangNhapGoogleThanhCong}
+                                        onError={(msg) => setThongBaoLoi(msg)}
+                                    />
                                 </div>
 
                                 <div className='login-register-prompt'>

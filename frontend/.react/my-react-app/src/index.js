@@ -4,6 +4,17 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+// Kiểm tra "Ghi nhớ đăng nhập": nếu không tick và là phiên trình duyệt mới thì xóa thông tin đăng nhập
+try {
+  const conGhiNho = localStorage.getItem("ghiNhoDangNhap") === "1";
+  const phienHienTai = sessionStorage.getItem("phienDangNhap") === "1";
+  if (!conGhiNho && !phienHienTai) {
+    localStorage.removeItem("userData");
+  }
+} catch (e) {
+  console.error(e);
+}
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

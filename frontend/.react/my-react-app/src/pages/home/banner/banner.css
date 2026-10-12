@@ -1,192 +1,393 @@
 @import url('https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
 
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-.banner {
-  display: flex;
-  justify-content: center;
+/* ============ KHUNG NGOÀI ============ */
+.bn-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(260px, 24%, 440px);
   gap: 16px;
-  margin:32px 60px;
- 
+  width: min(100% - 120px, 1840px); /* màn 4K vẫn gọn gàng, không bị kéo giãn quá mức */
+  margin: 32px auto;
 }
 
-.banner-left {
+.bn-wrap--full {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* ============ SLIDER CHÍNH ============ */
+.bn-hero {
   position: relative;
-  width: 856px;
-  height: 360px;
-  border-radius: 8px;
+  aspect-ratio: 16 / 7;
+  min-height: 300px;
+  max-height: 640px;
+  border-radius: 20px;
   overflow: hidden;
-  background-color: #000; /* Màu nền lót phòng khi ảnh tải chậm */
+  background-color: #0b1220; /* màu lót khi ảnh đang tải */
+  isolation: isolate;
 }
 
-/* Định dạng cho ảnh chính nằm trọn trong khung */
-.banner-img-main {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Hoặc chỉnh thành 'contain' nếu bạn muốn hiển thị toàn bộ chiều dài của ảnh mẫu */
-  display: block;
-}
-
- 
-.banner_right {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-/* Từng ô banner nhỏ bên phải */
-.banner_right_item {
-  width: 320px;
-  height: 172px;
-  border-radius: 8px;
-  overflow: hidden; /* Cắt gọn phần tràn viền khi bo góc */
-}
-
-.banner_right_item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Giúp ảnh không bị méo tỷ lệ */
-  display: block;
-  transition: transform 0.3s ease; /* Hiệu ứng phóng to nhẹ khi rê chuột vào */
-}
-
-.banner_right_item img:hover {
-  transform: scale(1.03);
-}
-
-.banner_right_top {
-  padding-bottom: 0; /* Đã dùng gap ở khung .banner nên bỏ padding thừa */
-}
- 
-
-.banner-content {
+.bn-img {
   position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  animation: bn-fade 0.7s ease both;
+}
+
+@keyframes bn-fade {
+  from { opacity: 0; transform: scale(1.03); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.bn-fill-link {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}
+
+/* Lớp tối dần từ trái sang phải để chữ luôn dễ đọc trên mọi ảnh */
+.bn-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    rgba(8, 15, 35, 0.82) 0%,
+    rgba(8, 15, 35, 0.55) 38%,
+    rgba(8, 15, 35, 0) 72%
+  );
+  pointer-events: none;
+}
+
+/* ============ NỘI DUNG CHỮ ============ */
+.bn-content {
+  position: absolute;
+  z-index: 10;
   top: 50%;
-  left: 40px;
-  transform: translateY(-50%); /* căn giữa theo chiều dọc */
-  max-width: 400px;
-  z-index: 10; /* đảm bảo nội dung nổi lên trên ảnh */
+  left: clamp(24px, 4vw, 72px);
+  transform: translateY(-50%);
+  max-width: min(560px, 58%);
+  animation: bn-slide-up 0.7s ease both;
 }
 
-.banner-tag {
+@keyframes bn-slide-up {
+  from { opacity: 0; transform: translateY(calc(-50% + 18px)); }
+  to   { opacity: 1; transform: translateY(-50%); }
+}
+
+.bn-tag {
   display: inline-block;
-  background-color: #DC2626;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   color: #FFFFFF;
-  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(11px, 0.9vw, 13px);
   font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 4px;
-  margin-bottom: 12px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  margin-bottom: 16px;
 }
 
-.banner-title {
+.bn-title {
   color: #FFFFFF;
   font-family: 'Sora', sans-serif;
-  font-size: 32px;
+  font-size: clamp(24px, 3.2vw, 56px);
   font-weight: 800;
-  margin: 0 0 12px 0;
+  line-height: 1.15;
+  margin-bottom: 14px;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.25);
 }
 
-.banner-desc {
+.bn-desc {
   color: #E5E7EB;
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  margin: 0 0 20px 0;
+  font-size: clamp(13px, 1.05vw, 18px);
+  line-height: 1.6;
+  margin-bottom: 26px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.banner-buttons {
+.bn-buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
 }
 
-.btn-primary {
-  background-color: #DC2626;
-  color: #FFFFFF;
+.bn-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: clamp(40px, 3.2vw, 52px);
+  padding: 0 clamp(16px, 1.8vw, 28px);
+  border-radius: 999px;
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(13px, 1vw, 15px);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
-.btn-outline {
-  background-color: transparent;
+.bn-btn i {
+  font-size: 20px;
+}
+
+.bn-btn-primary {
+  background: linear-gradient(135deg, #2563EB, #1D4ED8);
   color: #FFFFFF;
-  border: 1px solid #FFFFFF;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(29, 78, 216, 0.45);
 }
 
+.bn-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(29, 78, 216, 0.55);
+}
 
+.bn-btn-outline {
+  background: #FFFFFF;
+  color: #111827;
+}
 
-.banner-nav {
+.bn-btn-outline:hover {
+  transform: translateY(-2px);
+  background: #F3F4F6;
+}
+
+/* ============ NÚT TRƯỚC / SAU ============ */
+.bn-nav {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: rgba(255, 255, 255, 0.15);
-  border: none;
-  color: #FFFFFF;
-  width: 40px;
-  height: 40px;
+  z-index: 20;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #FFFFFF;
+  font-size: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 22px;
-  z-index: 20; /* cao hơn banner-content để luôn bấm được */
-  transition: background-color 0.2s ease;
+  opacity: 0;
+  transition: opacity 0.25s ease, background-color 0.2s ease;
 }
 
-.banner-nav:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+.bn-hero:hover .bn-nav {
+  opacity: 1;
 }
 
-.banner-nav-prev {
-  left: 16px;
+.bn-nav:hover {
+  background: rgba(255, 255, 255, 0.34);
 }
 
-.banner-nav-next {
-  right: 16px;
-}
+.bn-nav-prev { left: 16px; }
+.bn-nav-next { right: 16px; }
 
-.banner-dots {
+/* ============ DẢI ẢNH NHỎ ============ */
+.bn-thumbs {
   position: absolute;
-  bottom: 16px;
+  z-index: 20;
+  right: clamp(16px, 2.5vw, 40px);
+  bottom: clamp(14px, 2vw, 28px);
+  display: flex;
+  gap: 10px;
+}
+
+.bn-thumb {
+  width: clamp(48px, 4.4vw, 76px);
+  aspect-ratio: 3 / 2;
+  padding: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  opacity: 0.8;
+  transition: transform 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.bn-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.bn-thumb:hover {
+  opacity: 1;
+}
+
+.bn-thumb.active {
+  opacity: 1;
+  border-color: #FFFFFF;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+/* ============ CHẤM TRÒN (ẩn trên máy tính) ============ */
+.bn-dots {
+  display: none;
+  position: absolute;
+  z-index: 20;
+  bottom: 14px;
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
   gap: 8px;
-  z-index: 20;
 }
 
-.dot {
+.bn-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, width 0.2s ease;
 }
 
-.dot.active {
+.bn-dot.active {
   background-color: #FFFFFF;
+  width: 20px;
+  border-radius: 999px;
 }
 
-.banner_right_item img {
-    width: 320px;
-    height: 172px;
-    border-radius: 8px;
-
+/* ============ BANNER PHỤ BÊN PHẢI ============ */
+/* .bn-side-inner đặt absolute để ảnh phụ KHÔNG làm cao hơn banner chính */
+.bn-side {
+  position: relative;
 }
 
-.banner_right_top{
-    padding-bottom: 16px;
+.bn-side-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
+.bn-side-item {
+  flex: 1;
+  min-height: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  display: block;
+  background-color: #0b1220;
+}
+
+.bn-side-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.bn-side-item:hover img {
+  transform: scale(1.05);
+}
+
+/* ============ KHUNG CHỜ ============ */
+.bn-skeleton {
+  background: linear-gradient(100deg, #e5e7eb 30%, #f3f4f6 50%, #e5e7eb 70%);
+  background-size: 200% 100%;
+  animation: bn-shimmer 1.4s linear infinite;
+}
+
+@keyframes bn-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* ============ MÀN HÌNH NHỎ ============ */
+@media (max-width: 1100px) {
+  .bn-wrap {
+    width: min(100% - 48px, 1840px);
+  }
+}
+
+@media (max-width: 900px) {
+  .bn-wrap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bn-side {
+    position: static;
+  }
+
+  .bn-side-inner {
+    position: static;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .bn-side-item {
+    aspect-ratio: 2 / 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .bn-wrap {
+    width: calc(100% - 32px);
+    margin: 20px auto;
+  }
+
+  .bn-hero {
+    aspect-ratio: 4 / 3;
+    border-radius: 16px;
+  }
+
+  .bn-content {
+    max-width: calc(100% - 48px);
+  }
+
+  .bn-desc {
+    display: none; /* tiết kiệm chỗ trên điện thoại */
+  }
+
+  .bn-btn-outline {
+    display: none;
+  }
+
+  .bn-thumbs {
+    display: none;
+  }
+
+  .bn-dots {
+    display: flex;
+  }
+}
+
+/* Thiết bị cảm ứng không có hover -> luôn hiện nút điều hướng */
+@media (hover: none) {
+  .bn-nav {
+    opacity: 1;
+  }
+}
+
+/* Người dùng bật "giảm chuyển động" thì tắt hiệu ứng */
+@media (prefers-reduced-motion: reduce) {
+  .bn-img,
+  .bn-content,
+  .bn-skeleton {
+    animation: none;
+  }
+}

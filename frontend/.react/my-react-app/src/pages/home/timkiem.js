@@ -65,7 +65,7 @@ function SuLyTimKiem() {
     // Bắt sự kiện chọn/bỏ chọn checkbox Danh mục
     const xuLyChonDanhMuc = (loai) => {
         if (loai === "tat-ca") {
-            setLocDanhMuc([]); 
+            setLocDanhMuc([]);
             return;
         }
         setLocDanhMuc(prev =>
@@ -84,7 +84,7 @@ function SuLyTimKiem() {
         else if (locGia === "10-20") khopGia = giaSP >= 10000000 && giaSP <= 20000000;
         else if (locGia === "tren-20") khopGia = giaSP > 20000000;
 
-        return khopDanhMuc && khopGia; 
+        return khopDanhMuc && khopGia;
     });
 
     // ==== KHI KHACH HANG BAM VAO BO LOC ============== 
@@ -114,7 +114,7 @@ function SuLyTimKiem() {
                     <span className="timkiem-breadcrumb_link">Trang chủ</span>
                 </Link>
 
-                &gt;
+                <i className="bx bx-chevron-right"></i>
                 <span className="timkiem-breadcrumb_current">Tìm kiếm</span>
             </div>
 
@@ -143,22 +143,22 @@ function SuLyTimKiem() {
                     {/* CỘT TRÁI: LỌC SẢN PHẨM */}
                     <li className="timkiem-sidebar">
                         <h3 className="timkiem-sidebar_title">LỌC SẢN PHẨM</h3>
-                        
+
                         <div className="timkiem-filter_group">
                             <span className="timkiem-filter_label">Danh mục</span>
                             <label className="timkiem-filter_item">
-                                <input 
-                                    type="checkbox" 
-                                    className="timkiem-filter_input" 
+                                <input
+                                    type="checkbox"
+                                    className="timkiem-filter_input"
                                     checked={locDanhMuc.length === 0}
                                     onChange={() => xuLyChonDanhMuc("tat-ca")}
                                 /> Tất cả
                             </label>
-                          
+
                             {danhSachLoaiHienCo.map(loai => (
                                 <label key={loai} className="timkiem-filter_item">
-                                    <input 
-                                        type="checkbox" 
+                                    <input
+                                        type="checkbox"
                                         className="timkiem-filter_input"
                                         checked={locDanhMuc.includes(loai)}
                                         onChange={() => xuLyChonDanhMuc(loai)}

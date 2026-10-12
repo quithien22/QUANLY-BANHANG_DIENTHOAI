@@ -3,12 +3,33 @@ import "./chitiethang.css";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
+// Các mức lọc hiển thị trên giao diện
+const DS_RAM = ["4GB", "6GB", "8GB", "12GB", "16GB"];
+const DS_ROM = ["64GB", "128GB", "256GB", "512GB", "1TB"];
+
+// Rút các mức dung lượng từ chuỗi bất kỳ: "128 GB", "8GB LPDDR5X", "256GB / 512GB", "1 TB"...
+// -> ["128GB"], ["8GB"], ["256GB", "512GB"], ["1TB"]
+const layDungLuong = (danhSachChuoi) => {
+    const ketQua = new Set();
+    (danhSachChuoi || []).forEach((chuoi) => {
+        const khop = String(chuoi).matchAll(/(\d+(?:[.,]\d+)?)\s*(GB|TB)/gi);
+        for (const m of khop) {
+            ketQua.add(`${m[1].replace(",", ".")}${m[2].toUpperCase()}`);
+        }
+    });
+    return [...ketQua];
+};
+
+// Header dùng "Khác" cho mục "Phụ kiện Công nghệ", nên nút hãng "Phụ Kiện" cũng trỏ về "Khác"
+const giaTriHang = (th) => (/phụ\s*kiện/i.test(th.tenThuongHieu) ? "Khác" : th.tenThuongHieu);
+const cungHang = (a, b) => String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
+
 function SanPhamCacHang() {
 
-    // GHI CHÚ: đổi từ "tenHang" (tên hiển thị, VD "Apple") sang "maThuongHieu"
-    // (mã, VD "TH01") vì bảng SanPham lọc theo mã, không theo tên. Route phía
-    // React Router cũng cần đổi param tương ứng, VD: "/hang/:maThuongHieu"
-    const { maThuongHieu } = useParams();
+    // GHI CHÚ: tham số trên URL thực chất là TÊN HÃNG (VD "Apple", "Samsung", "Khác")
+    // vì Header dẫn tới /home/hang/Apple và backend lọc theo cột SanPham.hang.
+    // Tên param trong route vẫn là ":maThuongHieu" nên đổi tên biến ở đây cho đỡ nhầm.
+    const { maThuongHieu: tenHang } = useParams();
     const navigate = useNavigate();
 
     const [hienThiBoLoc, setHienThiBoLoc] = useState(false);
@@ -22,33 +43,72 @@ function SanPhamCacHang() {
             .catch((error) => console.error("Lỗi khi lấy danh sách thương hiệu:", error));
     }, []);
 
-    // Tên thương hiệu đang xem (để hiện lên breadcrumb), lấy từ danh sách vừa tải
-    const thuongHieuHienTai = danhSachThuongHieu.find((th) => th.maThuongHieu === maThuongHieu);
+    // Thương hiệu đang xem (để hiện lên breadcrumb), lấy từ danh sách vừa tải
+    const thuongHieuHienTai = danhSachThuongHieu.find((th) => cungHang(giaTriHang(th), tenHang));
+
+    // ============== BỘ LỌC RAM / ROM (chọn nhiều mức; trong 1 nhóm là HOẶC, giữa 2 nhóm là VÀ) ===========
+    const [ramDaChon, setRamDaChon] = useState([]);
+    const [romDaChon, setRomDaChon] = useState([]);
+    const soBoLocDangChon = ramDaChon.length + romDaChon.length;
 
     // ============== DANH SÁCH SẢN PHẨM THEO THƯƠNG HIỆU ===========
     const [sanPhamTheoHang, setSanPhamTheoHang] = useState([]);
     const [dangTai, setDangTai] = useState(true);
 
-    useEffect(() => {
-        if (!maThuongHieu) {
+    // ============== PHÂN TRANG ===========
+    const soLuongMotTrang = 8;
+    const [trangHienTai, setTrangHienTai] = useState(1);
 
-            console.warn("SanPhamCacHang: không nhận được maThuongHieu từ URL. Kiểm tra lại route và Link trỏ vào trang này.");
+    useEffect(() => {
+        // Đổi hãng thì xóa các lựa chọn RAM/ROM cũ
+        setRamDaChon([]);
+        setRomDaChon([]);
+
+        if (!tenHang) {
+            console.warn("SanPhamCacHang: không nhận được tên hãng từ URL. Kiểm tra lại route và Link trỏ vào trang này.");
             setDangTai(false);
             setSanPhamTheoHang([]);
             return;
         }
 
-        console.log("SanPhamCacHang: đang tải sản phẩm cho maThuongHieu =", maThuongHieu);
         setDangTai(true);
-        axios.get(`http://localhost:8080/api/sanpham/thuonghieu/${maThuongHieu}`)
+        axios.get(`http://localhost:8080/api/sanpham/thuonghieu/${encodeURIComponent(tenHang)}`)
             .then((response) => {
-                console.log("SanPhamCacHang: nhận được", response.data.length, "sản phẩm");
-                setSanPhamTheoHang(response.data);
+                // Chuẩn hóa sẵn RAM/ROM của từng sản phẩm để lọc cho nhanh
+                const danhSach = response.data.map((sp) => ({
+                    ...sp,
+                    _ram: layDungLuong(sp.ram),
+                    _rom: layDungLuong(sp.rom),
+                }));
+                setSanPhamTheoHang(danhSach);
                 setTrangHienTai(1);
             })
             .catch((error) => console.error("Lỗi khi lấy sản phẩm theo thương hiệu:", error))
             .finally(() => setDangTai(false));
-    }, [maThuongHieu]);
+    }, [tenHang]);
+
+    // Bấm 1 mức RAM/ROM: chọn thêm, bấm lại để bỏ chọn
+    const chonLoc = (nhom, giaTri) => {
+        const capNhat = nhom === "ram" ? setRamDaChon : setRomDaChon;
+        capNhat((cu) => (cu.includes(giaTri) ? cu.filter((x) => x !== giaTri) : [...cu, giaTri]));
+        setTrangHienTai(1);
+    };
+
+    const xoaBoLoc = () => {
+        setRamDaChon([]);
+        setRomDaChon([]);
+        setTrangHienTai(1);
+    };
+
+    // Số sản phẩm của hãng này có mỗi mức RAM/ROM (mức nào không có sản phẩm thì làm mờ, không cho bấm)
+    const demTheoMuc = (truong, muc) => sanPhamTheoHang.filter((sp) => sp[truong].includes(muc)).length;
+
+    // ============== ÁP DỤNG BỘ LỌC ===========
+    const sanPhamDaLoc = sanPhamTheoHang.filter((sp) => {
+        const khopRam = ramDaChon.length === 0 || ramDaChon.some((r) => sp._ram.includes(r));
+        const khopRom = romDaChon.length === 0 || romDaChon.some((r) => sp._rom.includes(r));
+        return khopRam && khopRom;
+    });
 
     // ============== SẮP XẾP ===========
     // GIẢ ĐỊNH: "Bán chạy nhất" xếp theo soLuongDanhGia giảm dần (chưa có cột
@@ -56,7 +116,7 @@ function SanPhamCacHang() {
     // (chưa có cột ngày tạo thật) - nên đổi lại khi bạn bổ sung các cột này.
     const [kieuSapXep, setKieuSapXep] = useState("ban-chay");
 
-    const sanPhamDaSapXep = [...sanPhamTheoHang].sort((a, b) => {
+    const sanPhamDaSapXep = [...sanPhamDaLoc].sort((a, b) => {
         if (kieuSapXep === "gia-tang") return a.giaBan - b.giaBan;
         if (kieuSapXep === "gia-giam") return b.giaBan - a.giaBan;
         if (kieuSapXep === "moi-ve") return String(b.maSP).localeCompare(String(a.maSP));
@@ -64,10 +124,7 @@ function SanPhamCacHang() {
         return (b.soLuongDanhGia || 0) - (a.soLuongDanhGia || 0);
     });
 
-    // ============== PHÂN TRANG ===========
-    const soLuongMotTrang = 8;
-    const [trangHienTai, setTrangHienTai] = useState(1);
-
+    // ============== PHÂN TRANG (tính trên danh sách đã lọc) ===========
     const tinhSoTrang = Math.ceil(sanPhamDaSapXep.length / soLuongMotTrang);
     const viTriBatDau = (trangHienTai - 1) * soLuongMotTrang;
     const sanPhamDangHien = sanPhamDaSapXep.slice(viTriBatDau, viTriBatDau + soLuongMotTrang);
@@ -96,7 +153,7 @@ function SanPhamCacHang() {
                         <i className="bx bx-chevron-right"></i>
                     </li>
 
-                    <li className="chitconsiethangsp-back-list-th">{thuongHieuHienTai ? thuongHieuHienTai.tenThuongHieu : maThuongHieu}</li>
+                    <li className="chitconsiethangsp-back-list-th">{thuongHieuHienTai ? thuongHieuHienTai.tenThuongHieu : tenHang}</li>
                 </ul>
             </div>
 
@@ -108,6 +165,9 @@ function SanPhamCacHang() {
                     >
                         BỘ LỌC TÌM KIẾM
                         <i className="bx bx-filter-alt"></i>
+                        {soBoLocDangChon > 0 && (
+                            <span className="chitiethangsp-filter_badge">{soBoLocDangChon}</span>
+                        )}
                     </button>
                 </div>
 
@@ -120,8 +180,8 @@ function SanPhamCacHang() {
                                     {danhSachThuongHieu.map((th) => (
                                         <button
                                             key={th.maThuongHieu}
-                                            className={`chitiethangsp-filter_btn ${th.maThuongHieu === maThuongHieu ? "active" : ""}`}
-                                            onClick={() => navigate(`/hang/${th.maThuongHieu}`)}
+                                            className={`chitiethangsp-filter_btn ${cungHang(giaTriHang(th), tenHang) ? "active" : ""}`}
+                                            onClick={() => navigate(`/home/hang/${encodeURIComponent(giaTriHang(th))}`)}
                                         >
                                             {th.tenThuongHieu}
                                         </button>
@@ -129,32 +189,45 @@ function SanPhamCacHang() {
                                 </div>
                             </div>
 
-                            {/* GHI CHÚ: 2 nhóm lọc dưới đây CHƯA lọc được sản phẩm thật,
-                                vì schema hiện tại không có cột RAM, và ROM (BienTheSanPham)
-                                chưa được nối vào câu truy vấn danh sách sản phẩm. Để mắt
-                                lọc theo ROM hoạt động, cần join thêm BienTheSanPham theo
-                                maSP + loaiBienThe='dungluong' và lọc theo giaTri. */}
                             <div className="chitiethangsp-filter_group">
                                 <span className="chitiethangsp-filter_label">Dung lượng RAM:</span>
                                 <div className="chitiethangsp-filter_options">
-                                    <button className="chitiethangsp-filter_btn">4GB</button>
-                                    <button className="chitiethangsp-filter_btn">6GB</button>
-                                    <button className="chitiethangsp-filter_btn">8GB</button>
-                                    <button className="chitiethangsp-filter_btn">12GB</button>
-                                    <button className="chitiethangsp-filter_btn">16GB</button>
+                                    {DS_RAM.map((muc) => (
+                                        <button
+                                            key={muc}
+                                            className={`chitiethangsp-filter_btn ${ramDaChon.includes(muc) ? "active" : ""}`}
+                                            onClick={() => chonLoc("ram", muc)}
+                                            disabled={demTheoMuc("_ram", muc) === 0}
+                                            title={demTheoMuc("_ram", muc) === 0 ? "Không có sản phẩm" : `${demTheoMuc("_ram", muc)} sản phẩm`}
+                                        >
+                                            {muc}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
 
                             <div className="chitiethangsp-filter_group">
                                 <span className="chitiethangsp-filter_label">Bộ nhớ trong ROM:</span>
                                 <div className="chitiethangsp-filter_options">
-                                    <button className="chitiethangsp-filter_btn">64GB</button>
-                                    <button className="chitiethangsp-filter_btn">128GB</button>
-                                    <button className="chitiethangsp-filter_btn">256GB</button>
-                                    <button className="chitiethangsp-filter_btn">512GB</button>
-                                    <button className="chitiethangsp-filter_btn">1TB</button>
+                                    {DS_ROM.map((muc) => (
+                                        <button
+                                            key={muc}
+                                            className={`chitiethangsp-filter_btn ${romDaChon.includes(muc) ? "active" : ""}`}
+                                            onClick={() => chonLoc("rom", muc)}
+                                            disabled={demTheoMuc("_rom", muc) === 0}
+                                            title={demTheoMuc("_rom", muc) === 0 ? "Không có sản phẩm" : `${demTheoMuc("_rom", muc)} sản phẩm`}
+                                        >
+                                            {muc}
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
+
+                            {soBoLocDangChon > 0 && (
+                                <button className="chitiethangsp-filter_clear" onClick={xoaBoLoc}>
+                                    <i className="bx bx-x"></i> Xóa bộ lọc
+                                </button>
+                            )}
                         </>
                     )}
                 </div>
@@ -165,7 +238,7 @@ function SanPhamCacHang() {
             {/* THANH TOOLBAR: SỐ LƯỢNG + SẮP XẾP */}
             <div className="chitiethangsp-toolbar">
                 <div className="chitiethangsp-toolbar_count">
-                    Tìm thấy <span>{sanPhamTheoHang.length}</span> phù hợp
+                    Tìm thấy <span>{sanPhamDaLoc.length}</span> sản phẩm phù hợp
                 </div>
                 <ul className="chitiethangsp-toolbar_sort">
                     <li className="chitiethangsp-toolbar_sort-label">Sắp xếp theo:</li>
@@ -209,7 +282,11 @@ function SanPhamCacHang() {
                 {dangTai ? (
                     <p className="chitiethangsp-trang-thai">Đang tải sản phẩm...</p>
                 ) : sanPhamDangHien.length === 0 ? (
-                    <p className="chitiethangsp-trang-thai">Không có sản phẩm nào thuộc thương hiệu này.</p>
+                    <p className="chitiethangsp-trang-thai">
+                        {soBoLocDangChon > 0
+                            ? "Không có sản phẩm nào phù hợp với bộ lọc đã chọn."
+                            : "Không có sản phẩm nào thuộc thương hiệu này."}
+                    </p>
                 ) : (
                     <ul className="chitiethangsp-grid">
                         {sanPhamDangHien.map((product) => (
@@ -249,34 +326,35 @@ function SanPhamCacHang() {
             </div>
 
             {/* PHÂN TRANG */}
-
-            <div className="chitiethangsp-pagination">
-                <button
-                    className="chitiethangsp-page_btn"
-                    onClick={() => setTrangHienTai(trangHienTai - 1)}
-                    disabled={trangHienTai === 1}
-                >
-                    <i className="bx bx-chevron-left"></i>
-                </button>
-
-                {danhSachTrang.map((soTrang) => (
+            {tinhSoTrang > 1 && (
+                <div className="chitiethangsp-pagination">
                     <button
-                        key={soTrang}
-                        className={`chitiethangsp-page_btn ${trangHienTai === soTrang ? "active" : ""}`}
-                        onClick={() => setTrangHienTai(soTrang)}
+                        className="chitiethangsp-page_btn"
+                        onClick={() => setTrangHienTai(trangHienTai - 1)}
+                        disabled={trangHienTai === 1}
                     >
-                        {soTrang}
+                        <i className="bx bx-chevron-left"></i>
                     </button>
-                ))}
 
-                <button
-                    className="chitiethangsp-page_btn"
-                    onClick={() => setTrangHienTai(trangHienTai + 1)}
-                    disabled={trangHienTai === tinhSoTrang}
-                >
-                    <i className="bx bx-chevron-right"></i>
-                </button>
-            </div>
+                    {danhSachTrang.map((soTrang) => (
+                        <button
+                            key={soTrang}
+                            className={`chitiethangsp-page_btn ${trangHienTai === soTrang ? "active" : ""}`}
+                            onClick={() => setTrangHienTai(soTrang)}
+                        >
+                            {soTrang}
+                        </button>
+                    ))}
+
+                    <button
+                        className="chitiethangsp-page_btn"
+                        onClick={() => setTrangHienTai(trangHienTai + 1)}
+                        disabled={trangHienTai >= tinhSoTrang}
+                    >
+                        <i className="bx bx-chevron-right"></i>
+                    </button>
+                </div>
+            )}
 
         </div>
     );

@@ -120,6 +120,29 @@
     border-color: #94a3b8;
 }
 
+/* Ô nhập link ảnh nằm cạnh nút "Chọn hình ảnh" */
+.banner-upload-or {
+    font-size: 13px;
+    color: #94a3b8;
+    white-space: nowrap;
+}
+
+.banner-form-card .banner-link-input {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+}
+
+.banner-hint {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.banner-hint.loi {
+    color: #dc2626;
+}
+
 .banner-preview-img {
     height: 50px;
     border-radius: 4px;

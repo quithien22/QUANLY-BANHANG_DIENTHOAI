@@ -92,6 +92,53 @@
     transition: all 0.15s ease-in-out;
 }
 
+/* Mức RAM/ROM không có sản phẩm nào thì làm mờ, không cho bấm */
+.chitiethangsp-filter_options button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.chitiethangsp-filter_options button:disabled:hover {
+    background-color: #F3F4F6;
+}
+
+/* Số bộ lọc RAM/ROM đang chọn, hiện cạnh chữ "BỘ LỌC TÌM KIẾM" */
+.chitiethangsp-filter_badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background-color: #1D4ED8;
+    color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.chitiethangsp-filter_clear {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    padding: 6px 12px;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    background-color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #DC2626;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.chitiethangsp-filter_clear:hover {
+    background-color: #FEF2F2;
+}
+
 .chitiethangsp-filter_options button:hover {
     background-color: #E5E7EB;
 }

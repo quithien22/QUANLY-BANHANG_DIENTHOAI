@@ -9,7 +9,8 @@ const crypto = require('crypto');
 const axios = require('axios');
 
 // Doc khoa MoMo tu file .env (can: npm install dotenv). Neu chua cai thi bo qua, doc tu bien moi truong he thong.
-try { require('dotenv').config(); } catch (e) { console.warn('Chua cai dotenv - khong doc duoc file .env (npm install dotenv)'); }
+try { require('dotenv').config({ path: path.join(__dirname, '.env') }); } catch (e) { console.warn('Chua cai dotenv - khong doc duoc file .env (npm install dotenv)'); }
+if (!process.env.GOOGLE_CLIENT_ID) console.warn('Chua co GOOGLE_CLIENT_ID trong file .env - dang nhap Google se khong hoat dong.');
 
  
 
@@ -1834,10 +1835,20 @@ app.get('/api/caidat/banner', async (req, res) => {
 app.post('/api/caidat/banner', upload.single('hinhAnh'), async (req, res) => {
     try {
         let pool = await sql.connect(dbConfig);
-        const { tenBanner, duongDan, viTri, thuTu, tieuDe, moTa, textNutBam } = req.body;
+        const { tenBanner, duongDan, viTri, thuTu, tieuDe, moTa, textNutBam, hinhAnhLink } = req.body;
         
         // Lấy đường dẫn URL đầy đủ của ảnh vừa upload
-        const hinhAnhUrl = req.file ? layUrlAnh(req.file.filename) : null;
+        // Anh banner: uu tien file upload; neu khong co file thi nhan link anh (http/https) do admin dan vao
+        let hinhAnhUrl = null;
+        if (req.file) {
+            hinhAnhUrl = layUrlAnh(req.file.filename);
+        } else if (hinhAnhLink && /^https?:\/\/\S+$/i.test(String(hinhAnhLink).trim())) {
+            hinhAnhUrl = String(hinhAnhLink).trim();
+        }
+
+        if (!hinhAnhUrl) {
+            return res.status(400).json({ success: false, message: "Vui lòng chọn hình ảnh hoặc nhập link ảnh hợp lệ (bắt đầu bằng http:// hoặc https://)!" });
+        }
 
         await pool.request()
             .input('tenBanner', sql.NVarChar, tenBanner)
@@ -2156,6 +2167,104 @@ app.post('/api/user/dang-ky', async (req, res) => {
     }
 });
 
+// =================== DANG NHAP BANG GOOGLE (USER) ===================
+// Frontend gui accessToken lay tu Google. Backend hoi lai Google de xac thuc, KHONG tin du lieu do frontend tu gui.
+app.post('/api/user/dang-nhap-google', async (req, res) => {
+    try {
+        const { accessToken } = req.body;
+        const googleClientId = process.env.GOOGLE_CLIENT_ID;
+
+        if (!accessToken) {
+            return res.status(400).json({ success: false, message: "Thiếu mã xác thực Google!" });
+        }
+        if (!googleClientId) {
+            console.error("Chua cau hinh GOOGLE_CLIENT_ID trong file .env cua backend");
+            return res.status(500).json({ success: false, message: "Máy chủ chưa cấu hình đăng nhập Google!" });
+        }
+
+        // 1. Xac thuc token voi Google + kiem tra token co cap cho DUNG app nay khong
+        let tokenInfo, profile;
+        try {
+            const r1 = await axios.get('https://oauth2.googleapis.com/tokeninfo', { params: { access_token: accessToken } });
+            tokenInfo = r1.data;
+
+            const r2 = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+            profile = r2.data;
+        } catch (e) {
+            return res.status(401).json({ success: false, message: "Xác thực Google thất bại hoặc đã hết hạn, vui lòng thử lại!" });
+        }
+
+        if (tokenInfo.aud !== googleClientId && tokenInfo.azp !== googleClientId) {
+            return res.status(401).json({ success: false, message: "Mã xác thực Google không thuộc ứng dụng này!" });
+        }
+        if (!profile.email || String(profile.email_verified) !== 'true') {
+            return res.status(401).json({ success: false, message: "Email Google chưa được xác minh!" });
+        }
+
+        const email = profile.email.toLowerCase();
+        let pool = await sql.connect(dbConfig);
+
+        // 2. Tim khach hang theo email
+        let result = await pool.request()
+            .input('email', sql.VarChar(255), email)
+            .query(`SELECT maKH, hoTen, email, sdt, trangThai FROM KhachHang WHERE email = @email`);
+
+        let user;
+        if (result.recordset.length > 0) {
+            user = result.recordset[0];
+
+            // Tai khoan bi khoa
+            if (
+                user.trangThai == 0 ||
+                user.trangThai === 'da_khoa' ||
+                user.trangThai === 'Đã khóa (Chặn)'
+            ) {
+                return res.status(403).json({ success: false, message: "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ hỗ trợ!" });
+            }
+        } else {
+            // 3. Chua co tai khoan -> tu dong tao moi (mat khau ngau nhien, khong ai doan duoc)
+            const matKhauNgauNhien = await bcrypt.hash(crypto.randomBytes(32).toString('hex'), 10);
+            const maKH_Moi = "KH" + Date.now().toString().slice(-6);
+            const hoTen = (profile.name || "Khách hàng mới").substring(0, 50);
+
+            await pool.request()
+                .input('maKH', sql.VarChar(20), maKH_Moi)
+                .input('hoTen', sql.NVarChar(50), hoTen)
+                .input('email', sql.VarChar(255), email)
+                .input('SDT', sql.VarChar(15), null)
+                .input('matKhau', sql.VarChar(255), matKhauNgauNhien)
+                .input('diemTichLuy', sql.Int, 0)
+                .input('tongDonHang', sql.Int, 0)
+                .input('trangThai', sql.Bit, 1)
+                .query(`
+                    INSERT INTO KhachHang
+                        (maKH, hoTen, email, SDT, matKhau, diemTichLuy, tongDonHang, trangThai)
+                    VALUES
+                        (@maKH, @hoTen, @email, @SDT, @matKhau, @diemTichLuy, @tongDonHang, @trangThai)
+                `);
+
+            user = { maKH: maKH_Moi, hoTen: hoTen, email: email, sdt: null };
+        }
+
+        // 4. Tra ve cung dinh dang voi /api/user/dang-nhap
+        res.status(200).json({
+            success: true,
+            userInfo: {
+                maKH: user.maKH,
+                hoTen: user.hoTen,
+                email: user.email,
+                sdt: user.sdt
+            }
+        });
+
+    } catch (err) {
+        console.error("Lỗi đăng nhập Google:", err);
+        res.status(500).json({ success: false, message: "Lỗi hệ thống, vui lòng thử lại sau!" });
+    }
+});
+
 // ======================= DOI MAT KHAU ===================== 
 app.put('/api/user/doi-mat-khau', async (req, res) => {
     try {
@@ -2352,8 +2461,53 @@ app.get('/api/sanpham/thuonghieu/:tenHang', async (req, res) => {
                 ORDER BY sp.maSP DESC
             `);
 
+        const sanPham = result.recordset;
+
+        // Gan them RAM / ROM cua tung san pham de frontend loc.
+        // ROM: lay tu bien the loai 'dungluong'; RAM (va ROM neu bien the khong co): lay tu ThongSoKyThuat.
+        if (sanPham.length > 0) {
+            const ketQuaBienThe = await pool.request()
+                .input('tenHang', sql.NVarChar(50), tenHang)
+                .query(`
+                    SELECT bt.maSP, bt.giaTri
+                    FROM BienTheSanPham bt
+                    JOIN SanPham sp ON sp.maSP = bt.maSP
+                    WHERE sp.hang = @tenHang AND sp.trangThai = 1 AND bt.loaiBienThe = 'dungluong'
+                `);
+
+            const ketQuaThongSo = await pool.request()
+                .input('tenHang', sql.NVarChar(50), tenHang)
+                .query(`
+                    SELECT ts.maSP, ts.nhan, ts.giaTri
+                    FROM ThongSoKyThuat ts
+                    JOIN SanPham sp ON sp.maSP = ts.maSP
+                    WHERE sp.hang = @tenHang AND sp.trangThai = 1
+                      AND (ts.nhan LIKE N'%RAM%' OR ts.nhan LIKE N'%ROM%'
+                           OR ts.nhan LIKE N'%nhớ trong%' OR ts.nhan LIKE N'%lưu trữ%')
+                `);
+
+            const ramMap = {};
+            const romMap = {};
+            const themGiaTri = (map, maSP, giaTri) => {
+                if (!giaTri) return;
+                (map[maSP] = map[maSP] || []).push(String(giaTri));
+            };
+
+            ketQuaBienThe.recordset.forEach((r) => themGiaTri(romMap, r.maSP, r.giaTri));
+            ketQuaThongSo.recordset.forEach((r) => {
+                const nhan = String(r.nhan || '');
+                if (/\bram\b/i.test(nhan)) themGiaTri(ramMap, r.maSP, r.giaTri);
+                else if (/\brom\b|bộ nhớ trong|lưu trữ/i.test(nhan)) themGiaTri(romMap, r.maSP, r.giaTri);
+            });
+
+            sanPham.forEach((sp) => {
+                sp.ram = ramMap[sp.maSP] || [];
+                sp.rom = romMap[sp.maSP] || [];
+            });
+        }
+
         res.setHeader('Content-Type', 'application/json; charset=utf-8');
-        res.json(result.recordset);
+        res.json(sanPham);
     } catch (err) {
         console.error("Lỗi lấy sản phẩm theo thương hiệu:", err);
         res.status(500).send("Lỗi server chi tiết: " + err.message);

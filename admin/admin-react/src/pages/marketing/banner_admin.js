@@ -3,6 +3,15 @@ import axios from "axios";
 import Swal from 'sweetalert2';
 import "./banner_admin.css";
 
+const FORM_RONG = {
+    tenBanner: "", duongDan: "", viTri: "slider_chinh", thuTu: 1,
+    tieuDe: "", moTa: "", textNutBam: "",
+    fileAnh: null, linkAnh: "", hinhAnhPreview: ""
+};
+
+// Link ảnh hợp lệ: bắt đầu bằng http:// hoặc https://
+const laLinkHopLe = (chuoi) => /^https?:\/\/\S+$/i.test((chuoi || "").trim());
+
 function Banner() {
     // 1. Kiểm tra quyền (Chỉ Giám đốc CV01 và Quản lý CV02 mới được sửa)
     const adminInfo = JSON.parse(localStorage.getItem("adminData") || "{}");
@@ -11,11 +20,8 @@ function Banner() {
     // 2. State quản lý dữ liệu
     const [danhSachBanner, setDanhSachBanner] = useState([]);
     const inputBannerRef = useRef(null);
-    const [formBanner, setFormBanner] = useState({
-        tenBanner: "", duongDan: "", viTri: "slider_chinh", thuTu: 1,
-        tieuDe: "", moTa: "", textNutBam: "",
-        fileAnh: null, hinhAnhPreview: ""
-    });
+    const [formBanner, setFormBanner] = useState(FORM_RONG);
+    const [loiAnh, setLoiAnh] = useState(false); // true khi link ảnh không tải được
 
     // 3. Tải danh sách Banner khi vào trang
     const taiDanhSachBanner = async () => {
@@ -31,10 +37,42 @@ function Banner() {
         taiDanhSachBanner();
     }, []);
 
+    // Chọn file ảnh từ máy -> bỏ link đã dán (chỉ dùng 1 trong 2 cách)
+    const chonFileAnh = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setLoiAnh(false);
+            setFormBanner({ ...formBanner, fileAnh: file, linkAnh: "", hinhAnhPreview: URL.createObjectURL(file) });
+        }
+    };
+
+    // Dán/nhập link ảnh -> bỏ file đã chọn, xem trước ngay bằng chính link đó
+    const doiLinkAnh = (e) => {
+        const link = e.target.value;
+        setLoiAnh(false);
+        if (inputBannerRef.current) inputBannerRef.current.value = ""; // bỏ file đang chọn
+        setFormBanner({
+            ...formBanner,
+            fileAnh: null,
+            linkAnh: link,
+            hinhAnhPreview: laLinkHopLe(link) ? link.trim() : ""
+        });
+    };
+
     // 4. Xử lý thêm Banner mới
     const luuBannerMoi = async () => {
+        const linkAnh = formBanner.linkAnh.trim();
+
         if (!formBanner.tenBanner) return Swal.fire('Lỗi', 'Vui lòng nhập tên chiến dịch!', 'error');
-        if (!formBanner.fileAnh) return Swal.fire('Lỗi', 'Vui lòng chọn hình ảnh!', 'error');
+        if (!formBanner.fileAnh && !linkAnh) {
+            return Swal.fire('Lỗi', 'Vui lòng chọn hình ảnh hoặc dán link ảnh!', 'error');
+        }
+        if (!formBanner.fileAnh && !laLinkHopLe(linkAnh)) {
+            return Swal.fire('Lỗi', 'Link ảnh không hợp lệ! Link phải bắt đầu bằng http:// hoặc https://', 'error');
+        }
+        if (!formBanner.fileAnh && loiAnh) {
+            return Swal.fire('Lỗi', 'Không tải được ảnh từ link này, vui lòng kiểm tra lại link!', 'error');
+        }
 
         const formData = new FormData();
         formData.append("tenBanner", formBanner.tenBanner);
@@ -44,22 +82,24 @@ function Banner() {
         formData.append("tieuDe", formBanner.tieuDe);
         formData.append("moTa", formBanner.moTa);
         formData.append("textNutBam", formBanner.textNutBam);
-        formData.append("hinhAnh", formBanner.fileAnh);
+
+        if (formBanner.fileAnh) {
+            formData.append("hinhAnh", formBanner.fileAnh);   // upload file từ máy
+        } else {
+            formData.append("hinhAnhLink", linkAnh);          // dùng link ảnh
+        }
 
         try {
             await axios.post("http://localhost:8080/api/caidat/banner", formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             Swal.fire('Thành công!', 'Đã thêm banner mới.', 'success');
-            setFormBanner({
-                tenBanner: "", duongDan: "", viTri: "slider_chinh", thuTu: 1,
-                tieuDe: "", moTa: "", textNutBam: "",
-                fileAnh: null, hinhAnhPreview: ""
-            });
-            inputBannerRef.current.value = ""; // Reset ô input file
+            setFormBanner(FORM_RONG);
+            setLoiAnh(false);
+            if (inputBannerRef.current) inputBannerRef.current.value = ""; // Reset ô input file
             taiDanhSachBanner();
         } catch (err) {
-            Swal.fire('Lỗi', 'Không thể thêm banner', 'error');
+            Swal.fire('Lỗi', err.response?.data?.message || 'Không thể thêm banner', 'error');
         }
     };
 
@@ -100,6 +140,15 @@ function Banner() {
             }
         });
     };
+
+    // Thông báo nhỏ bên dưới hàng chọn ảnh
+    const linkDangNhap = formBanner.linkAnh.trim();
+    let thongBaoAnh = null;
+    if (linkDangNhap && !laLinkHopLe(linkDangNhap)) {
+        thongBaoAnh = { loai: "loi", noiDung: "Link ảnh phải bắt đầu bằng http:// hoặc https://" };
+    } else if (loiAnh) {
+        thongBaoAnh = { loai: "loi", noiDung: "Không tải được ảnh từ link này. Hãy kiểm tra lại link hoặc dùng ảnh khác." };
+    }
 
     return (
         <div className="banner-container">
@@ -154,17 +203,37 @@ function Banner() {
                         <div className="banner-file-btn" onClick={() => inputBannerRef.current.click()}>
                             <i className='bx bx-upload'></i> Chọn hình ảnh
                         </div>
-                        <input type="file" ref={inputBannerRef} hidden onChange={e => {
-                            const file = e.target.files[0];
-                            if(file) setFormBanner({...formBanner, fileAnh: file, hinhAnhPreview: URL.createObjectURL(file)});
-                        }} />
+                        <input type="file" accept="image/*" ref={inputBannerRef} hidden onChange={chonFileAnh} />
+
+                        <span className="banner-upload-or">hoặc</span>
+
+                        {/* Ô nhập link ảnh (dùng khi ảnh đã có sẵn trên mạng) */}
+                        <input
+                            type="text"
+                            className="banner-link-input"
+                            placeholder="Dán link ảnh (VD: https://.../banner.jpg)"
+                            value={formBanner.linkAnh}
+                            onChange={doiLinkAnh}
+                        />
                         
-                        {formBanner.hinhAnhPreview && <img src={formBanner.hinhAnhPreview} alt="Preview" className="banner-preview-img" />}
+                        {formBanner.hinhAnhPreview && (
+                            <img
+                                src={formBanner.hinhAnhPreview}
+                                alt="Preview"
+                                className="banner-preview-img"
+                                onError={() => { if (formBanner.linkAnh) setLoiAnh(true); }}
+                                onLoad={() => setLoiAnh(false)}
+                            />
+                        )}
                         
                         <button className="banner-submit-btn" onClick={luuBannerMoi}>
                             <i className='bx bx-save'></i> Lưu Banner
                         </button>
                     </div>
+
+                    {thongBaoAnh && (
+                        <div className={`banner-hint ${thongBaoAnh.loai}`}>{thongBaoAnh.noiDung}</div>
+                    )}
                 </div>
             )}
 

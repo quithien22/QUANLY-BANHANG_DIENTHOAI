@@ -62,6 +62,7 @@
 /* THANH TAB TRẠNG THÁI */
 .lsmh-tabs {
     display: flex;
+    align-items: center;
     gap: 10px;
     border-bottom: 2px solid #f3f4f6;
     padding-bottom: 15px;
@@ -72,7 +73,6 @@
 .lsmh-tab-btn {
     background: #f3f4f6;
     border: none;
-    padding: 6px 8px;
     border-radius: 20px;
     cursor: pointer;
     font-size: 14px;
@@ -80,10 +80,18 @@
     color: #4b5563;
     font-family: 'Inter', sans-serif;
     white-space: nowrap;
-    transition: all 0.2s;
-    min-width: 130px;          
-    text-align: center;        
- 
+    transition: background 0.2s, color 0.2s;
+
+    /* Kích thước cố định, không đổi khi active */
+    box-sizing: border-box;
+    width: 130px;
+    height: 40px;
+    padding: 0;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .lsmh-tab-btn:hover {
@@ -92,9 +100,8 @@
 
 .lsmh-tab-btn.active {
     background: #1D4ED8;
-    font-family: 'Sora', sans-serif;
     color: #fff;
-    font-weight: 600;  
+    font-weight: 500; /* giữ nguyên font-family/size/padding để nút không bị co */
 }
 
 /* DANH SÁCH & THẺ ĐƠN HÀNG */

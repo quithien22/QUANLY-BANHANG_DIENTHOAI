@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import './Header.css';
 import axios from 'axios';
+import LogoImages from '../../../images/logo.jpg';
  
 
 function Header() {
@@ -79,7 +80,7 @@ function Header() {
       <div className='top-bar'>
         <div className='top-bar-title'>
           <i className="bx bx-gift" />
-          Chào mừng đến với ThienStore – Mua sắm thông minh, tiết kiệm hơn mỗi ngày!
+          Chào mừng đến với 6AEStore – Mua sắm thông minh, tiết kiệm hơn mỗi ngày!
         </div>
         <div className='top-bar-contact'>
           <ul>
@@ -93,9 +94,9 @@ function Header() {
       <div className='main-header'>
         {/* LOGO */}
         <div className='main-header-logo'>
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQL29PuACx7QYeWoXL21gEuHj6vp7ftPETpGlEDtWkDPQ&s=10" alt="ThienStore Logo" />
+          <img src= {LogoImages} alt="" />
           <div className='main-header-logo_title' onClick={() => window.location.href = '/home'}>
-            <span className='main-header-logo-title-name'>THIỆNSTORE</span>
+            <span className='main-header-logo-title-name'>6AE-STORE</span>
             <br />
             <span className='main-header-logo-title-n'>Chính hãng giá tốt</span>
           </div>
