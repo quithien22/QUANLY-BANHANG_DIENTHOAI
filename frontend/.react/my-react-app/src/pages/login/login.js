@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { authApi } from '../../API/AuthApi';
 import Swal from 'sweetalert2';
 import './login.css';
 
@@ -77,14 +77,11 @@ function Login() {
         }
         // 3. GỌI API ĐĂNG NHẬP (BACKEND)
         try {
-            const response = await axios.post("http://localhost:8080/api/user/dang-nhap", {
-                taiKhoan: taiKhoan,
-                matKhau: matKhau
-            });
+            const data = await authApi.login(taiKhoan, matKhau);
 
-            if (response.status === 200) {
+            if (data.success) {
                 // Lưu thông tin khách hàng vào trình duyệt
-                localStorage.setItem("userData", JSON.stringify(response.data.userInfo));
+                localStorage.setItem("userData", JSON.stringify(data.userInfo));
 
                 // Xử lý ghi nhớ đăng nhập
                 if (ghiNho) {

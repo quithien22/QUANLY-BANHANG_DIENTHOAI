@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./sanphamyeuthich.css";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import { wishlistApi } from "../../../../API/WishlistApi";
+import { layUrlAnh } from "../../../../utils/imageUrl";
 
 function SanPhamYeuThich() {
     const [danhSachYeuThich, setDanhSachYeuThich] = useState([]);
@@ -18,9 +19,9 @@ function SanPhamYeuThich() {
             return;
         }
 
-        axios.get(`http://localhost:8080/api/yeuthich/${maKH}`)
-            .then(res => {
-                setDanhSachYeuThich(res.data);
+        wishlistApi.list(maKH)
+            .then(data => {
+                setDanhSachYeuThich(data);
                 setDangTai(false);
             })
             .catch(err => {
@@ -32,8 +33,8 @@ function SanPhamYeuThich() {
     // HÀM XÓA KHỎI DANH SÁCH YÊU THÍCH (NÚT THÙNG RÁC)
     const xoaYeuThich = async (maSP) => {
         try {
-            const res = await axios.post("http://localhost:8080/api/yeuthich/toggle", { maKH, maSP });
-            if (res.data.success && res.data.action === 'removed') {
+            const data = await wishlistApi.toggle(maKH, maSP);
+            if (data.success && data.action === 'removed') {
                 // Cập nhật lại UI lập tức bằng cách lọc bỏ sản phẩm vừa xóa
                 setDanhSachYeuThich(prev => prev.filter(sp => sp.maSP !== maSP));
             }
@@ -48,7 +49,7 @@ function SanPhamYeuThich() {
         return (
             <div className="spyeuthich-page" style={{ textAlign: "center", padding: "50px" }}>
                 <h3>Vui lòng đăng nhập để xem danh sách Yêu thích của bạn!</h3>
-                <Link to="/dangnhap" style={{ color: "blue", textDecoration: "underline" }}>Đến trang Đăng nhập</Link>
+                <Link to="/login" style={{ color: "blue", textDecoration: "underline" }}>Đến trang Đăng nhập</Link>
             </div>
         );
     }
@@ -58,7 +59,7 @@ function SanPhamYeuThich() {
             <div className="spyeuthich-breadcrumb">
                 <Link to="/home"><span className="spyeuthich-breadcrumb_home">Trang chủ</span></Link>
                 <i className="bx bx-chevron-right doitra-breadcrumb-icon"></i>
-                <Link to="/tai-khoan"><span className="spyeuthich-breadcrumb_link">Tài khoản</span></Link>
+                <Link to="/home/tai-khoan"><span className="spyeuthich-breadcrumb_link">Tài khoản</span></Link>
                 <i className="bx bx-chevron-right doitra-breadcrumb-icon"></i>
                 <span className="spyeuthich-breadcrumb_current">Sản phẩm yêu thích</span>
             </div>
@@ -81,7 +82,7 @@ function SanPhamYeuThich() {
                         <li className="spyeuthich-card" key={product.maSP}>
                             <div className="spyeuthich-card_imgwrap">
                                 <img 
-                                    src={product.hinhAnh?.startsWith('http') ? product.hinhAnh : `http://localhost:8080${product.hinhAnh}`} 
+                                    src={layUrlAnh(product.hinhAnh)}
                                     alt={product.tenSP} 
                                 />
                             </div>
@@ -96,7 +97,7 @@ function SanPhamYeuThich() {
                             </div>
                             
                             <div className="spyeuthich-btn"> 
-                                <Link to={`/chitietsanpham/${product.maSP}`} style={{ width: '100%' }}>
+                                <Link to={`/home/hang/chi-tiet-san-pham/${product.maSP}`} style={{ width: '100%' }}>
                                     <button className="spyeuthich-card_btn">Xem & Mua ngay</button>
                                 </Link>
                                 <button className="spyeuthich-card_remove" onClick={() => xoaYeuThich(product.maSP)}>

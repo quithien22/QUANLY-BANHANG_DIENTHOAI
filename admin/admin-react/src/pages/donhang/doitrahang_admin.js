@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from "react";
 import "./doitrahang_admin.css";
-import axios from "axios";
+import { doiTraHangApi } from "../../API/DoiTraHangApi";
+import { adminSession } from "../../utils/AdminSession";
 import Swal from "sweetalert2";
 
 function DoiTraHang() {
 
-    const adminInfo = JSON.parse(localStorage.getItem("adminInfo") || "null");
+    const adminInfo = adminSession.get();
     const maNV = adminInfo?.maNV;
 
     // ============== DANH SÁCH YÊU CẦU ĐỔI TRẢ ===========
     const [danhSach, setDanhSach] = useState([]);
 
     const taiDanhSach = () => {
-        axios.get("http://localhost:8080/api/doitrahang")
-            .then((response) => setDanhSach(response.data))
+        doiTraHangApi.layDanhSach()
+            .then((danhSachMoi) => setDanhSach(danhSachMoi))
             .catch((error) => console.error("Lỗi khi lấy danh sách đổi trả:", error));
     };
 
@@ -60,11 +61,11 @@ function DoiTraHang() {
         setGhiChuNoiBo("");
         setHinhThucGiaiQuyet("hoan_tien");
 
-        axios.get(`http://localhost:8080/api/doitrahang/${yc.maDoiTra}/chitiet`)
-            .then((response) => {
-                setChiTiet(response.data);
-                setGhiChuNoiBo(response.data.ghiChuNoiBo || "");
-                setHinhThucGiaiQuyet(response.data.hinhThucGiaiQuyet || "hoan_tien");
+        doiTraHangApi.layChiTiet(yc.maDoiTra)
+            .then((chiTietMoi) => {
+                setChiTiet(chiTietMoi);
+                setGhiChuNoiBo(chiTietMoi.ghiChuNoiBo || "");
+                setHinhThucGiaiQuyet(chiTietMoi.hinhThucGiaiQuyet || "hoan_tien");
             })
             .catch((error) => console.error("Lỗi khi lấy chi tiết đổi trả:", error))
             .finally(() => setDangTaiChiTiet(false));
@@ -78,7 +79,7 @@ function DoiTraHang() {
     const xuLyYeuCau = (trangThaiMoi) => {
         if (!chiTiet) return;
 
-        axios.put(`http://localhost:8080/api/doitrahang/xuly/${chiTiet.maDoiTra}`, {
+        doiTraHangApi.xuLy(chiTiet.maDoiTra, {
             trangThai: trangThaiMoi,
             hinhThucGiaiQuyet,
             ghiChuNoiBo,

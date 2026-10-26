@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./themvaogiohang.css";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { cartApi } from "../../../API/CartApi";
+import { promotionApi } from "../../../API/PromotionApi";
+import { layUrlAnh } from "../../../utils/imageUrl";
 
 function ThemVaoGioHang() {
 
@@ -21,8 +23,8 @@ function ThemVaoGioHang() {
             return;
         }
         setDangTai(true);
-        axios.get(`http://localhost:8080/api/giohang/${maKH}`)
-            .then((response) => setDanhSachGioHang(response.data))
+        cartApi.getCart(maKH)
+            .then((data) => setDanhSachGioHang(data))
             .catch((error) => console.error("Lỗi khi tải giỏ hàng:", error))
             .finally(() => setDangTai(false));
     };
@@ -34,9 +36,7 @@ function ThemVaoGioHang() {
 
     // ============== TĂNG / GIẢM SỐ LƯỢNG ===========
     const capNhatSoLuong = (item, soLuongMoi) => {
-        axios.put(`http://localhost:8080/api/giohang/capnhat-soluong/${item.maGioHang}`, {
-            soLuong: soLuongMoi,
-        })
+        cartApi.updateQuantity(item.maGioHang, soLuongMoi)
             .then(() => taiGioHang())
             .catch((error) => console.error("Lỗi khi cập nhật số lượng:", error));
     };
@@ -48,7 +48,7 @@ function ThemVaoGioHang() {
     const xoaKhoiGio = (item) => {
         const xacNhan = window.confirm(`Xóa "${item.tenSP}" khỏi giỏ hàng?`);
         if (!xacNhan) return;
-        axios.delete(`http://localhost:8080/api/giohang/${item.maGioHang}`)
+        cartApi.removeItem(item.maGioHang)
             .then(() => taiGioHang())
             .catch((error) => console.error("Lỗi khi xóa sản phẩm khỏi giỏ:", error));
     };
@@ -61,9 +61,9 @@ function ThemVaoGioHang() {
     const apDungMaGiamGia = () => {
         if (!maNhap.trim()) return;
         setLoiMaGiamGia("");
-        axios.post("http://localhost:8080/api/khuyenmai/ap-dung", { maNhap: maNhap.trim() })
-            .then((response) => {
-                setDanhSachGioHang(response.data);
+        promotionApi.applyCoupon(maNhap.trim())
+            .then((data) => {
+                setDanhSachGioHang(data);
                 // Báo Header cập nhật lại số lượng (sau khi tăng/giảm/xóa)
                 window.dispatchEvent(new Event("gioHangCapNhat"));
             })
@@ -150,7 +150,7 @@ function ThemVaoGioHang() {
                             <li className="add-cart-item" key={item.maGioHang}>
                                 <div className="add-cart-item_imgwrap">
                                     <img
-                                        src={item.hinhAnh?.startsWith('http') ? item.hinhAnh : `http://localhost:8080${item.hinhAnh}`}
+                                        src={layUrlAnh(item.hinhAnh)}
                                         alt={item.tenSP}
                                     />
                                 </div>

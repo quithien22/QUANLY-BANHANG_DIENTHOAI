@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./vanchuyen_admin.css";
-import axios from "axios";
+import { vanChuyenApi } from "../../API/VanChuyenApi";
 
 function VanChuyen_Admin() {
     const [danhSachVanChuyen, setDanhSachVanChuyen] = useState([]);
@@ -39,11 +39,11 @@ function VanChuyen_Admin() {
 // ============== DANH SACH VAN CHUYEN DON HANG 
  
     const taiLaiDanhSachVanChuyen = () => {
-        axios.get("http://localhost:8080/api/vanchuyen")
-            .then((response) => {
-                const duLieu = Array.isArray(response.data)
-                    ? response.data
-                    : response.data?.data || response.data?.content || response.data?.items || [];
+        vanChuyenApi.layDanhSach()
+            .then((danhSach) => {
+                const duLieu = Array.isArray(danhSach)
+                    ? danhSach
+                    : danhSach?.data || danhSach?.content || danhSach?.items || [];
                 const duLieuHopLe = duLieu.filter(vc => chuanHoaTrangThai(vc.trangThai) !== 'da_huy');
                 
                 setDanhSachVanChuyen(duLieuHopLe);
@@ -119,7 +119,7 @@ function VanChuyen_Admin() {
 
     const luuThayDoiVanChuyen = () => {
         if (!donDangSua) return;
-        axios.put(`http://localhost:8080/api/vanchuyen/${donDangSua.maVanChuyen}`, formSua)
+        vanChuyenApi.capNhat(donDangSua.maVanChuyen, formSua)
             .then(() => {
                 hienThiThongBao("Cập nhật vận chuyển thành công!")
                 taiLaiDanhSachVanChuyen();

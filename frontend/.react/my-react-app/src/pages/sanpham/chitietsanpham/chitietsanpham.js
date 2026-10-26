@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "./chitietsanpham.css";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { productApi } from "../../../API/ProductApi";
+import { BASE_URL } from "../../../API/BaseApi";
+import { wishlistApi } from "../../../API/WishlistApi";
 import Swal from "sweetalert2";
 import DanhGiaSanPhamSection from '../danhgia_page/danhgia';
+import { cartApi } from "../../../API/CartApi";
 
 function ChiTietSanPham() {
     const { id } = useParams();
@@ -18,6 +21,39 @@ function ChiTietSanPham() {
 
     const [hinhAnhHienThi, setHinhAnhHienThi] = useState("");
     const [danhSachAnh, setDanhSachAnh] = useState([]);
+
+    // YÊU THÍCH (thả tim) - hook đặt trước các return sớm bên dưới
+    const [daTym, setDaTym] = useState(false);
+    const nguoiDungHienTai = JSON.parse(localStorage.getItem("userData") || "null");
+    const maKHHienTai = nguoiDungHienTai?.maKH;
+
+    useEffect(() => {
+        if (!maKHHienTai || !id) { setDaTym(false); return; }
+        wishlistApi.list(maKHHienTai)
+            .then((data) => setDaTym(data.some((sp) => String(sp.maSP) === String(id))))
+            .catch((err) => console.error("Lỗi tải trạng thái yêu thích:", err));
+    }, [id, maKHHienTai]);
+
+    const xuLyTym = async () => {
+        if (!maKHHienTai) {
+            const ketQua = await Swal.fire({
+                title: "Bạn cần đăng nhập",
+                text: "Vui lòng đăng nhập để thêm sản phẩm vào mục Yêu thích.",
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonText: "Đăng nhập",
+                cancelButtonText: "Để sau",
+            });
+            if (ketQua.isConfirmed) navigate("/login");
+            return;
+        }
+        try {
+            const res = await wishlistApi.toggle(maKHHienTai, id);
+            if (res.success) setDaTym(res.action === 'added');
+        } catch (error) {
+            console.error("Lỗi khi thả tim:", error);
+        }
+    };
     // 2. GỌI API TẢI CHI TIẾT SẢN PHẨM
   useEffect(() => {
         if (!id) return;
@@ -25,9 +61,8 @@ function ChiTietSanPham() {
         setDangTai(true);
         setKhongTimThay(false);
 
-        axios.get(`http://localhost:8080/api/sanpham/chitiet/${id}`)
-            .then((response) => {
-                const sp = response.data;
+        productApi.getDetail(id)
+            .then((sp) => {
                 setSanPham(sp);
                 setDungLuongChon(sp.bienTheDungLuong?.[0] || null);
                 setMauSacChon(sp.bienTheMauSac?.[0] || null);
@@ -63,7 +98,7 @@ function ChiTietSanPham() {
     // ============== HÀM TIỆN ÍCH ===========
     const layUrlAnh = (duongDan) => {
         if (!duongDan) return "";
-        return duongDan.startsWith("http") ? duongDan : `http://localhost:8080${duongDan}`;
+        return duongDan.startsWith("http") ? duongDan : `${BASE_URL}${duongDan}`;
     };
     const dinhDangTien = (soTien) => `${(Number(soTien) || 0).toLocaleString("vi-VN")}đ`;
 
@@ -109,7 +144,7 @@ function ChiTietSanPham() {
         const thongTinPhanLoai = [dungLuongChon?.giaTri, mauSacChon?.giaTri].filter(Boolean).join(" - ");
 
         try {
-            await axios.post("http://localhost:8080/api/giohang/them", {
+            await cartApi.addToCart({
                 maKH: nguoiDung.maKH,
                 maSP: sanPham.maSP,
                 maBienThe: dungLuongChon?.maBienThe || mauSacChon?.maBienThe || null,
@@ -221,7 +256,15 @@ function ChiTietSanPham() {
             {/* TIÊU ĐỀ VÀ ĐÁNH GIÁ */}
             <div className="chitietsp-header">
                 <ul>
-                    <li className="chitietsp-header-name">{sanPham.tenSP}</li>
+                    <li className="chitietsp-header-name">
+                        {sanPham.tenSP}
+                        <i
+                            className={`bx ${daTym ? 'bxs-heart' : 'bx-heart'}`}
+                            onClick={xuLyTym}
+                            title={daTym ? "Bỏ khỏi yêu thích" : "Thêm vào yêu thích"}
+                            style={{ marginLeft: '12px', fontSize: '24px', cursor: 'pointer', verticalAlign: 'middle', color: daTym ? 'red' : '#1D4ED8' }}
+                        />
+                    </li>
                     <a href="#khu-vuc-danh-gia" style={{ textDecoration: 'none', color: 'inherit' }}>
                         <li className="chitietsp-header-rating">
                             <i className="bx bxs-star"></i>

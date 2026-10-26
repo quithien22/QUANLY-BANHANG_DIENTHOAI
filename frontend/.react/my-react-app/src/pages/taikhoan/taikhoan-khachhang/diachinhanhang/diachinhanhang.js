@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { addressApi } from "../../../../API/AddressApi";
 import Swal from "sweetalert2";
 import "./diachinhanhang.css";
 import { Link } from "react-router-dom";
@@ -42,8 +42,8 @@ function DiaChiNhanHang() {
     const taiDanhSachDiaChi = () => {
         if (!maKH) return;
         setDangTai(true);
-        axios.get(`http://localhost:8080/api/diachi/${maKH}`)
-            .then((response) => setDsDiaChi(response.data.data || []))
+        addressApi.list(maKH)
+            .then((data) => setDsDiaChi(data.data || []))
             .catch((error) => console.error("Lỗi lấy sổ địa chỉ:", error))
             .finally(() => setDangTai(false));
     };
@@ -75,19 +75,19 @@ function DiaChiNhanHang() {
         try {
             if (isEditing) {
                 // Gọi API Sửa
-                const response = await axios.put(`http://localhost:8080/api/diachi/sua/${formDiaChi.maDiaChi}`, formDiaChi);
-                if (response.data.success) {
+                const data = await addressApi.update(formDiaChi.maDiaChi, formDiaChi);
+                if (data.success) {
                     hienThiThongBaoDung("Thành công, Đã cập nhật địa chỉ");
                 }
             } else {
                 // Gọi API Thêm
-                const response = await axios.post("http://localhost:8080/api/diachi/them", {
+                const data = await addressApi.add({
                     maKH: maKH,
                     hoTenNguoiNhan: formDiaChi.hoTenNguoiNhan,
                     SDT: formDiaChi.SDT,
                     diaChiChiTiet: formDiaChi.diaChiChiTiet
                 });
-                if (response.data.success) {
+                if (data.success) {
                     hienThiThongBaoDung("Thành công ,Đã thêm địa chỉ mới");
                 }
             }
@@ -100,7 +100,7 @@ function DiaChiNhanHang() {
 
     const xuLyDatMacDinh = async (maDiaChi) => {
         try {
-            await axios.put("http://localhost:8080/api/diachi/dat-mac-dinh", { maKH: maKH, maDiaChi: maDiaChi });
+            await addressApi.setDefault(maKH, maDiaChi);
             taiDanhSachDiaChi();
         } catch (error) {
             console.error(error);
@@ -118,7 +118,7 @@ function DiaChiNhanHang() {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await axios.delete(`http://localhost:8080/api/diachi/xoa/${maDiaChi}`);
+                    await addressApi.remove(maDiaChi);
                     taiDanhSachDiaChi();
                     // Nếu đang sửa chính địa chỉ vừa bị xóa thì reset form
                     if (formDiaChi.maDiaChi === maDiaChi) kichHoatThemMoi();

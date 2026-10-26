@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./doitrahang.css";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import { returnApi } from "../../../../API/ReturnApi";
 
 function DoiTraHang() {
     // ================= STATE QUẢN LÝ FORM TẠO MỚI =================
@@ -34,8 +34,8 @@ function DoiTraHang() {
             const user = JSON.parse(userInfoStr);
             const maKhachHang = user.maKH || user.id;
 
-            axios.get(`http://localhost:8080/api/user/doitrahang/${maKhachHang}`)
-                .then(res => setLichSuDoiTra(res.data))
+            returnApi.list(maKhachHang)
+                .then(data => setLichSuDoiTra(data))
                 .catch(err => console.error("Lỗi tải lịch sử:", err));
         } else {
             console.log("Chưa đăng nhập, không thể tải lịch sử!");
@@ -73,11 +73,9 @@ function DoiTraHang() {
         }
 
         try {
-            const res = await axios.post("http://localhost:8080/api/user/doitrahang/tao", formData, {
-                headers: { "Content-Type": "multipart/form-data" }
-            });
+            const data = await returnApi.create(formData);
 
-            if (res.data.success) {
+            if (data.success) {
                 hienThiThongBao("Đã gửi yêu cầu đổi trả thành công!");
                 setMaHoaDon(""); setLyDo(""); setPhuongThucHoan("");
                 setFileAnh(null); setAnhPreview(null);

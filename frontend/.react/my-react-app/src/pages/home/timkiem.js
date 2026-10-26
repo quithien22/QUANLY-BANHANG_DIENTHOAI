@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
-import axios from "axios";
+import { productApi } from "../../API/ProductApi";
+import { layUrlAnh } from "../../utils/imageUrl";
 import "./timkiem.css";
 
 
@@ -25,9 +26,9 @@ function SuLyTimKiem() {
 
         setDangTai(true);
         setViTriHienTai(0);
-        axios.get(`http://localhost:8080/api/sanpham/tim-kiem?tuKhoa=${encodeURIComponent(tuKhoa)}`)
-            .then((response) => {
-                setDanhSachKetQua(response.data);
+        productApi.search(tuKhoa)
+            .then((data) => {
+                setDanhSachKetQua(data);
             })
             .catch((error) => {
                 console.error("Lỗi tìm kiếm sản phẩm:", error);
@@ -40,10 +41,10 @@ function SuLyTimKiem() {
     const [sanPhamGoiY, setSanPhamGoiY] = useState([]);
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/sanpham ")
-            .then((response) => {
+        productApi.getAll()
+            .then((data) => {
                 // Chỉ lấy 3 sản phẩm đầu tiên 
-                const duLieu = Array.isArray(response.data) ? response.data : [];
+                const duLieu = Array.isArray(data) ? data : [];
                 setSanPhamGoiY(duLieu.slice(0, 3));
             })
             .catch((error) => console.error("Lỗi lấy sản phẩm gợi ý:", error));
@@ -210,7 +211,7 @@ function SuLyTimKiem() {
                                             <li key={i} className="timkiem-card">
                                                 <div className="timkiem-card_imgwrap">
                                                     <img
-                                                        src={sp.hinhAnh?.startsWith('http') ? sp.hinhAnh : `http://localhost:8080${sp.hinhAnh}`}
+                                                        src={layUrlAnh(sp.hinhAnh)}
                                                         alt={sp.tenSP}
                                                     />
                                                 </div>
@@ -244,7 +245,7 @@ function SuLyTimKiem() {
                                     <li key={sp.maSP || i} className="timkiem-card">
                                         <div className="timkiem-card_imgwrap">
                                             <img
-                                                src={sp.hinhAnh?.startsWith('http') ? sp.hinhAnh : `http://localhost:8080${sp.hinhAnh}`}
+                                                src={layUrlAnh(sp.hinhAnh)}
                                                 alt={sp.tenSP}
                                             />
                                         </div>

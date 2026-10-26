@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { paymentApi } from "../../../API/PaymentApi";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
 // Trang MoMo chuyển khách về sau khi thanh toán (redirectUrl)
@@ -19,11 +19,11 @@ function ThanhToanThanhCong() {
             return;
         }
 
-        axios.post("http://localhost:8080/api/payment/momo-xacnhan", params)
-            .then((res) => {
-                setMaHoaDon(res.data.maHoaDon);
-                setTrangThai(res.data.thanhCong ? "thanh_cong" : "that_bai");
-                setThongBao(res.data.message || "");
+        paymentApi.confirmMomo(params)
+            .then((data) => {
+                setMaHoaDon(data.maHoaDon);
+                setTrangThai(data.thanhCong ? "thanh_cong" : "that_bai");
+                setThongBao(data.message || "");
             })
             .catch((err) => {
                 console.error("Lỗi xác nhận thanh toán MoMo:", err);

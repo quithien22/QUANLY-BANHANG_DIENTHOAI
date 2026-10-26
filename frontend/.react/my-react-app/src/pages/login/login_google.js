@@ -1,5 +1,5 @@
 import React from 'react';
-import axios from 'axios';
+import { authApi } from '../../API/AuthApi';
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 
 // Client ID lấy từ file .env của frontend: REACT_APP_GOOGLE_CLIENT_ID=xxxx.apps.googleusercontent.com
@@ -24,10 +24,8 @@ function NutGoogle({ onSuccess, onError }) {
             setDangXuLy(true);
             try {
                 // Gửi token xuống Backend để xác thực với Google và lấy/tạo tài khoản
-                const res = await axios.post('http://localhost:8080/api/user/dang-nhap-google', {
-                    accessToken: tokenResponse.access_token,
-                });
-                onSuccess(res.data.userInfo);
+                const data = await authApi.loginGoogle(tokenResponse.access_token);
+                onSuccess(data.userInfo);
             } catch (err) {
                 onError(err.response?.data?.message || 'Lỗi kết nối đến máy chủ!');
             } finally {

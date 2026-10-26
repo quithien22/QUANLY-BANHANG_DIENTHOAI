@@ -1,20 +1,20 @@
 import React from 'react';
-import axios from 'axios';
+import { paymentApi } from '../../../API/PaymentApi';
 
 function NutThanhToanMoMo({ tongTien, maDonHang }) {
 
     const xuLyThanhToan = async () => {
         try {
             // Gọi API Backend vừa tạo
-            const response = await axios.post('http://localhost:8080/api/payment/momo', {
+            const data = await paymentApi.createMomo({
                 amount: tongTien, // VD: 50000
                 orderId: maDonHang // VD: "DH123456"
             });
 
             // Nếu thành công, MoMo sẽ trả về một đường link tên là payUrl
-            if (response.data && response.data.payUrl) {
+            if (data && data.payUrl) {
                 // Tự động chuyển hướng trình duyệt của khách sang trang quét mã QR của MoMo
-                window.location.href = response.data.payUrl;
+                window.location.href = data.payUrl;
             }
         } catch (error) {
             console.error("Lỗi khi kết nối thanh toán MoMo:", error);

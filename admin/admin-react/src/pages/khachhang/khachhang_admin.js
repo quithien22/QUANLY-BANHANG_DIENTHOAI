@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { khachHangApi } from "../../API/KhachHangApi";
 import "./khachhang_admin.css";
 
 function KhachHang() {
@@ -21,9 +21,9 @@ function KhachHang() {
 
     // GỌI API LẤY DANH SÁCH
     const taiDanhSach = () => {
-        axios.get("http://localhost:8080/api/khachhang")
-            .then((response) => {
-                setDanhSachKhachHang(response.data);
+        khachHangApi.layDanhSach()
+            .then((danhSach) => {
+                setDanhSachKhachHang(danhSach);
             })
             .catch((error) => {
                 console.error("Lỗi khi kết nối tới Backend:", error);
@@ -82,12 +82,12 @@ function KhachHang() {
     const handleLuuSua = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.put(`http://localhost:8080/api/khachhang/sua/${khachHangDangSua.maKH}`, {
+            const ketQua = await khachHangApi.suaThongTin(khachHangDangSua.maKH, {
                 hoTen: tenSua,
                 SDT: sdtSua,
                 trangThai: trangThaiSua === "true" || trangThaiSua === true
             });
-            if (response.data.success || response.status === 200) {
+            if (ketQua.success) {
                 alert("Cập nhật thành công!");
                 setKhachHangDangSua(null);
                 taiDanhSach(); // Tải lại list

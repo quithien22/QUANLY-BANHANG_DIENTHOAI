@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import { reviewApi } from "../../../API/ReviewApi";
+import { userSession } from "../../../utils/UserSession";
+import { layUrlAnh } from "../../../utils/imageUrl";
 import "./danhgia.css";
 
 function formatThoiGian(isoString) {
@@ -28,13 +30,13 @@ function DanhGiaSanPhamSection({ productId }) {
     const [saoSua, setSaoSua] = useState(0);
     const [noiDungSua, setNoiDungSua] = useState("");
 
-    const nguoiDung = JSON.parse(localStorage.getItem("userData") || "null");
+    const nguoiDung = userSession.get();
     const maKH = nguoiDung?.maKH;
 
     const taiDanhSachDanhGia = () => {
         setDangTai(true);
-        axios.get(`http://localhost:8080/api/danhgia/${productId}`)
-            .then(res => setReviews(res.data))
+        reviewApi.list(productId)
+            .then(data => setReviews(data))
             .catch(err => console.error("Lỗi lấy đánh giá:", err))
             .finally(() => setDangTai(false));
     };
@@ -80,9 +82,9 @@ function DanhGiaSanPhamSection({ productId }) {
 
         try {
             const payload = { maSP: productId, maKH, soSao: chonSao, noiDung };
-            const res = await axios.post("http://localhost:8080/api/danhgia/them", payload);
+            const res = await reviewApi.add(payload);
 
-            if (res.data.success) {
+            if (res.success) {
                 setChonSao(0);
                 setNoiDung("");
                 taiDanhSachDanhGia();
@@ -99,11 +101,9 @@ function DanhGiaSanPhamSection({ productId }) {
         if (window.confirm("Bạn có chắc chắn muốn xóa đánh giá này?")) {
             try {
                 // Truyền maKH qua data body trong phương thức DELETE
-                const res = await axios.delete(`http://localhost:8080/api/danhgia/xoa/${maDanhGia}`, {
-                    data: { maKH }
-                });
+                const res = await reviewApi.remove(maDanhGia, maKH);
 
-                if (res.data.success) {
+                if (res.success) {
                     taiDanhSachDanhGia();
                     hienThiThongBao("Đã xóa đánh giá thành công!");
                 }
@@ -126,11 +126,9 @@ function DanhGiaSanPhamSection({ productId }) {
         if (saoSua === 0 || noiDungSua.trim() === "") return alert("Vui lòng không để trống nội dung hoặc sao!");
 
         try {
-            const res = await axios.put(`http://localhost:8080/api/danhgia/sua/${maDanhGia}`, {
-                maKH, soSao: saoSua, noiDung: noiDungSua
-            });
+            const res = await reviewApi.update(maDanhGia, { maKH, soSao: saoSua, noiDung: noiDungSua });
 
-            if (res.data.success) {
+            if (res.success) {
                 setIdDangSua(null); // Tắt form sửa
                 taiDanhSachDanhGia();
                 hienThiThongBao("Đã cập nhật đánh giá!");
@@ -307,7 +305,7 @@ function DanhGiaSanPhamSection({ productId }) {
                                                 <img
                                                     key={idx}
                                                     className="danhgia-img"
-                                                    src={imgUrl?.startsWith('http') ? imgUrl : `http://localhost:8080${imgUrl}`}
+                                                    src={layUrlAnh(imgUrl)}
                                                     alt="Đánh giá"
                                                 />
                                             ))}

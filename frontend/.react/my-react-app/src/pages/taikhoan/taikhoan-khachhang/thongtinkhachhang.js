@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./thongtinkhachhang.css";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import axios from "axios";
+import { customerApi } from "../../../API/CustomerApi";
 
 function ThongTinkhachHang() {
     const navigate = useNavigate();
@@ -37,10 +37,10 @@ function ThongTinkhachHang() {
         setGioiTinh(storedUser.gioiTinh || "Nam");
         setNgaySinh(storedUser.ngaySinh ? storedUser.ngaySinh.substring(0, 10) : "");
 
-        axios.get(`http://localhost:8080/api/khachhang/${storedUser.maKH}`)
+        customerApi.getProfile(storedUser.maKH)
             .then(res => {
-                if (res.data.success) {
-                    const freshData = Array.isArray(res.data.data) ? res.data.data[0] : res.data.data;
+                if (res.success) {
+                    const freshData = Array.isArray(res.data) ? res.data[0] : res.data;
 
                     if (freshData) {
                         setUserData(prev => ({
@@ -107,13 +107,13 @@ function ThongTinkhachHang() {
         }
 
         try {
-            const response = await axios.put("http://localhost:8080/api/user/doi-mat-khau", {
+            const data = await customerApi.changePassword({
                 maKH: userData.maKH,
                 matKhauCu: matKhauCu,
                 matKhauMoi: matKhauMoi,
             });
 
-            if (response.status === 200) {
+            if (data.success) {
                 Swal.fire("Thành công!", "Đổi mật khẩu thành công.", "success");
                 setMatKhauCu("");
                 setMatKhauMoi("");
@@ -131,7 +131,7 @@ function ThongTinkhachHang() {
     // LUU THONG TIN DANG NHAP
     const handleLuuThayDoi = async () => {
         try {
-            const response = await axios.put("http://localhost:8080/api/user/cap-nhat-info", {
+            const data = await customerApi.updateInfo({
                 maKH: userData.maKH,
                 hoTen: hoTen,
                 gioiTinh: gioiTinh,
@@ -141,7 +141,7 @@ function ThongTinkhachHang() {
                 email: email
             });
 
-            if (response.status === 200) {
+            if (data.success) {
                 setIsModalOpen(false);
 
                 const updatedUserData = {

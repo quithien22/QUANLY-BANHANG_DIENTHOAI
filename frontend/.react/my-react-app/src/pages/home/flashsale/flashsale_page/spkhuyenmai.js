@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
 import "./spkhuyenmai.css";
-import axios from "axios";
+import { promotionApi } from "../../../../API/PromotionApi";
+import { layUrlAnh } from "../../../../utils/imageUrl";
 import { Link } from "react-router-dom";
 
 function SanPhamKhuyenMai() {
     const [danhSachKhuyenMai, setDanhSachKhuyenMai] = useState([]);
 
     const taiLaiDanhSachKhuyenMai = () => {
-        axios.get("http://localhost:8080/api/user/khuyenmai")
-            .then((response) => {
-                const duLieu = Array.isArray(response.data)
-                    ? response.data
-                    : response.data?.data || response.data?.content || response.data?.items || [];
+        promotionApi.getFlashSale()
+            .then((data) => {
+                const duLieu = Array.isArray(data)
+                    ? data
+                    : data?.data || data?.content || data?.items || [];
                 setDanhSachKhuyenMai(Array.isArray(duLieu) ? duLieu : []);
             })
             .catch((error) => {
@@ -77,7 +78,7 @@ function SanPhamKhuyenMai() {
 
             const now = new Date();
             // Đã đổi Regex để bắt định dạng HH:MM cho phù hợp với kiểu VarChar mới
-            const timeMatch = slot.gioKT.match(/(\d{2}):(\d{2})/); 
+            const timeMatch = slot.gioKT.match(/(\d{2}):(\d{2})/);
             if (!timeMatch) return;
 
             const thoiGianKT = new Date();
@@ -100,28 +101,37 @@ function SanPhamKhuyenMai() {
 
 
     //  ================ PHAN TRANG =========
-   const soLuongMotTrang = 8;
+    const soLuongMotTrang = 8;
     const [trangHienTai, setTrangHienTai] = useState(1);
- 
+
     const slotDangChon = danhSachKhungGio.find(kg => kg.maKhungGio === khungGioActive);
     const laKhungGioDaKetThuc = slotDangChon && slotDangChon.trangThai === "Đã kết thúc";
- 
-    const sanPhamCuaKhungGio = laKhungGioDaKetThuc 
-        ? [] 
+
+    const sanPhamCuaKhungGio = laKhungGioDaKetThuc
+        ? []
         : danhSachKhuyenMai.filter(sp => sp.maKhungGio === khungGioActive);
- 
+
     const tinhSoTrang = Math.ceil(sanPhamCuaKhungGio.length / soLuongMotTrang);
     const viTriBatDau = (trangHienTai - 1) * soLuongMotTrang;
     const sanPhamDangHien = sanPhamCuaKhungGio.slice(viTriBatDau, viTriBatDau + soLuongMotTrang);
- 
+
     const danhSachTrang = Array.from({ length: tinhSoTrang }, (_, i) => i + 1);
     // ====================================================
 
     return (
         <div className="spflashsale-page">
-            <div className="spflashsale-breadcrumb">
-                <span className="spflashsale-breadcrumb_home">Trang chủ</span> &gt; <span className="spflashsale-breadcrumb_current">Flash sale giờ vàng</span>
-            </div>
+            <ul className="spflashsale-breadcrumb">
+                <Link to="/home">
+                    <li className="spflashsale-breadcrumb_item">
+                        <span className="spflashsale-breadcrumb_item-tc">Trang chủ</span>
+                        <i className="bx bx-chevron-right"></i>
+                    </li>
+                </Link>
+
+                <li className="spflashsale-breadcrumb_item ">
+                    <span className="spflashsale-breadcrumb_item-dh">Flash sale giờ vàng</span>
+                </li>
+            </ul>
 
             <div className="spflashsale-timeslots">
                 {danhSachKhungGio.map((kg, index) => {
@@ -180,7 +190,7 @@ function SanPhamKhuyenMai() {
                                 <div className="spflashsale-card_imgwrap">
                                     {product.badge && <span className="spflashsale-badge">{product.badge}</span>}
                                     <img
-                                        src={product.hinhAnh?.startsWith('http') ? product.hinhAnh : `http://localhost:8080${product.hinhAnh}`}
+                                        src={layUrlAnh(product.hinhAnh)}
                                         alt={product.tenSP}
                                     />
                                 </div>
@@ -217,13 +227,13 @@ function SanPhamKhuyenMai() {
                         {/* Thay đổi icon và nội dung dựa theo việc khung giờ đã kết thúc hay chưa có sản phẩm */}
                         <i className={laKhungGioDaKetThuc ? "bx bx-time-five" : "bx bx-package"}></i>
                         <span>
-                            {laKhungGioDaKetThuc 
-                                ? "Khung giờ Flash Sale này đã kết thúc!" 
+                            {laKhungGioDaKetThuc
+                                ? "Khung giờ Flash Sale này đã kết thúc!"
                                 : "Chưa có sản phẩm nào trong khung giờ này."}
                         </span>
                         <p>
-                            {laKhungGioDaKetThuc 
-                                ? "Rất tiếc, các ưu đãi trong khung giờ này đã hết hạn. Vui lòng chọn khung giờ khác nhé!" 
+                            {laKhungGioDaKetThuc
+                                ? "Rất tiếc, các ưu đãi trong khung giờ này đã hết hạn. Vui lòng chọn khung giờ khác nhé!"
                                 : "Chương trình ưu đãi có thể chưa bắt đầu. Vui lòng quay lại sau nhé!"}
                         </p>
                     </div>

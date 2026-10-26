@@ -1,70 +1,55 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./login_admin.css";
 import bannerimages from '../../images-admin/baner-login.png';
-import axios from "axios";
 import myVideo from "../../assets/back_ground_admin.mp4";
 import Swal from 'sweetalert2';
 
+// Các lớp đối tượng (OOP) dùng cho trang đăng nhập
+import { adminAuthApi } from "../../API/AdminAuthApi";
+import { chamCongApi } from "../../API/ChamCongApi";
+import { adminSession } from "../../utils/AdminSession";
+import { adminLoginValidator } from "../../utils/AdminLoginValidator";
+
 function LoginAdmin() {
-    // Gộp chung thành 1 state duy nhất là taiKhoan
-    const [taiKhoan, setTaiKhoan] = useState("");
+    const navigate = useNavigate();
+
+    // Nếu lần trước có tick "Ghi nhớ đăng nhập" thì tự điền sẵn tài khoản (KHÔNG lưu mật khẩu)
+    const [taiKhoan, setTaiKhoan] = useState(adminSession.getRememberedAccount());
     const [matKhau, setMatKhau] = useState("");
     const [thongBaoLoi, setThongBaoLoi] = useState("");
-    
-    const [hienThiMatKhau, setHienThiMatKhau] = useState(false);
-    const [ghiNho, setGhiNho] = useState(false);
 
+    const [hienThiMatKhau, setHienThiMatKhau] = useState(false);
+    const [ghiNho, setGhiNho] = useState(adminSession.getRememberedAccount() !== "");
+
+    // Dọn mật khẩu cũ từng bị lưu dạng văn bản thường trong trình duyệt
     useEffect(() => {
-        const savedTaiKhoan = localStorage.getItem("adminSavedTaiKhoan");
-        const savedMK = localStorage.getItem("adminSavedMK");
-        if (savedTaiKhoan && savedMK) {
-            setTaiKhoan(savedTaiKhoan);
-            setMatKhau(savedMK);
-            setGhiNho(true);
-        }
+        adminSession.removeLegacyPassword();
     }, []);
 
     const handleDangNhap = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         setThongBaoLoi("");
 
-        if (!taiKhoan.trim() || !matKhau.trim()) {
-            setThongBaoLoi("Vui lòng nhập đầy đủ thông tin đăng nhập!");
+        // 1. Kiểm tra dữ liệu nhập
+        const loi = adminLoginValidator.validate(taiKhoan, matKhau);
+        if (loi) {
+            setThongBaoLoi(loi);
             return;
         }
 
-        // KIỂM TRA THÔNG MINH: Chỉ ép kiểu @gmail.com NẾU người dùng đang nhập email (có dấu @)
-        if (taiKhoan.includes("@") && !taiKhoan.trim().toLowerCase().endsWith("@gmail.com")) {
-            setThongBaoLoi("Nếu dùng Email, tài khoản phải có định dạng @gmail.com!");
-            return;
-        }
-
-        if (matKhau.length < 6) {
-            setThongBaoLoi("Mật khẩu phải có ít nhất 6 ký tự!");
-            return;
-        }
-
+        // 2. Gọi API đăng nhập
         try {
-            const response = await axios.post("http://localhost:8080/api/admin/dang-nhap", {
-                taiKhoan: taiKhoan, // Truyền biến taiKhoan lên Backend
-                matKhau: matKhau
-            });
+            const data = await adminAuthApi.login(taiKhoan.trim(), matKhau);
 
-            if (response.status === 200) {
-                if (ghiNho) {
-                    localStorage.setItem("adminSavedTaiKhoan", taiKhoan);
-                    localStorage.setItem("adminSavedMK", matKhau);
-                } else {
-                    localStorage.removeItem("adminSavedTaiKhoan");
-                    localStorage.removeItem("adminSavedMK");
-                }
+            if (data.success) {
+                // Lưu phiên đăng nhập + ghi nhớ tài khoản
+                adminSession.save(data.adminInfo);
+                adminSession.rememberAccount(taiKhoan, ghiNho);
 
-                localStorage.setItem("adminData", JSON.stringify(response.data.adminInfo));
-
+                // Chấm công tự động (lỗi ở đây không được chặn việc đăng nhập)
                 try {
-                    await axios.post("http://localhost:8080/api/chamcong/tu-dong", {
-                        maNV: response.data.adminInfo.maNV
-                    });
+                    await chamCongApi.chamCongTuDong(data.adminInfo.maNV);
                 } catch (err) {
                     console.error("Lỗi gọi chấm công tự động ngầm:", err);
                 }
@@ -76,15 +61,12 @@ function LoginAdmin() {
                     showConfirmButton: false,
                     timer: 1500
                 }).then(() => {
-                    window.location.href = "/admin/dashboard";
+                    navigate("/admin/dashboard");
                 });
             }
         } catch (error) {
-            if (error.response && error.response.data.message) {
-                setThongBaoLoi(error.response.data.message);
-            } else {
-                setThongBaoLoi("Sai thông tin đăng nhập hoặc lỗi máy chủ!");
-            }
+            // error là ApiError: error.message đã là thông báo từ backend (hoặc câu mặc định)
+            setThongBaoLoi(error.message || "Sai thông tin đăng nhập hoặc lỗi máy chủ!");
             console.error(error);
         }
     };
@@ -98,7 +80,6 @@ function LoginAdmin() {
             confirmButtonColor: '#2563eb'
         });
     };
- 
 
     return (
         <div className="login-admin-container">
@@ -158,9 +139,10 @@ function LoginAdmin() {
                                 placeholder="Nhập mật khẩu..."
                                 value={matKhau}
                                 onChange={(e) => setMatKhau(e.target.value)}
+                                onKeyDown={(e) => { if (e.key === "Enter") handleDangNhap(e); }}
                             />
-                            <i 
-                                className={`bx ${hienThiMatKhau ? 'bx-hide' : 'bx-show'} input-icon-eye`} 
+                            <i
+                                className={`bx ${hienThiMatKhau ? 'bx-hide' : 'bx-show'} input-icon-eye`}
                                 onClick={() => setHienThiMatKhau(!hienThiMatKhau)}
                                 style={{ cursor: 'pointer' }}
                             />
@@ -169,21 +151,21 @@ function LoginAdmin() {
 
                     <div className="form-options">
                         <div className="remember-me">
-                            <input 
-                                className="checkbox-input" 
-                                type="checkbox" 
-                                id="remember" 
+                            <input
+                                className="checkbox-input"
+                                type="checkbox"
+                                id="remember"
                                 checked={ghiNho}
                                 onChange={(e) => setGhiNho(e.target.checked)}
                             />
-                            <label htmlFor="remember" className="checkbox-label" style={{cursor: 'pointer'}}>Ghi nhớ đăng nhập</label>
+                            <label htmlFor="remember" className="checkbox-label" style={{ cursor: 'pointer' }}>Ghi nhớ đăng nhập</label>
                         </div>
                         <span className="forgot-password" onClick={handleQuenMatKhau} style={{ cursor: 'pointer' }}>
                             Quên mật khẩu?
                         </span>
                     </div>
 
-                    <button  className="btn-submit" onClick={handleDangNhap}>
+                    <button className="btn-submit" onClick={handleDangNhap}>
                         Đăng nhập
                     </button>
 

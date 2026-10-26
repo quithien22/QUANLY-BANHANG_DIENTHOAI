@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { authApi } from '../../API/AuthApi';
 import Swal from 'sweetalert2';
 
 import './register.css';
@@ -33,12 +33,9 @@ function Register() {
 
         // Gửi dữ liệu lên API Backend
         try {
-            const response = await axios.post("http://localhost:8080/api/user/dang-ky", {
-                taiKhoan: taiKhoan,
-                matKhau: matKhau
-            });
+            const data = await authApi.register(taiKhoan, matKhau);
 
-            if (response.data.success) {
+            if (data.success) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Đăng ký thành công!',

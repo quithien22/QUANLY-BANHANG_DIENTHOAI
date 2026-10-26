@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { hoaDonApi } from "../../API/HoaDonApi";
 import "./quanlyhd_admin.css";
 
 function QuanLyDonHang() {
@@ -22,9 +22,9 @@ function QuanLyDonHang() {
     };
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/hoadon/toanbo")
-            .then((response) => {
-                setDanhSachHoaDon(response.data);
+        hoaDonApi.layToanBo()
+            .then((danhSach) => {
+                setDanhSachHoaDon(danhSach);
             })
             .catch((error) => {
                 console.error("Lỗi khi kết nối tới Backend:", error);
@@ -95,10 +95,8 @@ function QuanLyDonHang() {
 
     const handleCapNhatTrangThai = async (maHoaDon, trangThaiMoi) => {
         try {
-            const response = await axios.put(`http://localhost:8080/api/hoadon/capnhat-trangthai/${maHoaDon}`, {
-                trangThai: trangThaiMoi
-            });
-            if (response.data.success) {
+            const ketQua = await hoaDonApi.capNhatTrangThai(maHoaDon, trangThaiMoi);
+            if (ketQua.success) {
                 hienThiThongBao("Cập nhật trạng thái thành công!");
                 setDanhSachHoaDon(prevList =>
                     prevList.map(dh => dh.maHoaDon === maHoaDon ? { ...dh, trangThai: trangThaiMoi } : dh)

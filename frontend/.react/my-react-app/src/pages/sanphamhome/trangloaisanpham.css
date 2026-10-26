@@ -57,6 +57,7 @@
 }
 
 .tlsp-heart {
+    z-index: 10; /* nằm trên ảnh (ảnh bị transform khi hover sẽ đè lên tim nếu thiếu dòng này) */
     position: absolute;
     top: 0;
     left: 0;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { contentApi } from "../../../API/ContentApi";
 import './banner.css';
 
 const THOI_GIAN_TU_CHUYEN = 5000; // 5 giây đổi slide
@@ -14,10 +14,10 @@ function Banner() {
 
   // 1. Lấy banner từ CSDL (admin thêm/sửa/tắt thì ngoài trang chủ tự đổi theo)
   useEffect(() => {
-    axios.get("http://localhost:8080/api/caidat/banner")
-      .then(res => {
+    contentApi.getBanners()
+      .then(data => {
         // Chỉ lấy banner đang bật VÀ có ảnh (bỏ qua banner bị thiếu link ảnh)
-        const activeBanners = res.data.filter(b => (b.trangThai === 1 || b.trangThai === true) && b.hinhAnh);
+        const activeBanners = data.filter(b => (b.trangThai === 1 || b.trangThai === true) && b.hinhAnh);
 
         setBannerSlides(activeBanners.filter(b => b.viTri === 'slider_chinh'));
         setBannerPhuTruoc(activeBanners.find(b => b.viTri === 'phu_tren') || null);

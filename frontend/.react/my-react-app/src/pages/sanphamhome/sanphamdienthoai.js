@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./sanphamdienthoai.css";
-import axios from "axios";
+import { productApi } from "../../API/ProductApi";
+import { userSession } from "../../utils/UserSession";
+import { wishlistApi } from "../../API/WishlistApi";
+import { layUrlAnh } from "../../utils/imageUrl";
 import { Link } from "react-router-dom";
 
 
@@ -13,18 +16,18 @@ function DanhSachSanPhamTheoLoai({ tieuDe, maLSP }) {
     const [danhSachTym, setDanhSachTym] = useState([]);
 
     // LẤY THÔNG TIN KHÁCH HÀNG TỪ LOCAL STORAGE
-    const nguoiDung = JSON.parse(localStorage.getItem("userData") || "null");
+    const nguoiDung = userSession.get();
     const maKH = nguoiDung?.maKH;
 
     //  GỌI API DỰA TRÊN maLSP
     useEffect(() => {
         if (!maLSP) return;
 
-        axios.get(`http://localhost:8080/api/sanpham/loai-san-pham/${maLSP}`)
-            .then((response) => {
-                const duLieu = Array.isArray(response.data)
-                    ? response.data
-                    : response.data?.data || response.data?.content || response.data?.items || [];
+        productApi.getByType(maLSP)
+            .then((data) => {
+                const duLieu = Array.isArray(data)
+                    ? data
+                    : data?.data || data?.content || data?.items || [];
                 setDanhSachSP(Array.isArray(duLieu) ? duLieu : []);
             })
             .catch((error) => {
@@ -35,10 +38,10 @@ function DanhSachSanPhamTheoLoai({ tieuDe, maLSP }) {
     // GỌI API LẤY DANH SÁCH TIM BAN ĐẦU CỦA USER
     useEffect(() => {
         if (maKH) {
-            axios.get(`http://localhost:8080/api/yeuthich/${maKH}`)
-                .then((response) => {
+            wishlistApi.list(maKH)
+                .then((data) => {
                     // Chỉ lấy mảng mã SP để dễ so sánh (VD: ['SP01', 'SP05'])
-                    const mangMaSP = response.data.map(sp => sp.maSP);
+                    const mangMaSP = data.map(sp => sp.maSP);
                     setDanhSachTym(mangMaSP);
                 })
                 .catch(err => console.error("Lỗi tải danh sách tim:", err));
@@ -53,9 +56,9 @@ function DanhSachSanPhamTheoLoai({ tieuDe, maLSP }) {
         }
 
         try {
-            const res = await axios.post("http://localhost:8080/api/yeuthich/toggle", { maKH, maSP });
-            if (res.data.success) {
-                if (res.data.action === 'added') {
+            const res = await wishlistApi.toggle(maKH, maSP);
+            if (res.success) {
+                if (res.action === 'added') {
                     setDanhSachTym(prev => [...prev, maSP]); // Thêm vào mảng local (Đỏ)
                 } else {
                     setDanhSachTym(prev => prev.filter(id => id !== maSP)); // Xóa khỏi mảng local (Rỗng)
@@ -130,7 +133,7 @@ function DanhSachSanPhamTheoLoai({ tieuDe, maLSP }) {
                                     />
 
                                     {product.badge && <span className="spdienthoai-badge">{product.badge}</span>}
-                                    <img src={product.hinhAnh?.startsWith('http') ? product.hinhAnh : `http://localhost:8080${product.hinhAnh}`} alt={product.tenSP} />
+                                    <img src={layUrlAnh(product.hinhAnh)} alt={product.tenSP} />
                                 </div>
 
                                 {/* Luôn render khung chứa tag (kể cả rỗng) để giữ đúng chiều cao,

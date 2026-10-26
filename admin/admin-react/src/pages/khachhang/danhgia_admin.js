@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import './danhgia_admin.css';
-import axios from "axios";
+import { danhGiaApi } from "../../API/DanhGiaApi";
+import { adminSession } from "../../utils/AdminSession";
 
 function DanhGia_Admin() {
     // =============== LAY NHAN VIEN HIEN TAI ======== 
-    const nhanVien = JSON.parse(localStorage.getItem("adminData") || localStorage.getItem("userData") || "null");
+    const nhanVien = adminSession.get();
     const maNV = nhanVien?.maNV || "NV01";
 
     // DANH SACH DANH GIA
@@ -12,9 +13,9 @@ function DanhGia_Admin() {
 
     // ===================== API DANH SACH DANH GIA SAN PHAM ===============
     const taiDanhSachAdmin = () => {
-        axios.get("http://localhost:8080/api/admin/danhgiasanpham")
-            .then((response) => {
-                setdanhSachDanhGia(response.data);
+        danhGiaApi.layDanhSach()
+            .then((danhSach) => {
+                setdanhSachDanhGia(danhSach);
             })
             .catch((error) => {
                 console.error("Lỗi khi kết nối tới Backend:", error);
@@ -64,7 +65,7 @@ function DanhGia_Admin() {
 
         setDangXuLy((prev) => ({ ...prev, [dg.maDanhGia]: true }));
 
-        axios.post(`http://localhost:8080/api/admin/danhgia/phanhoi`, {
+        danhGiaApi.guiPhanHoi({
             maDanhGia: dg.maDanhGia,
             maNV: maNV,
             noiDung: noiDung,
@@ -99,7 +100,7 @@ function DanhGia_Admin() {
         const xacNhan = window.confirm(`Bạn có chắc chắn muốn xóa đánh giá này không?`);
         if (!xacNhan) return;
 
-        axios.delete(`http://localhost:8080/api/admin/danhgia/xoa/${dg.maDanhGia}`)
+        danhGiaApi.xoa(dg.maDanhGia)
             .then(() => {
                 setdanhSachDanhGia((ds) => ds.filter((item) => item.maDanhGia !== dg.maDanhGia));
             })

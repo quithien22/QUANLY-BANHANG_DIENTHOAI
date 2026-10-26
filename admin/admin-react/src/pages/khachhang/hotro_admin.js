@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { hoTroApi } from "../../API/HoTroApi";
 import Swal from "sweetalert2";
 import "./hotro_admin.css";
 
@@ -17,11 +17,11 @@ function HoTro() {
     // 1. Lấy dữ liệu FAQ
     const taiDuLieuFAQ = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/api/faq");
-            setDanhMucFAQ(res.data);
+            const danhSach = await hoTroApi.layFaq();
+            setDanhMucFAQ(danhSach);
             // Mặc định chọn danh mục đầu tiên cho form câu hỏi
-            if (res.data.length > 0 && !formCauHoi.maDanhMuc) {
-                setFormCauHoi({ ...formCauHoi, maDanhMuc: res.data[0].maDanhMuc });
+            if (danhSach.length > 0 && !formCauHoi.maDanhMuc) {
+                setFormCauHoi({ ...formCauHoi, maDanhMuc: danhSach[0].maDanhMuc });
             }
         } catch (error) {
             console.error("Lỗi tải FAQ:", error);
@@ -36,7 +36,7 @@ function HoTro() {
     const handleThemDanhMuc = async () => {
         if (!tenDanhMucMoi.trim()) return Swal.fire("Lỗi", "Vui lòng nhập tên danh mục!", "warning");
         try {
-            await axios.post("http://localhost:8080/api/admin/faq/danhmuc", { tenDanhMuc: tenDanhMucMoi });
+            await hoTroApi.themDanhMuc({ tenDanhMuc: tenDanhMucMoi });
             Swal.fire("Thành công", "Đã thêm danh mục mới", "success");
             setTenDanhMucMoi("");
             taiDuLieuFAQ();
@@ -51,7 +51,7 @@ function HoTro() {
             return Swal.fire("Lỗi", "Vui lòng điền đủ thông tin câu hỏi cơ bản!", "warning");
         }
         try {
-            await axios.post("http://localhost:8080/api/admin/faq/cauhoi", formCauHoi);
+            await hoTroApi.themCauHoi(formCauHoi);
             Swal.fire("Thành công", "Đã thêm câu hỏi vào danh mục", "success");
             // Reset text và đính kèm, giữ nguyên danh mục
             setFormCauHoi({ ...formCauHoi, cauHoi: "", traLoi: "", linkLienQuan: "", anhLienQuan: "" }); 
@@ -72,7 +72,7 @@ function HoTro() {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await axios.delete(`http://localhost:8080/api/admin/faq/cauhoi/${maCauHoi}`);
+                    await hoTroApi.xoaCauHoi(maCauHoi);
                     Swal.fire("Đã xóa", "Câu hỏi đã được xóa", "success");
                     taiDuLieuFAQ();
                 } catch (error) {

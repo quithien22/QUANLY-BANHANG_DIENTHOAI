@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { orderApi } from "../../../../API/OrderApi";
 import "./lichsumuahang.css";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -16,9 +16,9 @@ function LichSuMuaHang() {
     useEffect(() => {
         if (!maKH) return;
         setDangTai(true);
-        axios.get(`http://localhost:8080/api/hoadon/lich-su/${maKH}`)
-            .then((res) => {
-                setDanhSachHD(res.data.data || []);
+        orderApi.getHistory(maKH)
+            .then((data) => {
+                setDanhSachHD(data.data || []);
             })
             .catch((err) => console.error("Lỗi lấy lịch sử đơn hàng:", err))
             .finally(() => setDangTai(false));
@@ -47,8 +47,8 @@ function LichSuMuaHang() {
   // Hàm xử lý nút Đặt lại đơn hàng -> Chuyển hướng đến trang tiến hành đặt hàng
 const xuLyDatLai = async (hd) => {
     try {
-        const resChiTiet = await axios.get(`http://localhost:8080/api/hoadon/chi-tiet/${hd.maHoaDon}`);
-        const danhSachSanPham = resChiTiet.data.data || [];
+        const resChiTiet = await orderApi.getItems(hd.maHoaDon);
+        const danhSachSanPham = resChiTiet.data || [];
 
         if (danhSachSanPham.length === 0) {
             alert("Không tìm thấy sản phẩm trong đơn hàng này!");

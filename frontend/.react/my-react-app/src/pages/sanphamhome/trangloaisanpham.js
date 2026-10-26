@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import { productApi } from '../../API/ProductApi';
+import { userSession } from '../../utils/UserSession';
+import { wishlistApi } from '../../API/WishlistApi';
+import { layUrlAnh } from '../../utils/imageUrl';
 import "./trangloaisanpham.css";
 
 function TrangLoaiSanPham() {
@@ -12,14 +15,14 @@ function TrangLoaiSanPham() {
 
     // Khởi tạo state cho tính năng thả tim
     const [danhSachTym, setDanhSachTym] = useState([]);
-    const nguoiDung = JSON.parse(localStorage.getItem("userData") || "null");
+    const nguoiDung = userSession.get();
     const maKH = nguoiDung?.maKH;
 
     // 1. Gọi API để kéo toàn bộ sản phẩm thuộc loại này
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/sanpham/loai-san-pham/${maLSP}`)
-            .then(res => {
-                const duLieu = Array.isArray(res.data) ? res.data : res.data?.data || [];
+        productApi.getByType(maLSP)
+            .then(data => {
+                const duLieu = Array.isArray(data) ? data : data?.data || [];
                 setDanhSach(duLieu);
             })
             .catch(err => console.error("Lỗi:", err));
@@ -28,9 +31,9 @@ function TrangLoaiSanPham() {
     // 2. Gọi API lấy danh sách tim ban đầu
     useEffect(() => {
         if (maKH) {
-            axios.get(`http://localhost:8080/api/yeuthich/${maKH}`)
-                .then((response) => {
-                    const mangMaSP = response.data.map(sp => sp.maSP);
+            wishlistApi.list(maKH)
+                .then((data) => {
+                    const mangMaSP = data.map(sp => sp.maSP);
                     setDanhSachTym(mangMaSP);
                 })
                 .catch(err => console.error("Lỗi tải danh sách tim:", err));
@@ -44,9 +47,9 @@ function TrangLoaiSanPham() {
             return;
         }
         try {
-            const res = await axios.post("http://localhost:8080/api/yeuthich/toggle", { maKH, maSP });
-            if (res.data.success) {
-                if (res.data.action === 'added') {
+            const res = await wishlistApi.toggle(maKH, maSP);
+            if (res.success) {
+                if (res.action === 'added') {
                     setDanhSachTym(prev => [...prev, maSP]);
                 } else {
                     setDanhSachTym(prev => prev.filter(id => id !== maSP));
@@ -83,7 +86,7 @@ function TrangLoaiSanPham() {
                                 />
 
                                 {product.badge && <span className="tlsp-badge">{product.badge}</span>}
-                                <img src={product.hinhAnh?.startsWith('http') ? product.hinhAnh : `http://localhost:8080${product.hinhAnh}`} alt={product.tenSP} />
+                                <img src={layUrlAnh(product.hinhAnh)} alt={product.tenSP} />
                             </div>
 
                             <span className="tlsp-card_tag-slot">

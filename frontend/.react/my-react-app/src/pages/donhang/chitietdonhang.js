@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./chitietdonhang.css";
-import axios from "axios";
+import { orderApi } from "../../API/OrderApi";
+import { layUrlAnh } from "../../utils/imageUrl";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 
@@ -20,9 +21,9 @@ function ChiTietDonHang() {
         }
 
         setDangTai(true);
-        axios.get(`http://localhost:8080/api/hoadon/khachhang/${maKH}`)
-            .then(response => {
-                setDanhSachDonHang(response.data);
+        orderApi.getOrders(maKH)
+            .then(data => {
+                setDanhSachDonHang(data);
             })
             .catch(error => console.error("Lỗi tải lịch sử đơn hàng:", error))
             .finally(() => setDangTai(false));
@@ -90,9 +91,9 @@ function ChiTietDonHang() {
         if (xacNhan.isConfirmed) {
             try {
                 // 2. Gọi API gửi yêu cầu hủy xuống Backend
-                const response = await axios.put(`http://localhost:8080/api/hoadon/huy-don/${maHoaDon}`);
+                const data = await orderApi.cancelOrder(maHoaDon);
 
-                if (response.data.success) {
+                if (data.success) {
                     Swal.fire('Thành công!', 'Đơn hàng đã được hủy.', 'success');
 
                     // 3. Cập nhật lại state lập tức để đổi màu UI sang "Đã hủy" (không cần load lại trang)
@@ -112,10 +113,13 @@ function ChiTietDonHang() {
     return (
         <div className="chitietdonhang-page">
             <ul className="chitietdonhang-breadcrumb">
-                <li className="chitietdonhang-breadcrumb_item">
-                    <span className="chitietdonhang-breadcrumb_item-tc">Trang chủ</span>
-                    <i className="bx bx-chevron-right"></i>
-                </li>
+                <Link to = "/home">
+                    <li className="chitietdonhang-breadcrumb_item">
+                        <span className="chitietdonhang-breadcrumb_item-tc">Trang chủ</span>
+                        <i className="bx bx-chevron-right"></i>
+                    </li>
+                </Link>
+                
                 <li className="chitietdonhang-breadcrumb_item ">
                     <span className="chitietdonhang-breadcrumb_item-dh">Đơn hàng của bạn</span>
                 </li>
@@ -173,7 +177,7 @@ function ChiTietDonHang() {
                                         <li className="chitietdonhang-product_item" key={spIndex}>
                                             <div className="chitietdonhang-product_info">
                                                 <img
-                                                    src={sp.hinhAnh?.startsWith('http') ? sp.hinhAnh : `http://localhost:8080${sp.hinhAnh}`}
+                                                    src={layUrlAnh(sp.hinhAnh)}
                                                     alt={sp.tenSP}
                                                     className="chitietdonhang-product_img"
                                                 />

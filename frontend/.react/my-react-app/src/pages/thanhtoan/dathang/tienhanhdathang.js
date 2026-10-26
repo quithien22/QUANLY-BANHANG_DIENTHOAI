@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./tienhanhdathang.css";
-import axios from "axios";
+import { addressApi } from "../../../API/AddressApi";
+import { orderApi } from "../../../API/OrderApi";
+import { paymentApi } from "../../../API/PaymentApi";
 import { useNavigate, useLocation } from "react-router-dom";
 
 
@@ -45,9 +47,9 @@ function TienHanhDatHang() {
     // GỌI API LẤY ĐỊA CHỈ GIAO HANG CỦA KHÁCH HÀNG  
     useEffect(() => {
         if (maKH) {
-            axios.get(`http://localhost:8080/api/diachi/${maKH}`)
-                .then((response) => {
-                    const ds = response.data.data || [];
+            addressApi.list(maKH)
+                .then((data) => {
+                    const ds = data.data || [];
                     setDsDiaChiGiaoHang(ds);
 
                     // Nếu có địa chỉ, tự động lấy địa chỉ đầu tiên (Mặc định) điền vào Form
@@ -88,14 +90,14 @@ function TienHanhDatHang() {
     // CHUYỂN KHÁCH SANG TRANG THANH TOÁN MOMO
     const thanhToanMoMo = async (maHoaDon, soTien) => {
         try {
-            const res = await axios.post("http://localhost:8080/api/payment/momo", {
+            const data = await paymentApi.createMomo({
                 amount: soTien,
                 orderId: maHoaDon
             });
-            if (res.data?.payUrl) {
-                window.location.href = res.data.payUrl;
+            if (data?.payUrl) {
+                window.location.href = data.payUrl;
             } else {
-                alert(`Đơn hàng ${maHoaDon} đã được tạo nhưng chưa mở được cổng MoMo (${res.data?.message || "lỗi không xác định"}). Vui lòng liên hệ cửa hàng.`);
+                alert(`Đơn hàng ${maHoaDon} đã được tạo nhưng chưa mở được cổng MoMo (${data?.message || "lỗi không xác định"}). Vui lòng liên hệ cửa hàng.`);
                 navigate("/home");
             }
         } catch (error) {
@@ -123,11 +125,11 @@ function TienHanhDatHang() {
         };
 
         try {
-            const response = await axios.post("http://localhost:8080/api/hoadon/dat-hang", payload);
+            const data = await orderApi.placeOrder(payload);
 
-            if (response.data.success) {
+            if (data.success) {
                 if (phuongThuc === "momo") {
-                    await thanhToanMoMo(response.data.maHoaDon, response.data.tongTien);
+                    await thanhToanMoMo(data.maHoaDon, data.tongTien);
                     return;
                 }
                 hienThiThongBaoTC("Đặt hàng thành công!");

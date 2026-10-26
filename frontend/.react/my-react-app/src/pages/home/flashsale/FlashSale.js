@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "./FlashSale.css";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import { promotionApi } from "../../../API/PromotionApi";
 
 function FlashSaleGioVang() {
      const [danhSachKhuyenMai, setDanhSachKhuyenMai] = useState([]);
 
     const taiLaiDanhSachKhuyenMai = () => {
-        axios.get("http://localhost:8080/api/user/khuyenmai")
-            .then((response) => {
-                const duLieu = Array.isArray(response.data)
-                    ? response.data
-                    : response.data?.data || response.data?.content || response.data?.items || [];
+        promotionApi.getFlashSale()
+            .then((data) => {
+                const duLieu = Array.isArray(data)
+                    ? data
+                    : data?.data || data?.content || data?.items || [];
                 setDanhSachKhuyenMai(Array.isArray(duLieu) ? duLieu : []);
             })
             .catch((error) => {

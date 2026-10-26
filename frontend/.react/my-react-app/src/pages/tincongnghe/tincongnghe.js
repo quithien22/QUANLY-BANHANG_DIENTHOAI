@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { contentApi } from "../../API/ContentApi";
 import "./tincongnghe.css";
 import { Link } from "react-router-dom";
 
@@ -9,9 +9,8 @@ function TinCongNghe() {
     const [openQuestion, setOpenQuestion] = useState(null);
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/faq")
-            .then(res => {
-                const data = res.data;
+        contentApi.getFaq()
+            .then(data => {
                 setDanhMucFAQ(data);
                 if (data.length > 0) {
                     setActiveTab(data[0].maDanhMuc);

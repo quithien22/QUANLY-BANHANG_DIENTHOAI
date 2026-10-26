@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./chitiethang.css";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { wishlistApi } from "../../API/WishlistApi";
+import { userSession } from "../../utils/UserSession";
+import { productApi } from "../../API/ProductApi";
+import { layUrlAnh } from "../../utils/imageUrl";
 
 // Các mức lọc hiển thị trên giao diện
 const DS_RAM = ["4GB", "6GB", "8GB", "12GB", "16GB"];
@@ -32,14 +35,45 @@ function SanPhamCacHang() {
     const { maThuongHieu: tenHang } = useParams();
     const navigate = useNavigate();
 
+    // ============== YÊU THÍCH (thả tim) ===========
+    const [danhSachTym, setDanhSachTym] = useState([]);
+    const nguoiDung = userSession.get();
+    const maKH = nguoiDung?.maKH;
+
+    useEffect(() => {
+        if (!maKH) return;
+        wishlistApi.list(maKH)
+            .then((data) => setDanhSachTym(data.map((sp) => sp.maSP)))
+            .catch((err) => console.error("Lỗi tải danh sách tim:", err));
+    }, [maKH]);
+
+    const xuLyTym = async (maSP) => {
+        if (!maKH) {
+            alert("Vui lòng đăng nhập để thêm sản phẩm vào mục Yêu thích!");
+            return;
+        }
+        try {
+            const res = await wishlistApi.toggle(maKH, maSP);
+            if (res.success) {
+                if (res.action === 'added') {
+                    setDanhSachTym((prev) => [...prev, maSP]);
+                } else {
+                    setDanhSachTym((prev) => prev.filter((id) => id !== maSP));
+                }
+            }
+        } catch (error) {
+            console.error("Lỗi khi thả tim:", error);
+        }
+    };
+
     const [hienThiBoLoc, setHienThiBoLoc] = useState(false);
 
     // ============== DANH SÁCH THƯƠNG HIỆU (để render nút lọc "Hãng sản xuất") ===========
     const [danhSachThuongHieu, setDanhSachThuongHieu] = useState([]);
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/thuonghieu")
-            .then((response) => setDanhSachThuongHieu(response.data))
+        productApi.getBrands()
+            .then((data) => setDanhSachThuongHieu(data))
             .catch((error) => console.error("Lỗi khi lấy danh sách thương hiệu:", error));
     }, []);
 
@@ -72,10 +106,10 @@ function SanPhamCacHang() {
         }
 
         setDangTai(true);
-        axios.get(`http://localhost:8080/api/sanpham/thuonghieu/${encodeURIComponent(tenHang)}`)
-            .then((response) => {
+        productApi.getByBrand(tenHang)
+            .then((data) => {
                 // Chuẩn hóa sẵn RAM/ROM của từng sản phẩm để lọc cho nhanh
-                const danhSach = response.data.map((sp) => ({
+                const danhSach = data.map((sp) => ({
                     ...sp,
                     _ram: layDungLuong(sp.ram),
                     _rom: layDungLuong(sp.rom),
@@ -291,10 +325,15 @@ function SanPhamCacHang() {
                     <ul className="chitiethangsp-grid">
                         {sanPhamDangHien.map((product) => (
                             <li className="chitiethangsp-card" key={product.maSP}>
-                                <div className="chitiethangsp-card_imgwrap">
+                                <div className="chitiethangsp-card_imgwrap" style={{ position: 'relative' }}>
+                                    <i
+                                        className={`bx ${danhSachTym.includes(product.maSP) ? 'bxs-heart' : 'bx-heart'}`}
+                                        onClick={() => xuLyTym(product.maSP)}
+                                        style={{ position: 'absolute', top: 0, left: 0, zIndex: 10, fontSize: '22px', cursor: 'pointer', color: danhSachTym.includes(product.maSP) ? 'red' : '#1D4ED8' }}
+                                    />
                                     {product.badge && <span className="chitiethangsp-badge">{product.badge}</span>}
                                     <img
-                                        src={product.hinhAnh?.startsWith('http') ? product.hinhAnh : `http://localhost:8080${product.hinhAnh}`}
+                                        src={layUrlAnh(product.hinhAnh)}
                                         alt={product.tenSP}
                                     />
                                 </div>

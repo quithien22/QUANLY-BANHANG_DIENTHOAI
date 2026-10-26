@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import axios from "axios";
+import { chatbotApi } from "../../API/ChatbotApi";
  
 
 function AiChatbot() {
@@ -27,12 +27,10 @@ function AiChatbot() {
 
         try {
             // Gọi API lên Backend Node.js
-            const res = await axios.post("http://localhost:8080/api/ai-chat", {
-                tinNhan: tinKhach.text
-            });
+            const res = await chatbotApi.ask(tinKhach.text);
             
             // Nhận câu trả lời từ AI
-            setLichSuChat(prev => [...prev, { sender: "bot", text: res.data.reply }]);
+            setLichSuChat(prev => [...prev, { sender: "bot", text: res.reply }]);
         } catch (error) {
             setLichSuChat(prev => [...prev, { sender: "bot", text: "Kết nối bị lỗi, vui lòng thử lại sau." }]);
         } finally {

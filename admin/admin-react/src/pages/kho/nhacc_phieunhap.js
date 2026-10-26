@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./nhacc_phieunhap.css";
-import axios from "axios";
+import { nhaCungCapApi } from "../../API/NhaCungCapApi";
+import { phieuNhapApi } from "../../API/PhieuNhapApi";
+import { sanPhamApi } from "../../API/SanPhamApi";
+import { adminSession } from "../../utils/AdminSession";
 
 function NhaCungCap_NhapHang() {
     // Điều khiển tab đang xem: "nha-cung-cap" hoặc "phieu-nhap"
@@ -24,8 +27,8 @@ function NhaCungCap_NhapHang() {
     const [trangThaiNCC, setTrangThaiNCC] = useState(0); // 0: Đang hợp tác, 1: Ngừng hợp tác
 
     const taiDanhSachNCC = () => {
-        axios.get("http://localhost:8080/api/nhacungcap")
-            .then((res) => setDanhSachNCC(res.data))
+        nhaCungCapApi.layDanhSach()
+            .then((danhSach) => setDanhSachNCC(danhSach))
             .catch((err) => console.error("Lỗi lấy danh sách NCC:", err));
     };
 
@@ -56,13 +59,13 @@ function NhaCungCap_NhapHang() {
         try {
             if (nccDangSua) {
                 // Sửa NCC
-                await axios.put(`http://localhost:8080/api/nhacungcap/sua/${nccDangSua.maNCC}`, {
+                await nhaCungCapApi.sua(nccDangSua.maNCC, {
                     tenNCC, diaChi: diaChiNCC, SDT: sdtNCC, trangThai: trangThaiNCC
                 });
                 alert("Cập nhật nhà cung cấp thành công!");
             } else {
                 // Thêm NCC
-                await axios.post("http://localhost:8080/api/nhacungcap/them", {
+                await nhaCungCapApi.them({
                     tenNCC, diaChi: diaChiNCC, SDT: sdtNCC
                 });
                 alert("Thêm nhà cung cấp thành công!");
@@ -86,16 +89,16 @@ function NhaCungCap_NhapHang() {
     const [danhSachSanPham, setDanhSachSanPham] = useState([]);
 
     const taiDanhSachPhieuNhap = () => {
-        axios.get("http://localhost:8080/api/phieunhap_nhacungcap")
-            .then((res) => setDanhSachPhieuNhap(res.data))
+        phieuNhapApi.layDanhSach()
+            .then((danhSach) => setDanhSachPhieuNhap(danhSach))
             .catch((err) => console.error("Lỗi lấy danh sách phiếu nhập:", err));
     };
 
     useEffect(() => {
         taiDanhSachPhieuNhap();
         // Lấy danh sách sản phẩm cho form tạo phiếu nhập
-        axios.get("http://localhost:8080/api/sanpham")
-            .then((res) => setDanhSachSanPham(res.data))
+        sanPhamApi.layDanhSach()
+            .then((danhSach) => setDanhSachSanPham(danhSach))
             .catch((err) => console.error("Lỗi lấy sản phẩm:", err));
     }, []);
 
@@ -147,10 +150,10 @@ function NhaCungCap_NhapHang() {
 
         try {
             // Lấy thông tin nhân viên đang đăng nhập từ localStorage nếu có
-            const adminData = JSON.parse(localStorage.getItem("adminData") || "{}");
+            const adminData = adminSession.get() || {};
             const maNV = adminData.maNV || "NV01"; // Mặc định NV01 nếu chưa đăng nhập
 
-            await axios.post("http://localhost:8080/api/phieunhap_nhacungcap/them", {
+            await phieuNhapApi.tao({
                 maNCC: maNCCChon,
                 maNV: maNV,
                 danhSachSanPham: sanPhamNhap
@@ -179,8 +182,8 @@ function NhaCungCap_NhapHang() {
         setChiTietSanPham([]);
         setDangTaiChiTiet(true);
 
-        axios.get(`http://localhost:8080/api/phieunhap_nhacungcap/${pn.maPN}/chitiet`)
-            .then((res) => setChiTietSanPham(res.data || []))
+        phieuNhapApi.layChiTiet(pn.maPN)
+            .then((chiTiet) => setChiTietSanPham(chiTiet || []))
             .catch((err) => {
                 console.error("Lỗi lấy chi tiết phiếu nhập:", err);
                 setChiTietSanPham([]);
