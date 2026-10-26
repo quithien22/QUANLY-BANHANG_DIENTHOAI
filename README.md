@@ -167,7 +167,7 @@ pages/     auth, Dashboard, donhang, hethong, khachhang, kho, marketing, nhansu,
 
 **Admin/Frontend** – thêm `src/API/XxxApi.js` (extends `BaseApi`), xuất kèm một đối tượng dùng chung, rồi gọi từ component.
 
-## 5. Tình trạng chuyển đổi OOP và các điểm cần biết
+<!-- ## 5. Tình trạng chuyển đổi OOP và các điểm cần biết
 
 - **Backend:** toàn bộ route admin và user đã nằm trong các lớp Routes/Controller/Service; `server.js` không còn chứa route nào.
 - **Admin React:** các trang `khachhang_admin`, `danhgia_admin`, `hotro_admin`, `quanlydh_admin`, `vanchuyen_admin`, `doitrahang_admin`, `nhacc_phieunhap` đã dùng lớp API. Các trang còn lại (`banner_admin`, `khuyenmai_admin`, `chamcong_admin`, `nhanvien_phanquyen`, `danhmucsp_admin`, `sanpham_admin`, `thongke_admin`, `caidathethong_admin`, `dashboard_admin`) **vẫn gọi `axios` trực tiếp** và đang được chuyển dần.
@@ -177,4 +177,4 @@ pages/     auth, Dashboard, donhang, hethong, khachhang, kho, marketing, nhansu,
   - `khuyenmai_admin` gọi `POST /api/admin/khuyenmai/them` nhưng backend chưa có route này.
   - `PUT /api/caidat/matkhau` kiểm tra mật khẩu dạng chữ thường trong bảng `TaiKhoan`, không đồng bộ với đăng nhập (bcrypt trên `NhanVien`).
   - Hai route cũ `GET /api/categories` và `GET /api/danhgiasanpham` đã bị bỏ khi dọn `server.js`.
-  - Mật khẩu nhân viên tạo qua `POST /api/admin/nhanvien/them` đang lưu dạng chữ thường (đăng nhập sẽ nâng cấp lên bcrypt ở lần đăng nhập đầu).
+  - Mật khẩu nhân viên tạo qua `POST /api/admin/nhanvien/them` đang lưu dạng chữ thường (đăng nhập sẽ nâng cấp lên bcrypt ở lần đăng nhập đầu). -->
