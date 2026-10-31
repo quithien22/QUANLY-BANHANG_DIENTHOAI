@@ -75,7 +75,8 @@
     font-size: 12px;
     color: #E11D48;
 }
-* WRAPPER BAO BỌC DANH MỤC */
+
+/* WRAPPER BAO BỌC DANH MỤC */
 .danhmuc-wrapper {
   position: relative;
   display: inline-block;
