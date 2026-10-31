@@ -73,6 +73,7 @@ const WishlistService = require('./services/user/WishlistService');
 const ReviewService = require('./services/user/ReviewService');
 const ReturnService = require('./services/user/ReturnService');
 const AddressService = require('./services/user/AddressService');
+const ChatbotService = require('./services/user/ChatbotService');
 //Controller
 const CartController = require('./controllers/user/CartController');
 const AuthController = require('./controllers/user/AuthController');
@@ -86,6 +87,7 @@ const WishlistController = require('./controllers/user/WishlistController');
 const ReviewController = require('./controllers/user/ReviewController');
 const ReturnController = require('./controllers/user/ReturnController');
 const AddressController = require('./controllers/user/AddressController');
+const ChatbotController = require('./controllers/user/ChatbotController');
 //Routes
 const CartRoutes = require('./routes/user/CartRoutes');
 const AuthRoutes = require('./routes/user/AuthRoutes');
@@ -99,6 +101,7 @@ const WishlistRoutes = require('./routes/user/WishlistRoutes');
 const ReviewRoutes = require('./routes/user/ReviewRoutes');
 const ReturnRoutes = require('./routes/user/ReturnRoutes');
 const AddressRoutes = require('./routes/user/AddressRoutes');
+const ChatbotRoutes = require('./routes/user/ChatbotRoutes');
 
 // Trả về danh sách { path, router } để server.js mount lần lượt
 module.exports = function buildContainer(dbConfig) {
@@ -137,5 +140,6 @@ module.exports = function buildContainer(dbConfig) {
         new ReviewRoutes(new ReviewController(new ReviewService(db))),
         new ReturnRoutes(new ReturnController(new ReturnService(db))),
         new AddressRoutes(new AddressController(new AddressService(db))),
+        new ChatbotRoutes(new ChatbotController(new ChatbotService(db))),
     ].map((routes) => routes.toMount());
 };

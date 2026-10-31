@@ -14,8 +14,8 @@ class CaiDatController extends BaseController {
 
     // PUT /api/caidat/hoso
     capNhatHoSo = this.handle(async (req, res) => {
-        await this.caiDatService.capNhatHoSo(req.body);
-        res.json({ success: true });
+        const ketQua = await this.caiDatService.capNhatHoSo(req.body, req.file);
+        res.json({ success: true, ...ketQua });
     }, "Lỗi cập nhật hồ sơ");
 
     // PUT /api/caidat/matkhau

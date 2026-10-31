@@ -2,6 +2,7 @@
 // Cài đặt hệ thống: hồ sơ cá nhân, thông tin cửa hàng, vận chuyển, đổi mật khẩu.
 const BaseService = require('../BaseService');
 const HttpError = require('../../errors/HttpError');
+const { layUrlAnh } = require('../../utils/imageUrl');
 
 class CaiDatService extends BaseService {
     // Trả về hồ sơ người đăng nhập (nếu có maNV) + cấu hình cửa hàng + vận chuyển
@@ -52,18 +53,39 @@ class CaiDatService extends BaseService {
         };
     }
 
-    async capNhatHoSo({ maNV, hoTen, soDienThoai, email }) {
+    async capNhatHoSo({ maNV, hoTen, soDienThoai, email, xoaAnh }, file) {
         const sql = this.sql;
         const pool = await this.getPool();
+
+        let avatar = null;
+        let capNhatAvatar = 0;
+        if (file) {
+            avatar = layUrlAnh(file.filename);
+            capNhatAvatar = 1;
+        } else if (String(xoaAnh) === 'true') {
+            capNhatAvatar = 1;
+        }
 
         await pool.request()
             .input('maNV', sql.VarChar, maNV)
             .input('hoTen', sql.NVarChar, hoTen)
             .input('SDT', sql.VarChar, soDienThoai)
             .input('email', sql.VarChar, email || null)
-            .query("UPDATE NhanVien SET hoTen = @hoTen, SDT = @SDT, email = @email WHERE maNV = @maNV");
-    }
+            .input('avatar', sql.VarChar, avatar)
+            .input('capNhatAvatar', sql.Bit, capNhatAvatar)
+            .query(`
+            UPDATE NhanVien
+            SET hoTen = @hoTen, SDT = @SDT, email = @email,
+                avatar = CASE WHEN @capNhatAvatar = 1 THEN @avatar ELSE avatar END
+            WHERE maNV = @maNV
+        `);
 
+        const kq = await pool.request()
+            .input('maNV', sql.VarChar, maNV)
+            .query("SELECT avatar FROM NhanVien WHERE maNV = @maNV");
+        return { anhDaiDien: kq.recordset[0]?.avatar || "" };
+    }
+    
     // Giữ nguyên logic cũ: kiểm tra trong bảng TaiKhoan, so sánh mật khẩu dạng chữ thường
     async doiMatKhau({ maNV, hienTai, moi }) {
         const sql = this.sql;

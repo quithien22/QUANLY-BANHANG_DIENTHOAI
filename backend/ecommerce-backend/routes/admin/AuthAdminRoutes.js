@@ -11,6 +11,7 @@ class AuthAdminRoutes extends BaseRoutes {
 
     registerRoutes() {
         const c = this.authAdminController;
+        // POST /api/admin/dang-nhap
         this.router.post('/dang-nhap', c.login);
     }
 }

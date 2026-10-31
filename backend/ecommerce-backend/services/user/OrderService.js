@@ -57,6 +57,36 @@ class OrderService extends BaseService {
             }
             const tongTienCuoi = tongTienHang;
 
+            // 2.5. Giữ hàng: trừ tồn kho bằng 1 câu UPDATE có điều kiện (chống bán quá số lượng)
+            // - Gộp các dòng cùng maSP (khác màu/dung lượng) vì tồn kho tính theo sản phẩm.
+            // - Sắp xếp theo maSP để mọi giao dịch khóa cùng 1 thứ tự -> tránh deadlock.
+            // - Câu UPDATE giữ khóa ghi tới khi commit: người đến sau phải chờ, rồi đánh giá lại
+            //   điều kiện tonKho >= soLuong -> nếu hết hàng thì rowsAffected = 0.
+            const canTru = new Map();
+            for (const sp of danhSachSanPham) {
+                const sl = Number(sp.soLuong) || 0;
+                if (!sp.maSP || sl <= 0) {
+                    throw new HttpError(400, "Thông tin sản phẩm hoặc số lượng không hợp lệ.");
+                }
+                canTru.set(sp.maSP, (canTru.get(sp.maSP) || 0) + sl);
+            }
+            const dsTru = [...canTru.entries()].sort(([a], [b]) => String(a).localeCompare(String(b)));
+
+            for (const [maSP, soLuong] of dsTru) {
+                const ketQuaTruKho = await new sql.Request(transaction)
+                    .input('maSP', sql.VarChar(20), maSP)
+                    .input('soLuong', sql.Int, soLuong)
+                    .query(`
+                        UPDATE SanPham
+                        SET tonKho = tonKho - @soLuong
+                        WHERE maSP = @maSP AND trangThai = 1 AND tonKho >= @soLuong
+                    `);
+
+                if (ketQuaTruKho.rowsAffected[0] === 0) {
+                    throw new HttpError(409, "Sản phẩm đã hết hàng hoặc không đủ số lượng, vui lòng kiểm tra lại giỏ hàng.");
+                }
+            }
+
             // 3. Hóa đơn
             const maHoaDon = 'HD' + Date.now();
             await new sql.Request(transaction)
@@ -120,30 +150,58 @@ class OrderService extends BaseService {
         }
     }
 
-    // Chỉ hủy được đơn đang ở trạng thái 'cho_xac_nhan'
+    // Chỉ hủy được đơn đang ở trạng thái 'cho_xac_nhan'.
+    // Hủy + hoàn tồn kho + hủy vận chuyển nằm trong 1 transaction.
     async cancelOrder(maHoaDon) {
         const sql = this.sql;
         const pool = await this.getPool();
+        const transaction = new sql.Transaction(pool);
+        await transaction.begin();
 
-        const result = await pool.request()
-            .input('maHoaDon', sql.VarChar, maHoaDon)
-            .query(`
-                UPDATE HoaDon 
-                SET trangThai = 'da_huy' 
-                WHERE maHoaDon = @maHoaDon AND trangThai = 'cho_xac_nhan'
-            `);
+        try {
+            // UPDATE có điều kiện trạng thái: chỉ 1 người hủy thành công (rowsAffected = 1),
+            // nên bấm hủy 2 lần / 2 request song song cũng không hoàn kho 2 lần.
+            const result = await new sql.Request(transaction)
+                .input('maHoaDon', sql.VarChar(20), maHoaDon)
+                .query(`
+                    UPDATE HoaDon
+                    SET trangThai = 'da_huy'
+                    WHERE maHoaDon = @maHoaDon AND trangThai = 'cho_xac_nhan'
+                `);
 
-        if (result.rowsAffected[0] === 0) {
-            throw new HttpError(400, "Không thể hủy đơn hàng này (có thể đã được xử lý).");
+            if (result.rowsAffected[0] === 0) {
+                throw new HttpError(400, "Không thể hủy đơn hàng này (có thể đã được xử lý).");
+            }
+
+            // Hoàn tồn kho. Gộp theo maSP trước khi JOIN, nếu không UPDATE...FROM
+            // chỉ cộng 1 dòng cho mỗi sản phẩm khi đơn có nhiều dòng cùng maSP.
+            await new sql.Request(transaction)
+                .input('maHoaDon', sql.VarChar(20), maHoaDon)
+                .query(`
+                    UPDATE sp
+                    SET sp.tonKho = sp.tonKho + ct.tongSL
+                    FROM SanPham sp
+                    JOIN (
+                        SELECT maSP, SUM(soLuong) AS tongSL
+                        FROM ChiTietHoaDon
+                        WHERE maHoaDon = @maHoaDon
+                        GROUP BY maSP
+                    ) ct ON sp.maSP = ct.maSP
+                `);
+
+            await new sql.Request(transaction)
+                .input('maHoaDon', sql.VarChar(20), maHoaDon)
+                .query(`
+                    UPDATE VanChuyen
+                    SET trangThai = 'da_huy'
+                    WHERE maHoaDon = @maHoaDon
+                `);
+
+            await transaction.commit();
+        } catch (err) {
+            try { await transaction.rollback(); } catch (_) { /* transaction đã đóng */ }
+            throw err;
         }
-
-        await pool.request()
-            .input('maHoaDon', sql.VarChar, maHoaDon)
-            .query(`
-                UPDATE VanChuyen 
-                SET trangThai = 'da_huy' 
-                WHERE maHoaDon = @maHoaDon
-            `);
     }
 
     // Trang "Đơn hàng của bạn": mỗi đơn kèm danh sách sản phẩm

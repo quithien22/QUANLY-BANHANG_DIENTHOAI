@@ -5,8 +5,8 @@ Dự án gồm 3 phần chạy riêng, giao tiếp với nhau qua REST API (JSON
 | Phần | Thư mục | Công nghệ | Vai trò |
 |---|---|---|---|
 | Backend | `backend/ecommerce-backend` | Node.js, Express, SQL Server (`mssql`) | Cung cấp API cho cả khách hàng và admin |
-| Frontend (khách hàng) | `frontend/.react/my-react-app` | React | Trang mua hàng |
-| Admin (nhân viên) | `admin/admin-react` | React | Trang quản trị |
+| Frontend (khách hàng) | `frontend/user` | React | Trang mua hàng |
+| Admin (nhân viên) | `frontend/admin` | React | Trang quản trị |
 
 ```
 Trình duyệt (React) ──HTTP/JSON──▶ Express (cổng 8080) ──▶ SQL Server (QuanLyBanHangDienThoai)
@@ -117,7 +117,7 @@ const ketQua   = await khachHangApi.suaThongTin(maKH, { hoTen, SDT, trangThai })
 if (ketQua.success) { /* ... */ }
 ```
 
-### Thư mục `admin/admin-react/src`
+### Thư mục `frontend/admin/src`
 ```
 API/       BaseApi, AdminAuthApi, ChamCongApi, KhachHangApi, HoaDonApi, NhanVienApi, NhaCungCapApi,
            PhieuNhapApi, KhuyenMaiApi, DanhGiaApi, ThuongHieuApi, VanChuyenApi, SanPhamApi,
@@ -151,8 +151,8 @@ pages/     auth, Dashboard, donhang, hethong, khachhang, kho, marketing, nhansu,
    ```
 6. Chạy frontend khách hàng và admin (mỗi cái trong một cửa sổ terminal, xem `scripts` trong `package.json` của từng thư mục):
    ```
-   cd frontend/.react/my-react-app && npm install && npm start
-   cd admin/admin-react            && npm install && npm start
+   cd frontend/user  && npm install && npm start     # http://localhost:3000
+   cd frontend/admin && npm install && npm start     # http://localhost:3001
    ```
 
 ---
