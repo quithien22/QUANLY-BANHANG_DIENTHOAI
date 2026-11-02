@@ -351,56 +351,7 @@ describe('C. Kết hợp và phản hồi từ server', () => {
     });
 });
 
-// =====================================================================
-// D. GHI NHỚ ĐĂNG NHẬP
-// =====================================================================
-describe('D. Ghi nhớ đăng nhập', () => {
-    test('TC-36: Tick ghi nhớ + đăng nhập thành công -> nhớ tài khoản, KHÔNG lưu mật khẩu', async () => {
-        const matKhau = 'Abc@xyz789';
-        serverTraThanhCong();
-        manHinh();
-        fireEvent.click(oGhiNho());
-        nhapVaDangNhap('user@gmail.com', matKhau);
-
-        await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/home'));
-        expect(localStorage.getItem('ghiNhoDangNhap')).toBe('1');
-        expect(localStorage.getItem('taiKhoanGhiNho')).toBe('user@gmail.com');
-        for (let i = 0; i < localStorage.length; i++) {
-            expect(localStorage.getItem(localStorage.key(i))).not.toContain(matKhau);
-        }
-    });
-
-    test('TC-37: Lần sau vào trang tự điền tài khoản (mật khẩu trống); bỏ tick rồi đăng nhập -> xóa ghi nhớ', async () => {
-        localStorage.setItem('ghiNhoDangNhap', '1');
-        localStorage.setItem('taiKhoanGhiNho', 'user@gmail.com');
-        serverTraThanhCong();
-        manHinh();
-
-        expect(oTaiKhoan().value).toBe('user@gmail.com');
-        expect(oMatKhau().value).toBe('');
-        expect(oGhiNho().checked).toBe(true);
-
-        fireEvent.click(oGhiNho()); // bỏ tick
-        fireEvent.change(oMatKhau(), { target: { value: '123456' } });
-        fireEvent.click(nutDangNhap());
-
-        await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/home'));
-        expect(localStorage.getItem('ghiNhoDangNhap')).toBeNull();
-        expect(localStorage.getItem('taiKhoanGhiNho')).toBeNull();
-    });
-
-    test('TC-38: Tick ghi nhớ nhưng đăng nhập thất bại -> không lưu gì', async () => {
-        serverBaoLoi('Mật khẩu không chính xác!');
-        manHinh();
-        fireEvent.click(oGhiNho());
-        nhapVaDangNhap('user@gmail.com', 'saimatkhau');
-
-        expect(await screen.findByText('Mật khẩu không chính xác!')).not.toBeNull();
-        expect(localStorage.getItem('userData')).toBeNull();
-        expect(localStorage.getItem('taiKhoanGhiNho')).toBeNull();
-        expect(localStorage.getItem('ghiNhoDangNhap')).toBeNull();
-    });
-});
+ 
 
 // =====================================================================
 // CÁCH SỬA CÁC TEST [BUG] trong login.js

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '../../API/AuthApi';
 import Swal from 'sweetalert2';
@@ -17,6 +17,8 @@ function Login() {
     const [matKhau, setMatKhau] = useState("");
     const [ghiNho, setGhiNho] = useState(localStorage.getItem("ghiNhoDangNhap") === "1");
     const [thongBaoLoi, setThongBaoLoi] = useState(""); // State hiển thị lỗi màu đỏ
+    const [dangGui, setDangGui] = useState(false); // true khi đang chờ server -> khóa nút Đăng nhập
+    const dangGuiRef = useRef(false); // cờ đồng bộ, chặn bấm đúp ngay trong cùng một nhịp
 
     // XỬ LÝ ĐĂNG NHẬP BẰNG GOOGLE (Backend đã xác thực, trả về userInfo)
     const xuLyDangNhapGoogleThanhCong = (userInfo) => {
@@ -46,26 +48,37 @@ function Login() {
     const xuLyDangNhap = async (e) => {
         e.preventDefault();
 
+        // Đang chờ server trả lời thì bỏ qua lần bấm tiếp theo (chống gửi trùng)
+        if (dangGuiRef.current) return;
+
         // Reset lỗi mỗi lần bấm nút
         setThongBaoLoi("");
 
+        // Cắt khoảng trắng đầu/cuối tài khoản, các bước sau đều dùng tk
+        const tk = taiKhoan.trim();
+
         // 2. RÀNG BUỘC (VALIDATION) FRONTEND
-        if (!taiKhoan.trim() || !matKhau.trim()) {
+        if (!tk || !matKhau.trim()) {
             setThongBaoLoi("Vui lòng nhập đầy đủ Email/Số điện thoại và mật khẩu!");
             return;
         }
 
         // Nếu người dùng nhập Email (có chứa dấu @)
-        if (taiKhoan.includes('@')) {
-            if (!taiKhoan.toLowerCase().endsWith("@gmail.com")) {
+        if (tk.includes('@')) {
+            if (!tk.toLowerCase().endsWith("@gmail.com")) {
                 setThongBaoLoi("Vui lòng sử dụng tài khoản Email có đuôi @gmail.com!");
+                return;
+            }
+            // Phải có phần tên trước @gmail.com, không chứa khoảng trắng hay dấu @ thừa
+            if (!/^[^\s@]+@gmail\.com$/i.test(tk)) {
+                setThongBaoLoi("Email không hợp lệ!");
                 return;
             }
         }
         // Nếu người dùng nhập Số điện thoại (không có dấu @)
         else {
-            const regexSDT = /^(0[3|5|7|8|9])+([0-9]{8})$/;
-            if (!regexSDT.test(taiKhoan)) {
+            const regexSDT = /^0[35789][0-9]{8}$/;
+            if (!regexSDT.test(tk)) {
                 setThongBaoLoi("Tài khoản không hợp lệ (Phải là SĐT 10 số hoặc Email @gmail.com)!");
                 return;
             }
@@ -76,8 +89,16 @@ function Login() {
             return;
         }
         // 3. GỌI API ĐĂNG NHẬP (BACKEND)
+        dangGuiRef.current = true;
+        setDangGui(true);
         try {
-            const data = await authApi.login(taiKhoan, matKhau);
+            const data = await authApi.login(tk, matKhau);
+
+            if (!data.success) {
+                // Server trả về nhưng không thành công -> mở khóa lại để thử lại
+                dangGuiRef.current = false;
+                setDangGui(false);
+            }
 
             if (data.success) {
                 // Lưu thông tin khách hàng vào trình duyệt
@@ -87,7 +108,7 @@ function Login() {
                 if (ghiNho) {
                     // Giữ đăng nhập lâu dài + nhớ tài khoản cho lần sau
                     localStorage.setItem("ghiNhoDangNhap", "1");
-                    localStorage.setItem("taiKhoanGhiNho", taiKhoan.trim());
+                    localStorage.setItem("taiKhoanGhiNho", tk);
                 } else {
                     // Chỉ giữ đăng nhập trong phiên hiện tại (đóng trình duyệt sẽ tự đăng xuất)
                     localStorage.removeItem("ghiNhoDangNhap");
@@ -107,6 +128,9 @@ function Login() {
                 });
             }
         } catch (error) {
+            // Mở khóa lại để người dùng thử lại
+            dangGuiRef.current = false;
+            setDangGui(false);
             // Bắt lỗi từ Backend trả về (Ví dụ: Sai mật khẩu, tài khoản không tồn tại)
             if (error.response && error.response.data.message) {
                 setThongBaoLoi(error.response.data.message);
@@ -203,7 +227,7 @@ function Login() {
                                     />
                                 </li>
                                 <li>
-                                    <button type="submit" className="btn-submit">Đăng nhập</button>
+                                    <button type="submit" className="btn-submit" disabled={dangGui}>Đăng nhập</button>
                                 </li>
                             </ul>
 

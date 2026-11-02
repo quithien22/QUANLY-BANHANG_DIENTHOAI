@@ -185,6 +185,11 @@
     background-color: #1E40AF;
 }
 
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 /* HÀNG GHI NHỚ ĐĂNG NHẬP + QUÊN MẬT KHẨU */
 .login-options {
     display: flex;
