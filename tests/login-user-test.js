@@ -77,6 +77,7 @@ const Swal = require(nm('sweetalert2')).default;
 const MSG_THIEU = 'Vui lòng nhập đầy đủ Email/Số điện thoại và mật khẩu!';
 const MSG_DUOI_EMAIL = 'Vui lòng sử dụng tài khoản Email có đuôi @gmail.com!';
 const MSG_SDT = 'Tài khoản không hợp lệ (Phải là SĐT 10 số hoặc Email @gmail.com)!';
+const MSG_EMAIL_SAI_DANG = 'Email không hợp lệ!';
 const MSG_MK_NGAN = 'Mật khẩu phải có ít nhất 6 ký tự!';
 const MSG_MAT_KET_NOI = 'Lỗi kết nối đến máy chủ!';
 
@@ -203,10 +204,12 @@ describe('A. Ô tài khoản (Email / SĐT)', () => {
         await waitFor(() => expect(authApi.login).toHaveBeenCalledWith('abc@gmail.com', '123456'));
     });
 
-    test.each([
-        ['TC-16', 'chuỗi SQL injection trá hình email', "' OR 1=1 --@gmail.com"],
-        ['TC-17', 'tài khoản rất dài (300 ký tự)', 'a'.repeat(300) + '@gmail.com'],
-    ])('%s: %s -> gửi nguyên vẹn, server trả 401, form hiện lỗi và không crash', async (ma, mota, taiKhoan) => {
+    test('TC-16: chuỗi SQL injection trá hình email (có khoảng trắng) -> bị chặn ở frontend, không gọi API', () => {
+        expectBiChanBoiFrontend("' OR 1=1 --@gmail.com", '123456', MSG_EMAIL_SAI_DANG);
+    });
+
+    test('TC-17: tài khoản rất dài (300 ký tự) -> gửi nguyên vẹn, server trả 401, form hiện lỗi và không crash', async () => {
+        const taiKhoan = 'a'.repeat(300) + '@gmail.com';
         serverBaoLoi('Tài khoản không chính xác!');
         manHinh();
         nhapVaDangNhap(taiKhoan, '123456');
