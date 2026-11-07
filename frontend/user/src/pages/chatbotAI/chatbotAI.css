@@ -1,0 +1,146 @@
+/* file: src/pages/chatbotAI/chatbotAI.css
+   Giao diện chatbot tư vấn. Mọi class đều có tiền tố "ai-chatbot" để không đụng CSS của trang khác. */
+
+.ai-chatbot-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+/* Nút bật/tắt chat */
+.ai-chatbot-toggle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #1d4ed8;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 26px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Khung chat */
+.ai-chatbot-window {
+    position: absolute;
+    bottom: 75px;
+    right: 0;
+    width: 350px;
+    height: 450px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.ai-chatbot-header {
+    padding: 15px;
+    background-color: #1d4ed8;
+    color: white;
+    font-weight: bold;
+}
+
+.ai-chatbot-body {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #f8fafc;
+}
+
+/* Tin nhắn */
+.ai-chatbot-msg {
+    padding: 10px 15px;
+    border-radius: 15px;
+    max-width: 80%;
+    white-space: pre-line; /* giữ xuống dòng trong câu trả lời */
+}
+
+.ai-chatbot-msg--user {
+    align-self: flex-end;
+    background-color: #1d4ed8;
+    color: white;
+}
+
+.ai-chatbot-msg--bot {
+    align-self: flex-start;
+    background-color: #e2e8f0;
+    color: black;
+}
+
+.ai-chatbot-typing {
+    align-self: flex-start;
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* Thẻ sản phẩm gợi ý */
+.ai-chatbot-product {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 8px;
+    padding: 8px;
+    background-color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.ai-chatbot-product-img {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+}
+
+.ai-chatbot-product-name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.ai-chatbot-product-price {
+    color: #dc2626;
+    font-size: 14px;
+}
+
+.ai-chatbot-product-link {
+    color: #1d4ed8;
+    font-size: 12px;
+}
+
+/* Ô nhập */
+.ai-chatbot-input-bar {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.ai-chatbot-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 20px;
+    outline: none;
+}
+
+.ai-chatbot-send {
+    margin-left: 10px;
+    background: none;
+    border: none;
+    color: #1d4ed8;
+    cursor: pointer;
+    font-size: 22px;
+}
+
+/* Màn hình nhỏ: khung chat vừa chiều rộng điện thoại */
+@media (max-width: 480px) {
+    .ai-chatbot-window {
+        width: calc(100vw - 40px);
+        height: 70vh;
+    }
+}
