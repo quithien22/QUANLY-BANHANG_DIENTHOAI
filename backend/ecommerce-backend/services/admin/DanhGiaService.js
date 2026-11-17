@@ -2,6 +2,15 @@
 // Quản lý đánh giá sản phẩm phía admin: xem, phản hồi, xóa.
 const BaseService = require('../BaseService');
 
+// Tên cột lưu đường dẫn ảnh trong HinhAnhDanhGia có thể khác nhau giữa các DB -> lấy cột chuỗi đầu tiên (không phải mã)
+const layDuongDan = (dong) => {
+    for (const [khoa, giaTri] of Object.entries(dong)) {
+        if (/^(ma|id)/i.test(khoa)) continue;
+        if (typeof giaTri === 'string' && giaTri) return giaTri;
+    }
+    return null;
+};
+
 class DanhGiaService extends BaseService {
     // Toàn bộ đánh giá kèm tên sản phẩm, khách hàng, phản hồi của shop và danh sách ảnh
     async layDanhSach() {
@@ -9,7 +18,7 @@ class DanhGiaService extends BaseService {
 
         const ketQua = await pool.request().query(`
             SELECT dg.maDanhGia, dg.maSP, dg.maKH, dg.soSao, dg.noiDung, dg.daMuaHang, dg.ngayTao,
-                   sp.tenSP, sp.hinhAnh, kh.hoTen, 
+                   sp.tenSP, sp.hinhAnh, kh.hoTen,
                    ph.noiDung AS shopReply, ph.ngayTao AS ngayReply
             FROM DanhGiaSanPham dg
             LEFT JOIN SanPham sp ON dg.maSP = sp.maSP
@@ -18,11 +27,17 @@ class DanhGiaService extends BaseService {
             ORDER BY dg.ngayTao DESC
         `);
 
-        const anh = await pool.request().query(`SELECT maDanhGia, duongDanDanhGia FROM HinhAnhDanhGia`);
+        // Bảng ảnh lỗi thì vẫn hiện danh sách đánh giá, chỉ thiếu ảnh
+        let anh = { recordset: [] };
+        try {
+            anh = await pool.request().query(`SELECT * FROM HinhAnhDanhGia`);
+        } catch (err) {
+            console.error('[Đánh giá admin] Không đọc được HinhAnhDanhGia:', err.message);
+        }
 
         return ketQua.recordset.map(dg => ({
             ...dg,
-            danhSachAnh: anh.recordset.filter(a => a.maDanhGia === dg.maDanhGia).map(a => a.duongDanDanhGia)
+            danhSachAnh: anh.recordset.filter(a => a.maDanhGia === dg.maDanhGia).map(layDuongDan).filter(Boolean)
         }));
     }
 

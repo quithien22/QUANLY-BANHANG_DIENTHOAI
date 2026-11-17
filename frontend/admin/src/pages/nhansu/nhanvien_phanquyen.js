@@ -47,11 +47,37 @@ function NhanVien_PhanQuyen() {
         taiDanhSach();
     }, []);
 
-    // ================= PHÂN TRANG =================
+
+    //BỎ DẤU TIẾNG VIỆT KHI TÌM KIẾM
+    const boDauTiengViet = (str) => {
+        return String(str || "")
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/đ/g, "d")
+            .trim();
+    };
+
+   
+// ================== TÌM KIẾM NHÂN VIÊN ============
+    const [tuKhoaTimKiem, setTuKhoaTimKiem] = useState("");
+
+    const danhSachDaLoc = danhSachNhanVien.filter((nv) => {
+        const key = boDauTiengViet(tuKhoaTimKiem);
+        if (!key) return true;
+
+        return (
+            boDauTiengViet(nv.maNV).includes(key) ||
+            boDauTiengViet(nv.hoTen).includes(key) ||
+            String(nv.SDT || "").includes(key) ||
+            boDauTiengViet(nv.email).includes(key)
+        );
+    });
+ // ================= PHÂN TRANG =================
     const soLuongMotTrang = 10;
-    const tongSoTrang = Math.ceil(danhSachNhanVien.length / soLuongMotTrang);
+    const tongSoTrang = Math.ceil(danhSachDaLoc.length / soLuongMotTrang);
     const viTriBatDauTrang = (trangHienTai - 1) * soLuongMotTrang;
-    const viTriHienThi = danhSachNhanVien.slice(viTriBatDauTrang, viTriBatDauTrang + soLuongMotTrang);
+    const viTriHienThi = danhSachDaLoc.slice(viTriBatDauTrang, viTriBatDauTrang + soLuongMotTrang);
     const danhSachTrang = Array.from({ length: tongSoTrang }, (_, i) => i + 1);
 
     // Dùng cho bảng phân quyền
@@ -66,7 +92,7 @@ function NhanVien_PhanQuyen() {
     const formatTrangThai = (tt) => {
         switch (Number(tt)) {
             case 1: return { text: "Đang làm", class: "status-active" };
-            case 2: return { text: "Nghỉ phép", class: "status-leave" };  
+            case 2: return { text: "Nghỉ phép", class: "status-leave" };
             default: return { text: "Nghỉ việc", class: "status-inactive" };
         }
     };
@@ -162,6 +188,15 @@ function NhanVien_PhanQuyen() {
                             </button>
                         )}
                     </div>
+                </div>
+                <div class="nhanvien-search">
+                    <i class="bx bx-search-big" />
+                    <input type="search" placeholder="Tìm mã nhân viên, tên nhân viên"
+                        value={tuKhoaTimKiem}
+                        onChange={(e) => {
+                            setTuKhoaTimKiem(e.target.value);
+                            setTrangHienTai(1);
+                        }} />
                 </div>
 
                 <div className="table-responsive">

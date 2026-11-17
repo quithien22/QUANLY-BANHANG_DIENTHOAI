@@ -42,6 +42,33 @@
     color: #E11D48;
 }
 
+/* ĐỒNG HỒ ĐẾM NGƯỢC cạnh tiêu đề */
+.flashsale-countdown {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 12px;
+}
+
+/* Ghi đè rule `.flashsale_title span` (22px, màu đỏ) */
+.flashsale_title .flashsale-countdown_label {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.flashsale_title .flashsale-countdown_timer {
+    background-color: #E11D48;
+    color: #FFFFFF;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
 .flashsale-viewall {
     color: #E11D48;
     font-size: 14px;
@@ -63,6 +90,8 @@
     border: 1px solid #E5E7EB;
     border-radius: 12px;
     padding: 16px;
+    display: flex;
+    flex-direction: column;
 }
 
 .flashsale-card_imgwrap {
@@ -88,6 +117,14 @@
     border-radius: 4px;
 }
 
+/* Khung giữ chỗ cố định cho nhãn (trả góp...) – card không có nhãn vẫn giữ cùng chiều cao */
+.flashsale-card_tagwrap {
+    height: 22px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
 .flashsale-card_tag {
     display: inline-block;
     background-color: #EFF6FF;
@@ -97,7 +134,6 @@
     font-size: 11px;
     padding: 2px 8px;
     border-radius: 4px;
-    margin-bottom: 8px;
 }
 
 .flashsale-card_name {
@@ -106,6 +142,7 @@
     font-weight: 600;
     color: #111827;
     margin-bottom: 8px;
+    line-height: 20px;
     min-height: 40px;
     /* giữ chiều cao đều nhau dù tên dài/ngắn khác nhau */
     display: -webkit-box;
@@ -117,6 +154,7 @@
 
 .flashsale-card_price {
     display: flex;
+    min-height: 24px;
     align-items: baseline;
     gap: 8px;
     margin-bottom: 8px;
@@ -147,6 +185,12 @@
 .flashsale-card_rating i {
     color: #FBBF24;
     font-size: 14px;
+}
+
+/* Đẩy nút xuống sát đáy card để các nút thẳng hàng */
+.flashsale-card_link {
+    margin-top: auto;
+    display: block;
 }
 
 .flashsale-card_btn {

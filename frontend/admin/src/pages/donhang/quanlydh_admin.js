@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { hoaDonApi } from "../../API/HoaDonApi";
 import "./quanlyhd_admin.css";
+import html2pdf from "html2pdf.js";
 
 function QuanLyDonHang() {
     const [trangThaiDangChon, setTrangThaiDangChon] = useState("Tất cả");
@@ -70,7 +71,7 @@ function QuanLyDonHang() {
 
         //  Lọc theo khoảng ngày lập
         let matchNgay = true;
-        const ngayLapDon = new Date(dh.thoiGianLap).setHours(0, 0, 0, 0);
+        const ngayLapDon = new Date(dh.thoiGianLapGoc || dh.thoiGianLap).setHours(0, 0, 0, 0);
         if (tuNgay) {
             const start = new Date(tuNgay).setHours(0, 0, 0, 0);
             if (ngayLapDon < start) matchNgay = false;
@@ -92,6 +93,129 @@ function QuanLyDonHang() {
     const danhSachTrangDonHang = Array.from({ length: tinhSoDonHangMotTrang }, (_, i) => i + 1);
 
     const [donHangDangXem, setDonHangDangXem] = useState(null);
+
+    // Chi tiết đầy đủ của đơn đang xem (người nhận, địa chỉ, thanh toán, mọi sản phẩm)
+    const [chiTiet, setChiTiet] = useState(null);
+
+    const layUrlAnh = (duongDan) => {
+        if (!duongDan) return "";
+        return duongDan.startsWith("http") ? duongDan : `${process.env.REACT_APP_API_URL || "http://localhost:8080"}${duongDan}`;
+    };
+
+    const moChiTiet = (dh) => {
+        setDonHangDangXem(dh);
+        setChiTiet(null);
+        hoaDonApi.layChiTiet(dh.maHoaDon)
+            .then(setChiTiet)
+            .catch((error) => console.error("Lỗi tải chi tiết đơn hàng:", error));
+    };
+
+    const tenPhuongThuc = { cod: "Thanh toán khi nhận hàng (COD)", momo: "Ví MoMo", chuyen_khoan: "Chuyển khoản ngân hàng" };
+
+    // ================= IN HÓA ĐƠN RA PDF =================
+    // Lưu mã hóa đơn đang tạo PDF để khóa nút, tránh bấm nhiều lần
+    const [dangInPDF, setDangInPDF] = useState(null);
+
+    const escapeHtml = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => (
+        { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+    ));
+    const dinhDangTien = (n) => `${Number(n || 0).toLocaleString("vi-VN")}đ`;
+
+    const inHoaDonPDF = async (maHoaDon) => {
+        setDangInPDF(maHoaDon);
+        try {
+            // Lấy chi tiết mới nhất của đơn (người nhận, địa chỉ, thanh toán, toàn bộ sản phẩm)
+            const { thongTin, sanPham } = await hoaDonApi.layChiTiet(maHoaDon);
+
+            const tamTinh = sanPham.reduce((tong, sp) => tong + Number(sp.giaBan || 0) * Number(sp.soLuong || 0), 0);
+            const chenhLech = Number(thongTin.tongTien || 0) - tamTinh; // < 0: giảm giá, > 0: phí khác
+
+            const dongSanPham = sanPham.map((sp, i) => `
+                <tr>
+                    <td style="padding:8px;border:1px solid #D1D5DB;text-align:center;">${i + 1}</td>
+                    <td style="padding:8px;border:1px solid #D1D5DB;">${escapeHtml(sp.tenSP)}${sp.phanLoai ? ` (${escapeHtml(sp.phanLoai)})` : ""}</td>
+                    <td style="padding:8px;border:1px solid #D1D5DB;text-align:center;">${escapeHtml(sp.soLuong)}</td>
+                    <td style="padding:8px;border:1px solid #D1D5DB;text-align:right;">${dinhDangTien(sp.giaBan)}</td>
+                    <td style="padding:8px;border:1px solid #D1D5DB;text-align:right;">${dinhDangTien(Number(sp.giaBan || 0) * Number(sp.soLuong || 0))}</td>
+                </tr>`).join("");
+
+            const dongChenhLech = chenhLech !== 0 ? `
+                <tr>
+                    <td colspan="4" style="padding:8px;border:1px solid #D1D5DB;text-align:right;">${chenhLech < 0 ? "Giảm giá" : "Phí vận chuyển / phí khác"}</td>
+                    <td style="padding:8px;border:1px solid #D1D5DB;text-align:right;">${chenhLech < 0 ? "-" : ""}${dinhDangTien(Math.abs(chenhLech))}</td>
+                </tr>` : "";
+
+            const ngayLap = thongTin.thoiGianLap ? new Date(thongTin.thoiGianLap).toLocaleString("vi-VN") : "";
+            const tenNguoiNhan = thongTin.hoTenNguoiNhan || thongTin.tenKhachHang || "";
+            const sdt = thongTin.sdtNguoiNhan || thongTin.soDienThoai || "";
+
+            const manHinh = document.createElement("div");
+            manHinh.style.cssText = "width:720px;padding:24px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#111827;background:#fff;";
+            manHinh.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #1D4ED8;padding-bottom:12px;margin-bottom:16px;">
+                    <div>
+                        <div style="font-size:22px;font-weight:700;color:#1D4ED8;">6AE-STORE</div>
+                        <div style="color:#6B7280;margin-top:2px;">Chính hãng giá tốt</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:20px;font-weight:700;">HÓA ĐƠN BÁN HÀNG</div>
+                        <div style="margin-top:4px;">Mã: <b>#${escapeHtml(thongTin.maHoaDon)}</b></div>
+                        <div>Ngày lập: ${escapeHtml(ngayLap)}</div>
+                    </div>
+                </div>
+
+                <div style="line-height:1.7;margin-bottom:16px;">
+                    <div><b>Khách hàng:</b> ${escapeHtml(thongTin.tenKhachHang || tenNguoiNhan)}</div>
+                    <div><b>Người nhận:</b> ${escapeHtml(tenNguoiNhan)}${sdt ? ` - ${escapeHtml(sdt)}` : ""}</div>
+                    <div><b>Địa chỉ giao hàng:</b> ${escapeHtml(thongTin.diaChiChiTiet || "Chưa có")}</div>
+                    <div><b>Thanh toán:</b> ${escapeHtml(tenPhuongThuc[thongTin.phuongThuc] || thongTin.phuongThuc || "Chưa có")}</div>
+                </div>
+
+                <table style="width:100%;border-collapse:collapse;">
+                    <thead>
+                        <tr style="background:#F3F4F6;">
+                            <th style="padding:8px;border:1px solid #D1D5DB;width:40px;">STT</th>
+                            <th style="padding:8px;border:1px solid #D1D5DB;text-align:left;">Sản phẩm</th>
+                            <th style="padding:8px;border:1px solid #D1D5DB;width:50px;">SL</th>
+                            <th style="padding:8px;border:1px solid #D1D5DB;width:110px;text-align:right;">Đơn giá</th>
+                            <th style="padding:8px;border:1px solid #D1D5DB;width:120px;text-align:right;">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${dongSanPham}
+                        <tr>
+                            <td colspan="4" style="padding:8px;border:1px solid #D1D5DB;text-align:right;">Tạm tính</td>
+                            <td style="padding:8px;border:1px solid #D1D5DB;text-align:right;">${dinhDangTien(tamTinh)}</td>
+                        </tr>
+                        ${dongChenhLech}
+                        <tr style="font-weight:700;background:#EFF6FF;">
+                            <td colspan="4" style="padding:10px;border:1px solid #D1D5DB;text-align:right;">TỔNG THANH TOÁN</td>
+                            <td style="padding:10px;border:1px solid #D1D5DB;text-align:right;color:#DC2626;">${dinhDangTien(thongTin.tongTien)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="display:flex;justify-content:space-between;margin-top:36px;text-align:center;">
+                    <div style="width:45%;"><b>Khách hàng</b><div style="color:#6B7280;font-size:12px;">(Ký, ghi rõ họ tên)</div></div>
+                    <div style="width:45%;"><b>Người lập hóa đơn</b><div style="color:#6B7280;font-size:12px;">(Ký, ghi rõ họ tên)</div></div>
+                </div>
+                <div style="margin-top:60px;text-align:center;color:#6B7280;font-size:12px;">Cảm ơn quý khách đã mua sắm tại 6AE-STORE!</div>
+            `;
+
+            await html2pdf().from(manHinh).set({
+                margin: 10,
+                filename: `HoaDon_${thongTin.maHoaDon}.pdf`,
+                image: { type: "jpeg", quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+            }).save();
+        } catch (error) {
+            console.error("Lỗi in hóa đơn PDF:", error);
+            hienThiThongBao("Không thể tạo file PDF hóa đơn.");
+        } finally {
+            setDangInPDF(null);
+        }
+    };
 
     const handleCapNhatTrangThai = async (maHoaDon, trangThaiMoi) => {
         try {
@@ -237,7 +361,15 @@ function QuanLyDonHang() {
                                     </td>
                                    <td>{dh.thoiGianLap}</td>
                                     <td>
-                                        <button className="btn-chi-tiet" onClick={() => setDonHangDangXem(dh)}>
+                                        <button
+                                            className="btn-chi-tiet"
+                                            style={{ marginRight: 6 }}
+                                            onClick={() => inHoaDonPDF(dh.maHoaDon)}
+                                            disabled={dangInPDF === dh.maHoaDon}
+                                        >
+                                            {dangInPDF === dh.maHoaDon ? "Đang tạo..." : "In PDF"}
+                                        </button>
+                                        <button className="btn-chi-tiet" onClick={() => moChiTiet(dh)}>
                                             Chi tiết
                                         </button>
                                     </td>
@@ -302,12 +434,30 @@ function QuanLyDonHang() {
                         </div>
                         <div className="modal-body">
                             <p><strong>Khách hàng:</strong> {donHangDangXem.tenKhachHang}</p>
-                            <p><strong>Số điện thoại:</strong> {donHangDangXem.sdtKhachHang}</p>
-                            <p><strong>Tên sản phẩm:</strong> {donHangDangXem.tenSanPham || "Đang cập nhật"}</p>
+                            <p><strong>Số điện thoại:</strong> {donHangDangXem.sdtKhachHang || chiTiet?.thongTin?.sdtNguoiNhan || "Chưa có"}</p>
+                            {chiTiet?.thongTin?.hoTenNguoiNhan && (
+                                <p><strong>Người nhận:</strong> {chiTiet.thongTin.hoTenNguoiNhan}{chiTiet.thongTin.sdtNguoiNhan ? ` - ${chiTiet.thongTin.sdtNguoiNhan}` : ""}</p>
+                            )}
+                            <p><strong>Địa chỉ giao hàng:</strong> {chiTiet ? (chiTiet.thongTin.diaChiChiTiet || "Chưa có") : "Đang tải..."}</p>
+                            <p><strong>Thanh toán:</strong> {chiTiet ? (tenPhuongThuc[chiTiet.thongTin.phuongThuc] || chiTiet.thongTin.phuongThuc || "Chưa có") : "Đang tải..."}</p>
+                            <div style={{ marginBottom: '10px' }}>
+                                <strong>Sản phẩm:</strong>
+                                {chiTiet ? (
+                                    <ul style={{ margin: '5px 0 0 18px' }}>
+                                        {chiTiet.sanPham.map((sp, i) => (
+                                            <li key={i}>
+                                                {sp.tenSP}{sp.phanLoai ? ` (${sp.phanLoai})` : ""} x {sp.soLuong} - đ{Number(sp.giaBan).toLocaleString('vi-VN')}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <span> {donHangDangXem.tenSanPham || "Đang tải..."}</span>
+                                )}
+                            </div>
                             <p className="modal-body-img">
                                 <strong>Hình ảnh:</strong>
                                 <img
-                                    src={donHangDangXem.duongDan || "https://via.placeholder.com/150"}
+                                    src={layUrlAnh(donHangDangXem.img) || "https://via.placeholder.com/150"}
                                     alt="Sản phẩm"
                                     style={{ width: '80px', height: '80px', objectFit: 'cover', display: 'block', marginTop: '5px' }}
                                 />
@@ -318,14 +468,22 @@ function QuanLyDonHang() {
                             </p>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
                                 <strong>Trạng thái:</strong>
-                               <span>{donHangDangXem.trangThai}</span>
+                               <span>{formatTrangThai(donHangDangXem.trangThai).text}</span>
                             </div>
 
-                            <p style={{ marginTop: '10px' }}><strong>Ngày lập:</strong> {new Date(donHangDangXem.thoiGianLap).toLocaleDateString('vi-VN')}</p>
+                            <p style={{ marginTop: '10px' }}><strong>Ngày lập:</strong> {donHangDangXem.thoiGianLapGoc ? new Date(donHangDangXem.thoiGianLapGoc).toLocaleString('vi-VN') : donHangDangXem.thoiGianLap}</p>
                         </div>
 
                         <div className="modal-footer">
 
+                            <button
+                                className="btn-chi-tiet"
+                                style={{ marginRight: 8 }}
+                                onClick={() => inHoaDonPDF(donHangDangXem.maHoaDon)}
+                                disabled={dangInPDF === donHangDangXem.maHoaDon}
+                            >
+                                {dangInPDF === donHangDangXem.maHoaDon ? "Đang tạo..." : "In hóa đơn PDF"}
+                            </button>
                             <button className="btn-cancel" onClick={() => setDonHangDangXem(null)}>Đóng</button>
 
                         </div>

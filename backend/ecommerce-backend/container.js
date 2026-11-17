@@ -107,6 +107,10 @@ const ChatbotRoutes = require('./routes/user/ChatbotRoutes');
 module.exports = function buildContainer(dbConfig) {
     const db = new Database(dbConfig);
 
+    // CartService giữ hàng trong giỏ 15 phút -> cần job nền tự xóa giỏ hết hạn và hoàn tồn kho
+    const cartService = new CartService(db);
+    cartService.startExpiryJob();
+
     return [
         // ---------------- ADMIN ROUTES ----------------
         new AuthAdminRoutes(new AuthAdminController(new AuthAdminService(db))),
@@ -128,7 +132,7 @@ module.exports = function buildContainer(dbConfig) {
         new HoTroRoutes(new HoTroController(new HoTroService(db))),
 
         // ---------------- USER ROUTES ----------------
-        new CartRoutes(new CartController(new CartService(db))),
+        new CartRoutes(new CartController(cartService)),
         new AuthRoutes(new AuthController(new AuthService(db))),
         new CustomerRoutes(new CustomerController(new CustomerService(db))),
         new CatalogRoutes(new CatalogController(new CatalogService(db))),

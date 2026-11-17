@@ -9,8 +9,7 @@ class KhuyenMaiApi extends BaseApi {
         return response.data;
     }
 
-    // POST /api/admin/khuyenmai/them
-    // LƯU Ý: route này hiện CHƯA có ở backend (trang khuyenmai_admin.js đã gọi từ trước) nên sẽ trả 404.
+    // POST /api/admin/khuyenmai/them  body: { tenKM, phanTram, dieuKien, ngayBD, ngayKT }
     async taoKhuyenMai(duLieu) {
         const response = await this.client.post("/api/admin/khuyenmai/them", duLieu);
         return response.data;

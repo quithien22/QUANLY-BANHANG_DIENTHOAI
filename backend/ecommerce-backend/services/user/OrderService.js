@@ -57,32 +57,64 @@ class OrderService extends BaseService {
             }
             const tongTienCuoi = tongTienHang;
 
-            // 2.5. Giữ hàng: trừ tồn kho bằng 1 câu UPDATE có điều kiện (chống bán quá số lượng)
-            // - Gộp các dòng cùng maSP (khác màu/dung lượng) vì tồn kho tính theo sản phẩm.
-            // - Sắp xếp theo maSP để mọi giao dịch khóa cùng 1 thứ tự -> tránh deadlock.
+            // 2.5. Chuyển hàng ĐANG GIỮ trong giỏ thành đơn, chỉ trừ kho phần còn thiếu.
+            // - Khi thêm vào giỏ, CartService đã trừ tonKho (giữ hàng 15 phút). Nếu ở đây trừ lại
+            //   toàn bộ thì mỗi đơn bị trừ kho 2 lần.
+            // - Cách làm: lấy các dòng giỏ của khách (đang giữ bao nhiêu mỗi sản phẩm = daGiu), xóa giỏ,
+            //   rồi với từng sản phẩm cập nhật đúng phần chênh: tonKho = tonKho + daGiu - daDat.
+            //     + Mua từ giỏ:  daGiu = daDat  -> tồn kho không đổi
+            //     + Mua ngay:    daGiu = 0      -> trừ đúng như trước đây
+            //     + Giỏ giữ dư so với đơn (hoặc sản phẩm không có trong đơn) -> hoàn phần dư
+            // - Dòng giỏ quá 15 phút nhưng job chưa kịp dọn vẫn đang giữ kho nên vẫn tính vào daGiu;
+            //   nếu hàng đã bị người khác mua mất thì điều kiện bên dưới sẽ báo hết hàng (409).
+            // - Khóa theo thứ tự GioHang -> SanPham (sắp theo maSP) để tránh deadlock.
             // - Câu UPDATE giữ khóa ghi tới khi commit: người đến sau phải chờ, rồi đánh giá lại
-            //   điều kiện tonKho >= soLuong -> nếu hết hàng thì rowsAffected = 0.
-            const canTru = new Map();
+            //   điều kiện -> nếu hết hàng thì rowsAffected = 0.
+            const gioHangDangGiu = await new sql.Request(transaction)
+                .input('maKH', sql.VarChar(20), maKH)
+                .query(`SELECT maSP, soLuong FROM GioHang WITH (UPDLOCK, HOLDLOCK) WHERE maKH = @maKH`);
+
+            const daGiu = new Map();
+            for (const dong of gioHangDangGiu.recordset) {
+                const key = String(dong.maSP);
+                daGiu.set(key, (daGiu.get(key) || 0) + Number(dong.soLuong));
+            }
+
+            // Xóa giỏ của khách (đơn đã gom hết hàng đang giữ). Rollback thì giỏ tự quay lại.
+            await new sql.Request(transaction)
+                .input('maKH', sql.VarChar(20), maKH)
+                .query(`DELETE FROM GioHang WHERE maKH = @maKH`);
+
+            // Gộp các dòng cùng maSP (khác màu/dung lượng) vì tồn kho tính theo sản phẩm.
+            const canDat = new Map();
             for (const sp of danhSachSanPham) {
                 const sl = Number(sp.soLuong) || 0;
                 if (!sp.maSP || sl <= 0) {
                     throw new HttpError(400, "Thông tin sản phẩm hoặc số lượng không hợp lệ.");
                 }
-                canTru.set(sp.maSP, (canTru.get(sp.maSP) || 0) + sl);
+                const key = String(sp.maSP);
+                canDat.set(key, (canDat.get(key) || 0) + sl);
             }
-            const dsTru = [...canTru.entries()].sort(([a], [b]) => String(a).localeCompare(String(b)));
 
-            for (const [maSP, soLuong] of dsTru) {
-                const ketQuaTruKho = await new sql.Request(transaction)
+            const dsMaSP = [...new Set([...canDat.keys(), ...daGiu.keys()])].sort((a, b) => a.localeCompare(b));
+
+            for (const maSP of dsMaSP) {
+                const daDat = canDat.get(maSP) || 0;
+                const giu = daGiu.get(maSP) || 0;
+
+                const ketQuaCapNhatKho = await new sql.Request(transaction)
                     .input('maSP', sql.VarChar(20), maSP)
-                    .input('soLuong', sql.Int, soLuong)
+                    .input('daGiu', sql.Int, giu)
+                    .input('daDat', sql.Int, daDat)
                     .query(`
                         UPDATE SanPham
-                        SET tonKho = tonKho - @soLuong
-                        WHERE maSP = @maSP AND trangThai = 1 AND tonKho >= @soLuong
+                        SET tonKho = tonKho + @daGiu - @daDat
+                        WHERE maSP = @maSP
+                          AND (@daDat = 0 OR trangThai = 1)
+                          AND tonKho + @daGiu >= @daDat
                     `);
 
-                if (ketQuaTruKho.rowsAffected[0] === 0) {
+                if (ketQuaCapNhatKho.rowsAffected[0] === 0 && daDat > 0) {
                     throw new HttpError(409, "Sản phẩm đã hết hàng hoặc không đủ số lượng, vui lòng kiểm tra lại giỏ hàng.");
                 }
             }
@@ -136,10 +168,7 @@ class OrderService extends BaseService {
                     VALUES (@maVanChuyen, @maHoaDon, NULL, NULL, 0, 'cho_lay_hang', DATEADD(day, 3, GETDATE()))
                 `);
 
-            // 7. Xóa giỏ hàng của khách
-            await new sql.Request(transaction)
-                .input('maKH', sql.VarChar(20), maKH)
-                .query(`DELETE FROM GioHang WHERE maKH = @maKH`);
+            // 7. Giỏ hàng của khách đã được xóa ở bước 2.5 (cùng transaction)
 
             await transaction.commit();
             return { maHoaDon, tongTien: tongTienCuoi };
@@ -262,10 +291,14 @@ class OrderService extends BaseService {
                     kh.hoTen as hoTenKhachHang,
                     dcgh.hoTenNguoiNhan,
                     dcgh.SDT,
-                    dcgh.diaChiChiTiet
+                    dcgh.diaChiChiTiet,
+                    tt.phuongThuc,
+                    vc.ngayGiaoDuKien
                 FROM HoaDon hd
                 JOIN KhachHang kh ON hd.maKH = kh.maKH
                 LEFT JOIN DiaChiGiaoHang dcgh ON hd.maDiaChi = dcgh.maDiaChi
+                LEFT JOIN ThanhToan tt ON hd.maHoaDon = tt.maHoaDon
+                LEFT JOIN VanChuyen vc ON hd.maHoaDon = vc.maHoaDon
                 WHERE hd.maKH = @maKH
                 ORDER BY hd.thoiGianLap DESC
             `);
@@ -282,13 +315,14 @@ class OrderService extends BaseService {
             .query(`
                 SELECT 
                     cthd.maHoaDon, 
-                    cthd.maSP, 
+                    cthd.maSP, cthd.maBienThe, bt.giaTri AS phanLoai, 
                     cthd.soLuong, 
                     cthd.giaBan AS donGia, 
                     sp.tenSP, 
                     sp.hinhAnh
                 FROM ChiTietHoaDon cthd
                 JOIN SanPham sp ON cthd.maSP = sp.maSP
+                LEFT JOIN BienTheSanPham bt ON cthd.maBienThe = bt.maBienThe
                 WHERE cthd.maHoaDon = @maHoaDon
             `);
         return result.recordset;

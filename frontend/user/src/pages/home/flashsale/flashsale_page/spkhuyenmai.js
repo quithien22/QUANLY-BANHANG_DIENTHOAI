@@ -186,7 +186,7 @@ function SanPhamKhuyenMai() {
                 {sanPhamDangHien.length > 0 ? (
                     sanPhamDangHien.map((product, index) => (
                         <li className="spflashsale-card" key={product.maSP || index}>
-                            <Link to={`/chitietsanpham/${product.maSP}`}>
+                            <Link to={`/home/hang/chi-tiet-san-pham/${product.maSP}`}>
                                 <div className="spflashsale-card_imgwrap">
                                     {product.badge && <span className="spflashsale-badge">{product.badge}</span>}
                                     <img
@@ -196,9 +196,11 @@ function SanPhamKhuyenMai() {
                                 </div>
                             </Link>
 
-                            {product.tag && <span className="spflashsale-card_tag">{product.tag}</span>}
+                            <div className="spflashsale-card_tagwrap">
+                                {product.tag && <span className="spflashsale-card_tag">{product.tag}</span>}
+                            </div>
 
-                            <Link to={`/chitietsanpham/${product.maSP}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <Link to={`/home/hang/chi-tiet-san-pham/${product.maSP}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                 <h3 className="spflashsale-card_name">{product.tenSP}</h3>
                             </Link>
 
@@ -217,7 +219,7 @@ function SanPhamKhuyenMai() {
                                 <span>({product.soLuongDanhGia || 0} đánh giá)</span>
                             </div>
 
-                            <Link to={`/chi-tiet-san-pham/${product.maSP}`}>
+                            <Link to={`/home/hang/chi-tiet-san-pham/${product.maSP}`} className="spflashsale-card_link">
                                 <button className="spflashsale-card_btn">Xem chi tiết</button>
                             </Link>
                         </li>

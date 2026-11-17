@@ -40,6 +40,44 @@
     color: #111827; 
 }
 
+/* Ô tìm kiếm */
+.nhanvien-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 400px;
+    max-width: 100%;
+    padding: 0 14px;
+    height: 35px;
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.nhanvien-search i {
+    font-size: 18px;
+    color: #111827;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.nhanvien-search input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #111827;
+}
+
+.nhanvien-search input::placeholder {
+    color: #9CA3AF;
+}
+
 .nhanvien-header p{
     font-family: 'Inter', sans-serif;
     font-size: 13px;

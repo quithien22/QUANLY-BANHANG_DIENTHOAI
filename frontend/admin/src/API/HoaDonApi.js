@@ -15,6 +15,12 @@ class HoaDonApi extends BaseApi {
         return response.data;
     }
 
+    // GET /api/hoadon/chitiet/:maHoaDon -> { thongTin, sanPham[] }
+    async layChiTiet(maHoaDon) {
+        const response = await this.client.get(`/api/hoadon/chitiet/${maHoaDon}`);
+        return response.data;
+    }
+
     // PUT /api/hoadon/capnhat-trangthai/:maHoaDon  body: { trangThai }
     async capNhatTrangThai(maHoaDon, trangThai) {
         const response = await this.client.put(`/api/hoadon/capnhat-trangthai/${maHoaDon}`, { trangThai });

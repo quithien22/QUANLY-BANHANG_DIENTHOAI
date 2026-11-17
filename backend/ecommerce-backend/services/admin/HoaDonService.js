@@ -20,6 +20,7 @@ class HoaDonService extends BaseService {
     }
 
     // Danh sách đầy đủ cho trang Quản lý đơn hàng (kèm tên SP đầu tiên, ảnh, tổng số lượng...)
+    // thoiGianLap: chuỗi dd/MM/yyyy để hiển thị; thoiGianLapGoc: ngày giờ gốc để lọc theo ngày.
     async layToanBo() {
         const pool = await this.getPool();
         const ketQua = await pool.request().query(`
@@ -31,10 +32,11 @@ class HoaDonService extends BaseService {
             SELECT 
                 h.maHoaDon, 
                 h.tongTien, 
-                FORMAT(h.thoiGianLap, 'dd/MM/yyyy') AS thoiGianLap, -- ÉP KIỂU NGÀY THÁNG TẠI ĐÂY
+                FORMAT(h.thoiGianLap, 'dd/MM/yyyy') AS thoiGianLap,
+                h.thoiGianLap AS thoiGianLapGoc,
                 h.trangThai,
-                k.hoTen AS tenKhachHang, 
-                k.SDT AS sdtKhachHang,
+                ISNULL(k.hoTen, dc.hoTenNguoiNhan) AS tenKhachHang, 
+                ISNULL(NULLIF(k.SDT, ''), dc.SDT) AS sdtKhachHang,
                 nv.hoTen AS tenNhanVien,
                 ISNULL(tsl.tongSoLuongSP, 0) AS tongSoLuongSP,
                 (
@@ -44,18 +46,59 @@ class HoaDonService extends BaseService {
                     WHERE ct.maHoaDon = h.maHoaDon
                 ) AS tenSanPham,
                 (
-                    SELECT TOP 1 ha.duongDan 
+                    SELECT TOP 1 sp.hinhAnh 
                     FROM ChiTietHoaDon ct 
-                    JOIN HinhAnhSanPham ha ON ct.maSP = ha.maSP 
+                    JOIN SanPham sp ON ct.maSP = sp.maSP 
                     WHERE ct.maHoaDon = h.maHoaDon
                 ) AS img
             FROM HoaDon h
             LEFT JOIN KhachHang k ON h.maKH = k.maKH
             LEFT JOIN NhanVien nv ON h.maNV = nv.maNV
+            LEFT JOIN DiaChiGiaoHang dc ON h.maDiaChi = dc.maDiaChi
             LEFT JOIN TongSoLuongHD tsl ON h.maHoaDon = tsl.maHoaDon
             ORDER BY h.thoiGianLap DESC
         `);
         return ketQua.recordset;
+    }
+
+    // Chi tiết 1 đơn: người nhận, địa chỉ, thanh toán, vận chuyển và TOÀN BỘ sản phẩm trong đơn
+    async layChiTiet(maHoaDon) {
+        const sql = this.sql;
+        const pool = await this.getPool();
+
+        const thongTin = await pool.request()
+            .input('maHoaDon', sql.VarChar, maHoaDon)
+            .query(`
+                SELECT h.maHoaDon, h.tongTien, h.thoiGianLap, h.trangThai, h.maKM,
+                       k.hoTen AS tenKhachHang,
+                       ISNULL(NULLIF(k.SDT, ''), dc.SDT) AS soDienThoai,
+                       dc.hoTenNguoiNhan, dc.SDT AS sdtNguoiNhan, dc.diaChiChiTiet,
+                       tt.phuongThuc, tt.trangThai AS trangThaiThanhToan,
+                       vc.trangThai AS trangThaiVanChuyen, vc.ngayGiaoDuKien
+                FROM HoaDon h
+                LEFT JOIN KhachHang k ON h.maKH = k.maKH
+                LEFT JOIN DiaChiGiaoHang dc ON h.maDiaChi = dc.maDiaChi
+                LEFT JOIN ThanhToan tt ON h.maHoaDon = tt.maHoaDon
+                LEFT JOIN VanChuyen vc ON h.maHoaDon = vc.maHoaDon
+                WHERE h.maHoaDon = @maHoaDon
+            `);
+
+        if (thongTin.recordset.length === 0) {
+            throw new HttpError(404, "Không tìm thấy hóa đơn");
+        }
+
+        const sanPham = await pool.request()
+            .input('maHoaDon', sql.VarChar, maHoaDon)
+            .query(`
+                SELECT ct.maSP, ct.soLuong, ct.giaBan, sp.tenSP, sp.hinhAnh,
+                       bt.giaTri AS phanLoai
+                FROM ChiTietHoaDon ct
+                JOIN SanPham sp ON ct.maSP = sp.maSP
+                LEFT JOIN BienTheSanPham bt ON ct.maBienThe = bt.maBienThe
+                WHERE ct.maHoaDon = @maHoaDon
+            `);
+
+        return { thongTin: thongTin.recordset[0], sanPham: sanPham.recordset };
     }
 
     // Đổi trạng thái đơn hàng.

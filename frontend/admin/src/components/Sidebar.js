@@ -42,7 +42,7 @@ function Sidebar() {
         <div className="sidebar-menu"> {/* Đổi thành sidebar-menu cho khớp CSS */}
             <div className="sidebar-logo">
                 <div className="sidebar-logo_icon">T</div>
-                <span>Thiện Store Admin</span>
+                <span>6EA Admin</span>
             </div>
 
             <ul className="sidebar-menu-list" style={{ listStyle: 'none', padding: 0 }}>

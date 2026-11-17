@@ -12,10 +12,11 @@ class AddressService extends BaseService {
             .input('maKH', sql.VarChar, maKH)
             .query(`
                 SELECT * FROM DiaChiGiaoHang 
-                WHERE maKH = @maKH AND (daXoa = 0 OR daXoa IS NULL) 
+                WHERE maKH = @maKH 
                 ORDER BY macDinh DESC
             `);
-        return result.recordset;
+        // Lọc địa chỉ đã xóa mềm ở đây để không lỗi nếu bảng chưa có cột daXoa
+        return result.recordset.filter((dc) => !dc.daXoa);
     }
 
     // Địa chỉ đầu tiên của khách tự động là mặc định

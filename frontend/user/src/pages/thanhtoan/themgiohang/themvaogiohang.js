@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { cartApi } from "../../../API/CartApi";
 import { promotionApi } from "../../../API/PromotionApi";
 import { layUrlAnh } from "../../../utils/imageUrl";
+import Swal from "sweetalert2";
 
 function ThemVaoGioHang() {
 
@@ -16,15 +17,37 @@ function ThemVaoGioHang() {
 
     const [danhSachGioHang, setDanhSachGioHang] = useState([]);
     const [dangTai, setDangTai] = useState(true);
+    // Thông báo nhỏ góc phải màn hình, tự tắt sau 4 giây
+    const hienToast = (icon, tieuDe) => Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon,
+        title: tieuDe,
+        showConfirmButton: false,
+        timer: 4000,
+        timerProgressBar: true,
+    });
 
-    const taiGioHang = () => {
+    // Đồng hồ 1 giây/lần để hiển thị đếm ngược thời gian giữ hàng (15 phút)
+    const [bayGio, setBayGio] = useState(Date.now());
+
+    // yenLang = true: tải lại ngầm (không nháy "Đang tải..."), dùng khi tự động làm mới giỏ
+    const taiGioHang = (yenLang = false) => {
         if (!maKH) {
             setDangTai(false);
-            return;
+            return Promise.resolve();
         }
-        setDangTai(true);
-        cartApi.getCart(maKH)
-            .then((data) => setDanhSachGioHang(data))
+        if (!yenLang) setDangTai(true);
+        return cartApi.getCart(maKH)
+            .then((data) => {
+                // Server trả về "conLaiGiay"; đổi sang mốc giờ của máy khách để đếm ngược không bị lệch đồng hồ
+                const moc = Date.now();
+                setDanhSachGioHang(data.map((item) => ({
+                    ...item,
+                    hetHanTai: moc + (Number(item.conLaiGiay) || 0) * 1000,
+                })));
+                return data;
+            })
             .catch((error) => console.error("Lỗi khi tải giỏ hàng:", error))
             .finally(() => setDangTai(false));
     };
@@ -34,20 +57,53 @@ function ThemVaoGioHang() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [maKH]);
 
+    useEffect(() => {
+        const dongHo = setInterval(() => setBayGio(Date.now()), 1000);
+        return () => clearInterval(dongHo);
+    }, []);
+
+    // Có dòng đã hết 15 phút giữ hàng -> tải lại giỏ (server đã tự xóa dòng đó và hoàn tồn kho)
+    useEffect(() => {
+        const coDongHetHan = danhSachGioHang.some((item) => item.hetHanTai && item.hetHanTai <= bayGio);
+        if (!coDongHetHan) return;
+
+        const soDongTruoc = danhSachGioHang.length;
+        taiGioHang(true).then((data) => {
+            if (data && data.length < soDongTruoc) {
+                hienToast("info", "Một số sản phẩm đã quá 15 phút giữ hàng nên được xóa khỏi giỏ.");
+                window.dispatchEvent(new Event("gioHangCapNhat")); // Header cập nhật lại số lượng
+            }
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [bayGio]);
+
     // ============== TĂNG / GIẢM SỐ LƯỢNG ===========
     const capNhatSoLuong = (item, soLuongMoi) => {
         cartApi.updateQuantity(item.maGioHang, soLuongMoi)
             .then(() => taiGioHang())
-            .catch((error) => console.error("Lỗi khi cập nhật số lượng:", error));
+            .catch((error) => {
+                console.error("Lỗi khi cập nhật số lượng:", error);
+                // 409: hết hàng / không đủ tồn kho; 404, 410: dòng đã quá 15 phút giữ hàng
+                hienToast("error", error.response?.data?.message || "Không thể cập nhật số lượng, vui lòng thử lại.");
+                taiGioHang(true);
+            });
     };
 
     const tangSoLuong = (item) => capNhatSoLuong(item, item.soLuong + 1);
     const giamSoLuong = (item) => capNhatSoLuong(item, item.soLuong - 1); // backend tự xóa nếu <= 0
 
     // ============== XÓA KHỎI GIỎ ===========
-    const xoaKhoiGio = (item) => {
-        const xacNhan = window.confirm(`Xóa "${item.tenSP}" khỏi giỏ hàng?`);
-        if (!xacNhan) return;
+    const xoaKhoiGio = async (item) => {
+        const ketQua = await Swal.fire({
+            icon: "warning",
+            title: "Xóa khỏi giỏ hàng?",
+            text: `"${item.tenSP}" sẽ bị xóa khỏi giỏ hàng của bạn.`,
+            showCancelButton: true,
+            confirmButtonText: "Xóa",
+            cancelButtonText: "Giữ lại",
+            confirmButtonColor: "#dc2626",
+        });
+        if (!ketQua.isConfirmed) return;
         cartApi.removeItem(item.maGioHang)
             .then(() => taiGioHang())
             .catch((error) => console.error("Lỗi khi xóa sản phẩm khỏi giỏ:", error));
@@ -75,6 +131,14 @@ function ThemVaoGioHang() {
 
     // ============== TÍNH TOÁN TỔNG TIỀN ===========
     const dinhDangTien = (soTien) => `${(Number(soTien) || 0).toLocaleString("vi-VN")}đ`;
+
+    // mm:ss còn lại của thời gian giữ hàng
+    const dinhDangDemNguoc = (ms) => {
+        const tongGiay = Math.max(0, Math.ceil(ms / 1000));
+        const phut = String(Math.floor(tongGiay / 60)).padStart(2, "0");
+        const giay = String(tongGiay % 60).padStart(2, "0");
+        return `${phut}:${giay}`;
+    };
 
     const donGia = (item) => (Number(item.giaBan) || 0) + (Number(item.giaChenhLech) || 0);
 
@@ -116,7 +180,7 @@ function ThemVaoGioHang() {
     const xuLyDatHang = () => {
         navigate("/home/themgiohang/tienhanhdathang", {
             state: {
-                danhSachSanPhamChonMua: danhSachGioHang,
+                danhSachSanPhamChonMua: danhSachGioHang.map((item) => ({ ...item, gia: donGia(item), tenPhanLoai: item.tenPhanLoai || item.bienTheGiaTri || "" })),
                 khuyenMai: khuyenMaiApDung,
             }
         });
@@ -158,6 +222,9 @@ function ThemVaoGioHang() {
                                     <span className="add-cart-item_name">{item.tenSP}</span>
                                     {item.bienTheGiaTri && (
                                         <span className="add-cart-item_color">Phân loại: {item.bienTheGiaTri}</span>
+                                    )}
+                                    {item.hetHanTai && (
+                                        <span className="add-cart-item_color">Giữ hàng còn {dinhDangDemNguoc(item.hetHanTai - bayGio)}</span>
                                     )}
 
                                     <div className="add-cart-item_actions">

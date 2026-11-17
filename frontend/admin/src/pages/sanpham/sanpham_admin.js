@@ -25,6 +25,18 @@ function SanPham() {
 
     useEffect(() => {
         taiLaiDanhSachSanPham();
+
+        // Tồn kho thay đổi liên tục (khách giữ hàng trong giỏ, hết hạn 15 phút, đặt hàng...)
+        // -> tự làm mới mỗi 10 giây khi tab đang mở, và ngay khi quay lại tab này
+        const dongHo = setInterval(() => {
+            if (!document.hidden) taiLaiDanhSachSanPham();
+        }, 10000);
+        window.addEventListener("focus", taiLaiDanhSachSanPham);
+
+        return () => {
+            clearInterval(dongHo);
+            window.removeEventListener("focus", taiLaiDanhSachSanPham);
+        };
     }, []);
 
     // ============== BỘ LỌC ===========

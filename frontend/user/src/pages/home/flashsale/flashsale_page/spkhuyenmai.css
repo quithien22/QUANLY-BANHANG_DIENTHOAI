@@ -159,6 +159,8 @@
     border: 1px solid #E5E7EB;
     border-radius: 12px;
     padding: 16px;
+    display: flex;
+    flex-direction: column;
 }
 
 .spflashsale-card_imgwrap {
@@ -184,6 +186,14 @@
     border-radius: 4px;
 }
 
+/* Khung giữ chỗ cố định cho nhãn (trả góp...) – card không có nhãn vẫn giữ cùng chiều cao */
+.spflashsale-card_tagwrap {
+    height: 22px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
 .spflashsale-card_tag {
     display: inline-block;
     background-color: #EFF6FF;
@@ -193,7 +203,6 @@
     font-size: 11px;
     padding: 2px 8px;
     border-radius: 4px;
-    margin-bottom: 8px;
 }
 
 .spflashsale-card_name {
@@ -202,6 +211,7 @@
     font-weight: 600;
     color: #111827;
     margin-bottom: 8px;
+    line-height: 20px;
     min-height: 40px;
     /* giữ chiều cao đều nhau dù tên dài/ngắn khác nhau */
     display: -webkit-box;
@@ -213,6 +223,7 @@
 
 .spflashsale-card_price {
     display: flex;
+    min-height: 24px;
     align-items: baseline;
     gap: 8px;
     margin-bottom: 8px;
@@ -243,6 +254,12 @@
 .spflashsale-card_rating i {
     color: #FBBF24;
     font-size: 14px;
+}
+
+/* Đẩy nút xuống sát đáy card để các nút thẳng hàng */
+.spflashsale-card_link {
+    margin-top: auto;
+    display: block;
 }
 
 .spflashsale-card_btn {

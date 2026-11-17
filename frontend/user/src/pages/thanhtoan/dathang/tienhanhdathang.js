@@ -3,6 +3,7 @@ import "./tienhanhdathang.css";
 import { addressApi } from "../../../API/AddressApi";
 import { orderApi } from "../../../API/OrderApi";
 import { paymentApi } from "../../../API/PaymentApi";
+import { layUrlAnh } from "../../../utils/imageUrl";
 import { useNavigate, useLocation } from "react-router-dom";
 
 
@@ -255,7 +256,7 @@ function TienHanhDatHang() {
                             {danhSachSanPham.map((sp, index) => (
                                 <li className="thdathang-summary-item-product" key={index}>
                                     <div className="thdathang-product-details">
-                                        <img src={sp.hinhAnh} alt={sp.tenSP} className="thdathang-product-img" />
+                                        <img src={layUrlAnh(sp.hinhAnh)} alt={sp.tenSP} className="thdathang-product-img" />
                                         <div className="thdathang-product-meta">
                                             <span className="thdathang-product-name">{sp.tenSP}</span>
                                             <div className="thdathang-product-variants">

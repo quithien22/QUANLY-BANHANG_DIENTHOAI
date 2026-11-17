@@ -8,6 +8,11 @@ import Swal from "sweetalert2";
 import DanhGiaSanPhamSection from '../danhgia_page/danhgia';
 import { cartApi } from "../../../API/CartApi";
 
+// Swal render chuỗi HTML thô, nên tên sản phẩm / phân loại phải được escape trước khi chèn vào
+const thoatHtml = (chuoi) => String(chuoi ?? "").replace(/[&<>"']/g, (c) => (
+    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+));
+
 function ChiTietSanPham() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -157,7 +162,8 @@ function ChiTietSanPham() {
             return true;
         } catch (error) {
             console.error("Lỗi khi thêm vào giỏ hàng:", error);
-            Swal.fire("Lỗi!", "Không thể thêm vào giỏ hàng, vui lòng thử lại.", "error");
+            // 409: hết hàng / không đủ tồn kho (hàng có thể đang được khách khác giữ trong giỏ)
+            Swal.fire("Lỗi!", error.response?.data?.message || "Không thể thêm vào giỏ hàng, vui lòng thử lại.", "error");
             return false;
         }
     };
@@ -166,14 +172,35 @@ function ChiTietSanPham() {
         const thanhCong = await themVaoGio();
         if (!thanhCong) return;
 
+        const phanLoai = [dungLuongChon?.giaTri, mauSacChon?.giaTri].filter(Boolean).join(" - ");
+
+        // Nội dung tự dựng (thẻ sản phẩm + ghi chú giữ hàng). Style nằm trong src/thongbao.css
         const ketQua = await Swal.fire({
-            title: "Đã thêm vào giỏ hàng!",
             icon: "success",
+            title: "Đã thêm vào giỏ hàng!",
+            html: `
+                <div class="tb-giohang">
+                    <div class="tb-giohang__sp">
+                        <img src="${thoatHtml(layUrlAnh(hinhAnhHienThi))}" alt="" />
+                        <div>
+                            <div class="tb-giohang__ten">${thoatHtml(sanPham.tenSP)}</div>
+                            ${phanLoai ? `<div class="tb-giohang__phanloai">${thoatHtml(phanLoai)}</div>` : ""}
+                            <div class="tb-giohang__gia">${thoatHtml(dinhDangTien(giaHienTai))}</div>
+                        </div>
+                    </div>
+                    <div class="tb-giohang__giu">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+                        <span>Hàng được giữ cho bạn trong <b>15 phút</b>. Quá thời gian này sản phẩm sẽ tự động bị xóa khỏi giỏ.</span>
+                    </div>
+                </div>
+            `,
             showCancelButton: true,
+            showCloseButton: true,
             confirmButtonText: "Xem giỏ hàng",
             cancelButtonText: "Tiếp tục mua sắm",
+            customClass: { popup: "tb-popup-giohang" },
         });
-        if (ketQua.isConfirmed) navigate("/themgiohang");
+        if (ketQua.isConfirmed) navigate("/home/themgiohang");
     };
 
     const xuLyMuaNgay = async () => {
@@ -212,7 +239,7 @@ function ChiTietSanPham() {
             tongTien: giaHienTai
         };
 
-        navigate("/tienhanhdathang", { state: { dsMuaNgay: [thongTinDonHang] } });
+        navigate("/home/themgiohang/tienhanhdathang", { state: { dsMuaNgay: [thongTinDonHang] } });
     };
 
     const xemTraGop = () => {

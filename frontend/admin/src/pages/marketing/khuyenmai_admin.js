@@ -43,8 +43,28 @@ function KhuyenMai() {
     });
 
     const [formKhungGio, setFormKhungGio] = useState({
-        ngayApDung: "", gioBD: "", gioKT: ""
+        ngayApDung: "", gioBD: "", gioKT: "", maKM: ""
     });
+    // null = đang TẠO khung giờ mới; có giá trị = mã khung giờ đang SỬA
+    const [khungGioDangSua, setKhungGioDangSua] = useState(null);
+
+    // ---- Hàm tiện ích hiển thị giờ/ngày ----
+    // Cột giờ kiểu TIME nên API trả về dạng "1970-01-01T08:00:00.000Z" -> lấy "08:00"
+    const layGioPhut = (v) => {
+        const m = String(v ?? "").match(/(\d{2}):(\d{2})/);
+        return m ? `${m[1]}:${m[2]}` : "";
+    };
+    const layNgayISO = (v) => String(v ?? "").slice(0, 10); // yyyy-mm-dd
+
+    // Trạng thái khung giờ tính theo giờ thực (thay vì hiện chữ thô "sap_dien_ra")
+    const tinhTrangThaiKhungGio = (kg) => {
+        const ymd = layNgayISO(kg.ngay), bd = layGioPhut(kg.gioBD), kt = layGioPhut(kg.gioKT);
+        if (!ymd || !bd || !kt) return { text: "Không xác định", css: "badge-gray" };
+        const now = new Date();
+        if (now < new Date(`${ymd}T${bd}:00`)) return { text: "Sắp diễn ra", css: "badge-green" };
+        if (now <= new Date(`${ymd}T${kt}:00`)) return { text: "Đang diễn ra", css: "badge-green" };
+        return { text: "Đã kết thúc", css: "badge-gray" };
+    };
 
     // Form thêm SP vào Flash Sale
     const [khungGioDangChon, setKhungGioDangChon] = useState(null); // Lưu mã Khung Giờ đang thao tác
@@ -62,7 +82,27 @@ function KhuyenMai() {
             taiDuLieu();
         } catch (error) {
             console.error("Lỗi thêm khuyến mãi:", error);
-            alert("Lỗi khi tạo khuyến mãi!");
+            const trangThai = error.response?.status;
+            const chiTiet = error.response?.data?.message || error.message;
+            alert(`Lỗi khi tạo khuyến mãi!${trangThai ? ` (HTTP ${trangThai})` : ""}\n${chiTiet}`);
+        }
+    };
+
+    // ================= HÀM ĐỔI TRẠNG THÁI KHUYẾN MÃI (Đang chạy <-> Tạm ngưng) =================
+    const xuLyDoiTrangThai = async (km) => {
+        const trangThaiMoi = !km.trangThai;
+        try {
+            await axios.put(`http://localhost:8080/api/admin/khuyenmai/${km.maKM}/trangthai`, {
+                trangThai: trangThaiMoi
+            });
+            // Cập nhật ngay trên giao diện, không cần tải lại cả trang
+            setdanhSachKhuyenMai((ds) =>
+                ds.map((item) => item.maKM === km.maKM ? { ...item, trangThai: trangThaiMoi } : item)
+            );
+        } catch (error) {
+            console.error("Lỗi cập nhật trạng thái khuyến mãi:", error);
+            const chiTiet = error.response?.data?.message || error.message;
+            alert(`Không cập nhật được trạng thái!\n${chiTiet}`);
         }
     };
 
@@ -76,14 +116,74 @@ function KhuyenMai() {
         }
 
         try {
-            await axios.post("http://localhost:8080/api/admin/flashsale/taokhunggio", formKhungGio);
-            alert("Tạo khung giờ Flash Sale thành công!");
+            if (khungGioDangSua) {
+                await axios.put(`http://localhost:8080/api/admin/flashsale/khunggio/${khungGioDangSua}`, formKhungGio);
+                alert("Cập nhật khung giờ Flash Sale thành công!");
+            } else {
+                await axios.post("http://localhost:8080/api/admin/flashsale/taokhunggio", formKhungGio);
+                alert("Tạo khung giờ Flash Sale thành công!");
+            }
             setHienThiModalKhungGio(false);
             taiDuLieu();
         } catch (error) {
             const thongBaoLoi = error.response?.data?.message || "Lỗi khi tạo khung giờ Flash Sale!";
             alert(thongBaoLoi);
         }
+    };
+
+    // ================= MỞ MODAL TẠO / SỬA / XÓA KHUNG GIỜ =================
+    const moModalTaoKhungGio = () => {
+        setKhungGioDangSua(null);
+        setFormKhungGio({ ngayApDung: "", gioBD: "", gioKT: "", maKM: "" });
+        setHienThiModalKhungGio(true);
+    };
+
+    const moModalSuaKhungGio = (kg) => {
+        setKhungGioDangSua(kg.maKhungGio);
+        setFormKhungGio({
+            ngayApDung: layNgayISO(kg.ngay),
+            gioBD: layGioPhut(kg.gioBD),
+            gioKT: layGioPhut(kg.gioKT),
+            maKM: kg.maKM || ""
+        });
+        setHienThiModalKhungGio(true);
+    };
+
+    const xuLyXoaKhungGio = async (kg) => {
+        const soSP = kg.danhSachSanPham.length;
+        const noiDung = `Xóa khung giờ ${layGioPhut(kg.gioBD)} - ${layGioPhut(kg.gioKT)}?`
+            + (soSP > 0 ? `\n${soSP} sản phẩm trong khung giờ này cũng sẽ bị gỡ khỏi Flash Sale.` : "");
+        if (!window.confirm(noiDung)) return;
+
+        try {
+            await axios.delete(`http://localhost:8080/api/admin/flashsale/khunggio/${kg.maKhungGio}`);
+            taiDuLieu();
+        } catch (error) {
+            console.error("Lỗi xóa khung giờ:", error);
+            alert(`Không xóa được khung giờ!\n${error.response?.data?.message || error.message}`);
+        }
+    };
+
+    const xuLyXoaSanPhamFS = async (maKhungGio, sp) => {
+        if (!window.confirm(`Gỡ "${sp.tenSP}" khỏi khung giờ này?`)) return;
+        try {
+            await axios.delete(`http://localhost:8080/api/admin/flashsale/khunggio/${maKhungGio}/sanpham/${sp.maSP}`);
+            taiDuLieu();
+        } catch (error) {
+            console.error("Lỗi gỡ sản phẩm:", error);
+            alert(`Không gỡ được sản phẩm!\n${error.response?.data?.message || error.message}`);
+        }
+    };
+
+    // Chọn sản phẩm: nếu khung giờ có áp dụng khuyến mãi thì gợi ý sẵn giá Flash Sale (vẫn sửa được)
+    const chonSanPhamFS = (maSP) => {
+        const kg = danhSachKhungGio.find((k) => k.maKhungGio === khungGioDangChon);
+        const sp = danhSachSanPhamGoc.find((s) => s.maSP === maSP);
+        let giaGoiY = formSanPhamFS.giaFlashSale;
+        if (kg?.phanTram && sp?.giaBan) {
+            giaGoiY = Math.round(Number(sp.giaBan) * (100 - Number(kg.phanTram)) / 100);
+        }
+        setFormSanPhamFS({ ...formSanPhamFS, maSP, giaFlashSale: giaGoiY });
     };
 
     // ================= HÀM XỬ LÝ THÊM SẢN PHẨM VÀO FLASH SALE =================
@@ -105,7 +205,7 @@ function KhuyenMai() {
             taiDuLieu();
         } catch (error) {
             console.error(error);
-            alert("Lỗi khi thêm sản phẩm vào Flash Sale!");
+            alert(`Lỗi khi thêm sản phẩm vào Flash Sale!\n${error.response?.data?.message || error.message}`);
         }
     };
 
@@ -123,6 +223,9 @@ function KhuyenMai() {
                     gioKT: sp.gioKT,
                     ngay: sp.ngayApDung,
                     trangThai: sp.trangThaiKhungGio,
+                    maKM: sp.maKM,
+                    tenKM: sp.tenKM,
+                    phanTram: sp.phanTram,
                     danhSachSanPham: [],
                 };
             }
@@ -135,6 +238,8 @@ function KhuyenMai() {
     };
 
     const danhSachKhungGio = nhomFlashSaleTheoKhungGio();
+    // Khung giờ đang được thêm sản phẩm (để biết có khuyến mãi tự giảm giá hay không)
+    const khungGioDangThemSP = danhSachKhungGio.find((k) => k.maKhungGio === khungGioDangChon);
 
     // Tính % hoàn thành
     const tinhPhanTramHoanThanh = (daBan, gioiHan) => {
@@ -203,7 +308,12 @@ function KhuyenMai() {
                                         {km.ngayKT ? new Date(km.ngayKT).toLocaleDateString('vi-VN') : ""}
                                     </td>
                                     <td>
-                                        <span className={`badge ${km.trangThai ? "badge-green" : "badge-gray"}`}>
+                                        <span
+                                            className={`badge ${km.trangThai ? "badge-green" : "badge-gray"}`}
+                                            style={{ cursor: "pointer" }}
+                                            title="Bấm để đổi trạng thái"
+                                            onClick={() => xuLyDoiTrangThai(km)}
+                                        >
                                             {km.trangThai ? "Đang chạy" : "Tạm ngưng"}
                                         </span>
                                     </td>
@@ -222,7 +332,7 @@ function KhuyenMai() {
             {tabDangChon === "flash-sale" && (
                 <div className="km-tab-content">
                     <div className="km-section-header">
-                        <button className="btn-add-khung-gio" onClick={() => setHienThiModalKhungGio(true)}>
+                        <button className="btn-add-khung-gio" onClick={moModalTaoKhungGio}>
                             + Tạo khung giờ mới
                         </button>
                     </div>
@@ -233,13 +343,28 @@ function KhuyenMai() {
                                 <div className="km-flashsale-gio">
                                     {/* Cắt chuỗi để hiển thị HH:MM thay vì HH:MM:SS */}
                                     <span className="km-flashsale-khung">
-                                        {khungGio.gioBD?.substring(0, 5)} - {khungGio.gioKT?.substring(0, 5)}
+                                        {layGioPhut(khungGio.gioBD)} - {layGioPhut(khungGio.gioKT)}
                                     </span>
                                     <span className="km-flashsale-ngay">
                                         {khungGio.ngay ? new Date(khungGio.ngay).toLocaleDateString('vi-VN') : ""}
                                     </span>
                                 </div>
-                                <span className="badge badge-green">{khungGio.trangThai || "Sắp diễn ra"}</span>
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                    {khungGio.tenKM && (
+                                        <span className="badge badge-gray" title="Chương trình khuyến mãi đang áp dụng">
+                                            {khungGio.tenKM} (-{khungGio.phanTram}%)
+                                        </span>
+                                    )}
+                                    <span className={`badge ${tinhTrangThaiKhungGio(khungGio).css}`}>
+                                        {tinhTrangThaiKhungGio(khungGio).text}
+                                    </span>
+                                    <button className="btn-edit-km" title="Sửa khung giờ" onClick={() => moModalSuaKhungGio(khungGio)}>
+                                        <i className="bx bx-pencil"></i>
+                                    </button>
+                                    <button className="btn-delete-km" title="Xóa khung giờ" onClick={() => xuLyXoaKhungGio(khungGio)}>
+                                        <i className="bx bx-trash" />
+                                    </button>
+                                </div>
                             </div>
 
                             <table className="km-flashsale-table">
@@ -273,7 +398,9 @@ function KhuyenMai() {
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <button className="btn-delete-km"><i className="bx bx-trash" /></button>
+                                                    <button className="btn-delete-km" title="Gỡ sản phẩm" onClick={() => xuLyXoaSanPhamFS(khungGio.maKhungGio, sp)}>
+                                                        <i className="bx bx-trash" />
+                                                    </button>
                                                 </td>
                                             </tr>
                                         )
@@ -358,7 +485,7 @@ function KhuyenMai() {
                     <div className="modal-content">
                         <form onSubmit={xuLyLuuKhungGio}>
                             <div className="modal-header">
-                                <h2>Tạo Khung Giờ Flash Sale</h2>
+                                <h2>{khungGioDangSua ? "Sửa Khung Giờ Flash Sale" : "Tạo Khung Giờ Flash Sale"}</h2>
                                 <button type="button" className="btn-close" onClick={() => setHienThiModalKhungGio(false)}>✖</button>
                             </div>
                             <div className="modal-body">
@@ -385,6 +512,20 @@ function KhuyenMai() {
                                         />
                                     </div>
                                 </div>
+                                <div className="form-group">
+                                    <label>Chương trình khuyến mãi áp dụng (giá sản phẩm tự giảm theo %):</label>
+                                    <select
+                                        value={formKhungGio.maKM}
+                                        onChange={e => setFormKhungGio({ ...formKhungGio, maKM: e.target.value })}
+                                    >
+                                        <option value="">-- Không áp dụng --</option>
+                                        {danhSachKhuyenMai.map((km) => (
+                                            <option key={km.maKM} value={km.maKM}>
+                                                {km.tenKM} (-{km.phanTram}%){km.trangThai ? "" : " - tạm ngưng"}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn-cancel" onClick={() => setHienThiModalKhungGio(false)}>Hủy</button>
@@ -409,7 +550,7 @@ function KhuyenMai() {
                                     <label>Chọn sản phẩm:</label>
                                     <select required
                                         value={formSanPhamFS.maSP} 
-                                        onChange={e => setFormSanPhamFS({ ...formSanPhamFS, maSP: e.target.value })} 
+                                        onChange={e => chonSanPhamFS(e.target.value)} 
                                     >
                                         <option value="">-- Chọn một sản phẩm --</option>
                                         {danhSachSanPhamGoc.map(sp => (
@@ -421,9 +562,15 @@ function KhuyenMai() {
                                 </div>
                                 <div className="form-group-row">
                                     <div className="form-group">
-                                        <label>Giá Flash Sale (VNĐ):</label>
+                                        <label>
+                                            {khungGioDangThemSP?.phanTram
+                                                ? `Giá Flash Sale (tự động -${khungGioDangThemSP.phanTram}% theo "${khungGioDangThemSP.tenKM}"):`
+                                                : "Giá Flash Sale (VNĐ):"}
+                                        </label>
                                         <input type="number" min="0" required
                                             value={formSanPhamFS.giaFlashSale} 
+                                            readOnly={!!khungGioDangThemSP?.phanTram}
+                                            style={khungGioDangThemSP?.phanTram ? { background: "#F3F4F6", cursor: "not-allowed" } : undefined}
                                             onChange={e => setFormSanPhamFS({ ...formSanPhamFS, giaFlashSale: e.target.value })} 
                                         />
                                     </div>

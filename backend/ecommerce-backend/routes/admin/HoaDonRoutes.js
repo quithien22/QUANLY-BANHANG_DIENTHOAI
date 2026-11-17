@@ -13,6 +13,7 @@ class HoaDonRoutes extends BaseRoutes {
         const c = this.hoaDonController;
         this.router.get('/', c.layDanhSach);
         this.router.get('/toanbo', c.layToanBo);
+        this.router.get('/chitiet/:maHoaDon', c.layChiTiet);
         this.router.put('/capnhat-trangthai/:maHoaDon', c.capNhatTrangThai);
     }
 }

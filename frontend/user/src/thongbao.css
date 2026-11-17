@@ -1,0 +1,205 @@
+/* ==========================================================================
+   GIAO DIỆN CHUNG CHO MỌI THÔNG BÁO (SweetAlert2)
+   - SweetAlert2 v11 lấy màu / bo góc từ các biến --swal2-*, nên đặt lại biến ở đây thì
+     mọi Swal.fire(...) trong app (đăng nhập, yêu thích, giỏ hàng, lỗi...) đổi theo, không cần sửa từng trang.
+   - Dùng "html:root" để đặc hiệu hơn ":root" của thư viện -> không phụ thuộc thứ tự nạp CSS.
+   - Màu chủ đạo #1d4ed8 trùng với màu nút ở trang đặt hàng.
+   ========================================================================== */
+
+html:root {
+  --swal2-backdrop: rgba(15, 23, 42, 0.55);
+  --swal2-color: #475569;
+  --swal2-border-radius: 1.25rem;
+
+  --swal2-action-button-hover: black 8%;
+  --swal2-action-button-active: black 14%;
+  --swal2-action-button-transition: background-color 0.2s, box-shadow 0.2s, transform 0.15s;
+
+  --swal2-confirm-button-background-color: #1d4ed8;
+  --swal2-confirm-button-border-radius: 0.75rem;
+  --swal2-confirm-button-box-shadow: 0 8px 18px -8px rgba(29, 78, 216, 0.75);
+
+  --swal2-deny-button-background-color: #dc2626;
+  --swal2-deny-button-border-radius: 0.75rem;
+
+  --swal2-cancel-button-background-color: #f1f5f9;
+  --swal2-cancel-button-color: #334155;
+  --swal2-cancel-button-border-radius: 0.75rem;
+
+  --swal2-timer-progress-bar-background: #3b82f6;
+  --swal2-close-button-color: #94a3b8;
+
+  --swal2-toast-border: 1px solid #e2e8f0;
+  --swal2-toast-box-shadow: 0 12px 30px -12px rgba(15, 23, 42, 0.4);
+}
+
+/* Nền mờ phía sau hộp thông báo */
+.swal2-container.swal2-backdrop-show {
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+/* ---------- Hộp thông báo thường (không áp dụng cho toast) ---------- */
+.swal2-popup:not(.swal2-toast) {
+  width: 26em;
+  padding: 1.75rem 1.5rem 1.5rem;
+  box-shadow: 0 30px 60px -20px rgba(15, 23, 42, 0.45);
+}
+
+.swal2-popup:not(.swal2-toast) .swal2-icon {
+  zoom: 0.85;
+  margin: 0.25rem auto 0.9rem;
+}
+
+.swal2-popup:not(.swal2-toast) .swal2-title {
+  padding: 0.25rem 0.5rem 0;
+  color: #0f172a;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.swal2-popup:not(.swal2-toast) .swal2-html-container {
+  padding: 0.75rem 0.25rem 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.swal2-popup:not(.swal2-toast) .swal2-actions {
+  gap: 0.6rem;
+  margin: 1.5rem auto 0;
+}
+
+.swal2-popup .swal2-actions .swal2-styled {
+  margin: 0;
+  padding: 0.7rem 1.4rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.swal2-popup .swal2-actions .swal2-styled:hover {
+  transform: translateY(-1px);
+}
+
+.swal2-popup .swal2-actions .swal2-styled:active {
+  transform: none;
+}
+
+.swal2-popup .swal2-actions .swal2-styled:focus-visible {
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.35);
+}
+
+/* ---------- Màu biểu tượng (thay cho màu mặc định nhạt của thư viện) ---------- */
+.swal2-icon.swal2-success {
+  border-color: #16a34a;
+  color: #16a34a;
+}
+.swal2-icon.swal2-success [class^='swal2-success-line'] {
+  background-color: #16a34a;
+}
+.swal2-icon.swal2-success .swal2-success-ring {
+  border-color: rgba(22, 163, 74, 0.2);
+}
+
+.swal2-icon.swal2-error {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+.swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+  background-color: #ef4444;
+}
+
+.swal2-icon.swal2-warning {
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+.swal2-icon.swal2-info,
+.swal2-icon.swal2-question {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+/* ---------- Toast (thông báo nhỏ góc màn hình) ---------- */
+.swal2-popup.swal2-toast .swal2-title {
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* ---------- Hộp "Đã thêm vào giỏ hàng" (chitietsanpham.js) ---------- */
+.swal2-popup.tb-popup-giohang {
+  width: 27em;
+}
+
+.tb-giohang {
+  text-align: left;
+}
+
+.tb-giohang__sp {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.9rem;
+  background: #f8fafc;
+}
+
+.tb-giohang__sp img {
+  flex-shrink: 0;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 0.65rem;
+  background: #fff;
+  object-fit: contain;
+}
+
+.tb-giohang__ten {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.35;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.tb-giohang__phanloai {
+  margin-top: 2px;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.tb-giohang__gia {
+  margin-top: 4px;
+  color: #dc2626;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.tb-giohang__giu {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.75rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.tb-giohang__giu svg {
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 1px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

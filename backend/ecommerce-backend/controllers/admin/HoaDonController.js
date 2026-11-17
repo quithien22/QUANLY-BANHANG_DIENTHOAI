@@ -17,6 +17,11 @@ class HoaDonController extends BaseController {
         res.json(await this.hoaDonService.layToanBo());
     }, "Lỗi lấy danh sách hóa đơn");
 
+    // GET /api/hoadon/chitiet/:maHoaDon
+    layChiTiet = this.handle(async (req, res) => {
+        res.json(await this.hoaDonService.layChiTiet(req.params.maHoaDon));
+    }, "Lỗi lấy chi tiết hóa đơn");
+
     // PUT /api/hoadon/capnhat-trangthai/:maHoaDon
     capNhatTrangThai = this.handle(async (req, res) => {
         const { maHoaDon } = req.params;
