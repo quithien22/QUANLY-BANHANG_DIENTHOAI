@@ -1,5 +1,6 @@
 // file: routes/admin/VanChuyenRoutes.js
 const BaseRoutes = require('../BaseRoutes');
+const { requireAdmin } = require('../../middlewares/auth');
 
 class VanChuyenRoutes extends BaseRoutes {
     constructor(vanChuyenController) {
@@ -10,8 +11,8 @@ class VanChuyenRoutes extends BaseRoutes {
 
     registerRoutes() {
         const c = this.vanChuyenController;
-        this.router.get('/', c.layDanhSach);
-        this.router.put('/:maVanChuyen', c.capNhat);
+        this.router.get('/', requireAdmin(), c.layDanhSach);
+        this.router.put('/:maVanChuyen', requireAdmin(), c.capNhat);
     }
 }
 

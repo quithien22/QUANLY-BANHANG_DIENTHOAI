@@ -19,7 +19,8 @@ class DoiTraHangController extends BaseController {
 
     // PUT /api/doitrahang/xuly/:maDoiTra
     xuLy = this.handle(async (req, res) => {
-        const ketQua = await this.doiTraHangService.xuLy(req.params.maDoiTra, req.body);
+        // maNV (người xử lý) lấy từ token, không tin maNV client gửi
+        const ketQua = await this.doiTraHangService.xuLy(req.params.maDoiTra, { ...req.body, maNV: req.auth.maNV });
         res.json({ success: true, ...ketQua });
     }, "Lỗi CSDL khi cập nhật đổi trả");
 }

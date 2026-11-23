@@ -1,5 +1,6 @@
 // file: routes/admin/NhaCungCapRoutes.js
 const BaseRoutes = require('../BaseRoutes');
+const { requireAdmin } = require('../../middlewares/auth');
 
 class NhaCungCapRoutes extends BaseRoutes {
     constructor(nhaCungCapController) {
@@ -10,9 +11,9 @@ class NhaCungCapRoutes extends BaseRoutes {
 
     registerRoutes() {
         const c = this.nhaCungCapController;
-        this.router.get('/', c.layDanhSach);
-        this.router.post('/them', c.them);
-        this.router.put('/sua/:maNCC', c.sua);
+        this.router.get('/', requireAdmin(), c.layDanhSach);
+        this.router.post('/them', requireAdmin(), c.them);
+        this.router.put('/sua/:maNCC', requireAdmin(), c.sua);
     }
 }
 

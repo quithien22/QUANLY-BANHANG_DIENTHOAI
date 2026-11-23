@@ -119,9 +119,10 @@ function ThemVaoGioHang() {
         setLoiMaGiamGia("");
         promotionApi.applyCoupon(maNhap.trim())
             .then((data) => {
-                setDanhSachGioHang(data);
-                // Báo Header cập nhật lại số lượng (sau khi tăng/giảm/xóa)
-                window.dispatchEvent(new Event("gioHangCapNhat"));
+                // Server trả { success, khuyenMai: { maKM, tenKM, phanTram } }.
+                // Trước đây gán nhầm cả object này vào danh sách giỏ hàng (setDanhSachGioHang(data)) nên trang
+                // sập ngay khi bấm Áp dụng ("danhSachGioHang.map is not a function") và mã không bao giờ được lưu.
+                setKhuyenMaiApDung(data.khuyenMai);
             })
             .catch((error) => {
                 setKhuyenMaiApDung(null);
@@ -144,7 +145,7 @@ function ThemVaoGioHang() {
 
     const tamTinh = danhSachGioHang.reduce((tong, item) => tong + donGia(item) * item.soLuong, 0);
     const phiGiaoDich = 0; // Miễn phí - chưa nối với cấu hình phí vận chuyển thật
-    const soTienGiam = khuyenMaiApDung ? (tamTinh * khuyenMaiApDung.phanTram) / 100 : 0;
+    const soTienGiam = khuyenMaiApDung ? Math.round((tamTinh * khuyenMaiApDung.phanTram) / 100) : 0;
     const tongThanhToan = tamTinh - soTienGiam + phiGiaoDich;
 
     // ============== GIAO DIỆN ===========
@@ -152,7 +153,7 @@ function ThemVaoGioHang() {
         return (
             <div className="add-cart">
                 <p className="add-cart-trang-thai">
-                    Bạn cần <Link to="/dang-nhap">đăng nhập</Link> để xem giỏ hàng.
+                    Bạn cần <Link to="/login">đăng nhập</Link> để xem giỏ hàng.
                 </p>
             </div>
         );
@@ -191,7 +192,7 @@ function ThemVaoGioHang() {
             {/* THANH TIẾN TRÌNH */}
             <div className="add-cart-steps">
                 <ul>
-                    <li className="add-cart-step active">
+                    <li className="add-cart-step" aria-current="step">
                         <span className="add-cart-step_number add-cart-step_number-1">1</span>
                         <span className="add-cart-step_label-1">Giỏ hàng</span>
                     </li>

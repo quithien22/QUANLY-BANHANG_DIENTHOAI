@@ -276,7 +276,8 @@ class CartService extends BaseService {
     //  - Giảm: hoàn phần chênh về tồn kho
     //  - Số lượng <= 0: xóa dòng + hoàn toàn bộ
     //  - Dòng đã hết hạn / không còn: báo lỗi để giao diện tải lại giỏ
-    async updateCartQuantity(maGioHang, soLuong) {
+    // maKH (lấy từ token): chỉ sửa được dòng giỏ của CHÍNH khách đó; dòng của người khác coi như không tồn tại.
+    async updateCartQuantity(maGioHang, soLuong, maKH) {
         await this.ready();
         const sql = this.sql;
 
@@ -295,11 +296,12 @@ class CartService extends BaseService {
         try {
             const dong = await new sql.Request(transaction)
                 .input('maGioHang', sql.Int, maGioHang)
+                .input('maKH', sql.VarChar(20), maKH)
                 .query(`
                     SELECT maSP, soLuong,
                            CASE WHEN hetHanLuc IS NOT NULL AND hetHanLuc <= GETDATE() THEN 1 ELSE 0 END AS daHetHan
                     FROM GioHang WITH (UPDLOCK, HOLDLOCK)
-                    WHERE maGioHang = @maGioHang
+                    WHERE maGioHang = @maGioHang AND maKH = @maKH
                 `);
 
             if (dong.recordset.length === 0) {
@@ -359,7 +361,8 @@ class CartService extends BaseService {
     }
 
     // Xóa hẳn 1 dòng khỏi giỏ + hoàn tồn kho đang giữ
-    async removeItem(maGioHang) {
+    // maKH (lấy từ token): chỉ xóa được dòng giỏ của chính khách đó.
+    async removeItem(maGioHang, maKH) {
         await this.ready();
         const sql = this.sql;
         const pool = await this.getPool();
@@ -370,9 +373,10 @@ class CartService extends BaseService {
             // Khóa dòng để job nền / request khác không hoàn kho cùng lúc
             const dong = await new sql.Request(transaction)
                 .input('maGioHang', sql.Int, maGioHang)
+                .input('maKH', sql.VarChar(20), maKH)
                 .query(`
                     SELECT maSP, soLuong FROM GioHang WITH (UPDLOCK, HOLDLOCK)
-                    WHERE maGioHang = @maGioHang
+                    WHERE maGioHang = @maGioHang AND maKH = @maKH
                 `);
 
             if (dong.recordset.length > 0) {

@@ -18,7 +18,10 @@ function Header() {
 
   const xuLyTimKiem = (e) => {
     e.preventDefault();
-    navigate(`/home/tim-kiem?q=${tuKhoa}`);
+    // encodeURIComponent: từ khóa có &, #, % hoặc dấu cách... không được làm hỏng query string
+    const tuKhoaSach = tuKhoa.trim();
+    if (!tuKhoaSach) return;
+    navigate(`/home/tim-kiem?q=${encodeURIComponent(tuKhoaSach)}`);
   };
 
   // ============== SỐ LƯỢNG SẢN PHẨM TRONG GIỎ (lấy thật từ API) ===========

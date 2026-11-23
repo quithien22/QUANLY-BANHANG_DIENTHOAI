@@ -3,6 +3,15 @@
 const BaseService = require('../BaseService');
 const HttpError = require('../../errors/HttpError');
 
+// Số sao hợp lệ: số nguyên 1..5
+const kiemTraSoSao = (soSao) => {
+    const sao = Number(soSao);
+    if (!Number.isInteger(sao) || sao < 1 || sao > 5) {
+        throw new HttpError(400, "Số sao phải là số nguyên từ 1 đến 5.");
+    }
+    return sao;
+};
+
 // Tên cột lưu đường dẫn ảnh trong HinhAnhDanhGia có thể khác nhau giữa các DB -> lấy cột chuỗi đầu tiên (không phải mã)
 const layDuongDan = (dong) => {
     for (const [khoa, giaTri] of Object.entries(dong)) {
@@ -74,6 +83,9 @@ class ReviewService extends BaseService {
     async add({ maSP, maKH, soSao, noiDung, hinhAnh = [] }) {
         const sql = this.sql;
         if (!maKH) throw new HttpError(401, "Vui lòng đăng nhập!");
+        if (!maSP) throw new HttpError(400, "Thiếu mã sản phẩm.");
+        soSao = kiemTraSoSao(soSao);
+        if (!Array.isArray(hinhAnh)) hinhAnh = [];
 
         const pool = await this.getPool();
 
@@ -113,6 +125,7 @@ class ReviewService extends BaseService {
 
     async update(maDanhGia, { maKH, soSao, noiDung }) {
         const sql = this.sql;
+        soSao = kiemTraSoSao(soSao);
         const pool = await this.getPool();
 
         const result = await pool.request()

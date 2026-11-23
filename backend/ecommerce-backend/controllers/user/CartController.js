@@ -19,7 +19,8 @@ class CartController extends BaseController {
 
     // POST /api/giohang/them
     addToCart = this.handle(async (req, res) => {
-        const result = await this.cartService.addToCart(req.body);
+        // maKH lấy từ token, bỏ qua maKH client gửi trong body
+        const result = await this.cartService.addToCart({ ...req.body, maKH: req.auth.maKH });
         res.status(200).json({ success: true, ...result });
     }, "Lỗi API thêm giỏ hàng", { exposeMessage: false });
 
@@ -27,14 +28,14 @@ class CartController extends BaseController {
     updateQuantity = this.handle(async (req, res) => {
         const { maGioHang } = req.params;
         const { soLuong } = req.body;
-        const result = await this.cartService.updateCartQuantity(maGioHang, soLuong);
+        const result = await this.cartService.updateCartQuantity(maGioHang, soLuong, req.auth.maKH);
         res.status(200).json({ success: true, ...result });
     }, "Lỗi cập nhật số lượng giỏ hàng");
 
     // DELETE /api/giohang/:maGioHang
     removeItem = this.handle(async (req, res) => {
         const { maGioHang } = req.params;
-        const result = await this.cartService.removeItem(maGioHang);
+        const result = await this.cartService.removeItem(maGioHang, req.auth.maKH);
         res.status(200).json({ success: true, ...result });
     }, "Lỗi xóa giỏ hàng");
 }

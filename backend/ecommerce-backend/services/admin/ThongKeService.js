@@ -4,6 +4,11 @@ const BaseService = require('../BaseService');
 
 const NGUONG_TON_KHO = 5; // Cùng ngưỡng với trang Quản lý sản phẩm
 
+// Thư viện mssql mặc định ghi giờ UTC của JS Date xuống cột DATETIME, trong khi cột thoiGianLap lưu giờ máy
+// (GETDATE()). Ở máy múi giờ +7, mốc "bây giờ" bị lệch 7 tiếng nên đơn lập trong 7 tiếng gần nhất
+// không được tính vào thống kê. Dịch mốc thời gian để giờ UTC gửi xuống chính là giờ trên đồng hồ máy.
+const sangGioMay = (ngay) => new Date(ngay.getTime() - ngay.getTimezoneOffset() * 60000);
+
 class ThongKeService extends BaseService {
     // Trả về khoảng thời gian hiện tại và khoảng ngay trước đó (để so sánh % tăng/giảm)
     tinhKhoangThoiGian(khoang) {
@@ -42,8 +47,8 @@ class ThongKeService extends BaseService {
 
         const layThongKe = async (tu, den) => {
             const ketQua = await pool.request()
-                .input('tu', sql.DateTime, tu)
-                .input('den', sql.DateTime, den)
+                .input('tu', sql.DateTime, sangGioMay(tu))
+                .input('den', sql.DateTime, sangGioMay(den))
                 .query(`
                     SELECT 
                         ISNULL(SUM(CASE WHEN trangThai = 'hoan_tat' THEN tongTien END), 0) AS doanhThu,
@@ -88,8 +93,8 @@ class ThongKeService extends BaseService {
         if (theo === 'thang') nhomTheo = `FORMAT(thoiGianLap, 'yyyy-MM')`;
 
         const ketQua = await pool.request()
-            .input('tu', sql.DateTime, hienTai.tu)
-            .input('den', sql.DateTime, hienTai.den)
+            .input('tu', sql.DateTime, sangGioMay(hienTai.tu))
+            .input('den', sql.DateTime, sangGioMay(hienTai.den))
             .query(`
                 SELECT ${nhomTheo} AS nhom, SUM(tongTien) AS doanhThu
                 FROM HoaDon
@@ -106,8 +111,8 @@ class ThongKeService extends BaseService {
         const { hienTai } = this.tinhKhoangThoiGian(khoang);
 
         const ketQua = await pool.request()
-            .input('tu', sql.DateTime, hienTai.tu)
-            .input('den', sql.DateTime, hienTai.den)
+            .input('tu', sql.DateTime, sangGioMay(hienTai.tu))
+            .input('den', sql.DateTime, sangGioMay(hienTai.den))
             .query(`
                 SELECT TOP 5 sp.maSP, sp.tenSP,
                        SUM(ct.soLuong * ct.giaBan) AS doanhThu,
@@ -128,8 +133,8 @@ class ThongKeService extends BaseService {
         const { hienTai } = this.tinhKhoangThoiGian(khoang);
 
         const ketQua = await pool.request()
-            .input('tu', sql.DateTime, hienTai.tu)
-            .input('den', sql.DateTime, hienTai.den)
+            .input('tu', sql.DateTime, sangGioMay(hienTai.tu))
+            .input('den', sql.DateTime, sangGioMay(hienTai.den))
             .query(`
                 SELECT km.maKM, km.tenKM, km.ngayBD, km.ngayKT, km.trangThai AS trangThaiBat,
                        COUNT(hd.maHoaDon) AS soDon,
@@ -144,13 +149,14 @@ class ThongKeService extends BaseService {
     }
 
     // Sản phẩm còn đang bán nhưng tồn kho thấp, cần nhập gấp
+    // Tên hãng lấy từ cột SanPham.hang (cột chắc chắn có, các service khác và ai-service đang dùng);
+    // trước đây JOIN ThuongHieu theo sp.maThuongHieu - cột mà CatalogService ghi chú là "có thể không tồn tại".
     async layTonKhoCanhBao() {
         const pool = await this.getPool();
         const ketQua = await pool.request().query(`
             SELECT sp.maSP, sp.tenSP, sp.hinhAnh, sp.tonKho,
-                   th.tenThuongHieu, lsp.tenLSP
+                   sp.hang AS tenThuongHieu, lsp.tenLSP
             FROM SanPham sp
-            LEFT JOIN ThuongHieu th ON sp.maThuongHieu = th.maThuongHieu
             LEFT JOIN LoaiSanPham lsp ON sp.maLSP = lsp.maLSP
             WHERE sp.tonKho <= ${NGUONG_TON_KHO} AND sp.trangThai = 1
             ORDER BY sp.tonKho ASC

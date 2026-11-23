@@ -75,13 +75,11 @@ jobs:
       # Chỉ user có test thật (tests/login-user-test.js). App.test.js ở cả hai app
       # là file mẫu của Create React App ("learn react") nên bị bỏ qua.
       # CRA chỉ quét src/ và chỉ nhận *.test.js, nên copy file vào src/ trên runner.
-      # Các test gắn [BUG] mô tả hành vi đúng mong muốn nhưng login.js chưa sửa -> bỏ qua.
-      # Sửa xong login.js thì xoá phần testNamePattern để chạy đủ.
       - name: Test đăng nhập (user)
         if: matrix.app == 'user'
         run: |
           cp ../../tests/login-user-test.js src/login-user.test.js
-          npx react-scripts test --watchAll=false --testNamePattern='^(?!.*\[BUG\])' login-user
+          npx react-scripts test --watchAll=false login-user
 
       # GitHub Actions đặt CI=true, khi đó CRA coi warning ESLint là lỗi build.
       # CI=false để chỉ lỗi thật mới làm hỏng build.

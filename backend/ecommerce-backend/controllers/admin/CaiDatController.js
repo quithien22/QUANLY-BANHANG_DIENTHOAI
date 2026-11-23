@@ -7,20 +7,20 @@ class CaiDatController extends BaseController {
         this.caiDatService = caiDatService;
     }
 
-    // GET /api/caidat?maNV=
+    // GET /api/caidat  (công khai; có token nhân viên hợp lệ thì trả thêm hồ sơ của chính người đó)
     layTatCa = this.handle(async (req, res) => {
-        res.json(await this.caiDatService.layTatCa(req.query.maNV));
+        res.json(await this.caiDatService.layTatCa(req.auth?.maNV));
     }, "Lỗi lấy cài đặt");
 
     // PUT /api/caidat/hoso
     capNhatHoSo = this.handle(async (req, res) => {
-        const ketQua = await this.caiDatService.capNhatHoSo(req.body, req.file);
+        const ketQua = await this.caiDatService.capNhatHoSo({ ...req.body, maNV: req.auth.maNV }, req.file);
         res.json({ success: true, ...ketQua });
     }, "Lỗi cập nhật hồ sơ");
 
     // PUT /api/caidat/matkhau
     doiMatKhau = this.handle(async (req, res) => {
-        await this.caiDatService.doiMatKhau(req.body);
+        await this.caiDatService.doiMatKhau({ ...req.body, maNV: req.auth.maNV });
         res.json({ success: true });
     }, "Lỗi đổi mật khẩu");
 

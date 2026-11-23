@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./tienhanhdathang.css";
 import { addressApi } from "../../../API/AddressApi";
 import { orderApi } from "../../../API/OrderApi";
@@ -27,6 +27,12 @@ function TienHanhDatHang() {
 
     // 2. NHẬN DỮ LIỆU TỪ GIỎ HÀNG THAY VÌ FIX CỨNG
     const [danhSachSanPham, setDanhSachSanPham] = useState([]);
+    // Mã khuyến mãi đã áp dụng ở giỏ hàng (nếu có) và cờ "Mua ngay" (đơn không đụng tới giỏ hàng)
+    const [khuyenMai, setKhuyenMai] = useState(null);
+    const [laMuaNgay, setLaMuaNgay] = useState(false);
+    // Chống bấm đặt hàng nhiều lần (trước đây bấm 2 lần liên tiếp tạo 2 đơn)
+    const dangDatRef = useRef(false);
+    const [dangDat, setDangDat] = useState(false);
 
     useEffect(() => {
         if (!location.state) {
@@ -37,8 +43,12 @@ function TienHanhDatHang() {
 
         if (location.state.dsMuaNgay) {
             setDanhSachSanPham(location.state.dsMuaNgay);
+            setLaMuaNgay(true);
+            setKhuyenMai(null);
         } else if (location.state.danhSachSanPhamChonMua) {
             setDanhSachSanPham(location.state.danhSachSanPhamChonMua);
+            setLaMuaNgay(false);
+            setKhuyenMai(location.state.khuyenMai || null);
         } else {
             alert("Không tìm thấy sản phẩm cần thanh toán.");
             navigate("/home");
@@ -74,7 +84,7 @@ function TienHanhDatHang() {
 
     //  TÍNH TOÁN TIỀN ĐỘNG
     const tongTienHang = danhSachSanPham.reduce((tong, sp) => tong + ((Number(sp.gia) || Number(sp.giaBan) || 0) * Number(sp.soLuong)), 0);
-    const giamGia = 0;
+    const giamGia = khuyenMai ? Math.round(tongTienHang * (Number(khuyenMai.phanTram) || 0) / 100) : 0; // server tính lại khi đặt hàng
     const phiVanChuyen = 0;
     const tongThanhToan = tongTienHang - giamGia + phiVanChuyen;
 
@@ -110,6 +120,8 @@ function TienHanhDatHang() {
 
     // 4. HÀM XỬ LÝ ĐẶT HÀNG GỌI API
     const handleDatHang = async () => {
+        if (dangDatRef.current) return; // đang gửi đơn, bỏ qua lần bấm thêm
+
         if (!hoTen || !sdt || !diaChi) {
             alert("Vui lòng điền đầy đủ các thông tin bắt buộc (*) !");
             return;
@@ -121,10 +133,13 @@ function TienHanhDatHang() {
             sdt: sdt,
             diaChi: diaChi,
             phuongThuc: phuongThuc,
-            maKM: null,
+            maKM: khuyenMai?.maKM || null,
+            muaNgay: laMuaNgay,
             danhSachSanPham: danhSachSanPham
         };
 
+        dangDatRef.current = true;
+        setDangDat(true);
         try {
             const data = await orderApi.placeOrder(payload);
 
@@ -135,10 +150,16 @@ function TienHanhDatHang() {
                 }
                 hienThiThongBaoTC("Đặt hàng thành công!");
                 // Nếu khách sửa địa chỉ trực tiếp trên form và chưa có trong sổ -> Có thể gọi thêm API Thêm địa chỉ mới ở đây nếu muốn
+            } else {
+                dangDatRef.current = false;
+                setDangDat(false);
             }
         } catch (error) {
             console.error("Lỗi khi đặt hàng:", error);
             alert(error.response?.data?.message || "Đã xảy ra lỗi khi đặt hàng. Vui lòng thử lại!");
+            // Đặt hàng lỗi thì cho phép bấm lại
+            dangDatRef.current = false;
+            setDangDat(false);
         }
     };
 
@@ -276,7 +297,7 @@ function TienHanhDatHang() {
                                         <span className="thdathang-summary-row-value">{dinhDangTien(tongTienHang)}</span>
                                     </div>
                                     <div className="thdathang-summary-row">
-                                        <span className="thdathang-summary-row-title">Giảm giá Voucher:</span>
+                                        <span className="thdathang-summary-row-title">Giảm giá Voucher{khuyenMai?.tenKM ? ` (${khuyenMai.tenKM})` : ""}:</span>
                                         <span className="thdathang-summary-row-value text-discount">-{dinhDangTien(giamGia)}</span>
                                     </div>
                                     <div className="thdathang-summary-row thdathang-summary-row-border">
@@ -293,7 +314,7 @@ function TienHanhDatHang() {
                                 </div>
 
                                 <div className="thdathang-summary-total-xn">
-                                    <button className="thdathang-btn-submit" onClick={handleDatHang}>Xác nhận đặt hàng</button>
+                                    <button className="thdathang-btn-submit" onClick={handleDatHang} disabled={dangDat}>{dangDat ? "Đang xử lý..." : "Xác nhận đặt hàng"}</button>
                                     <span className="thdathang-terms-text">Bằng cách nhấn đặt hàng, bạn đã đồng ý <br />với Điều khoản và Thỏa thuận bán hàng của Thiện Store.</span>
                                 </div>
                             </li>

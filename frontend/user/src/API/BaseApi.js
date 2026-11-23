@@ -2,6 +2,7 @@
 // Lớp cha cho mọi API Client: giữ 1 axios instance với baseURL dùng chung
 // và chuẩn hoá lỗi thành ApiError để component không phụ thuộc vào cấu trúc lỗi của axios.
 import axios from "axios";
+import { installAuthInterceptor } from "../utils/authInterceptor";
 
 // Đổi địa chỉ backend bằng REACT_APP_API_URL trong file .env, mặc định là localhost:8080
 export const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
@@ -22,6 +23,9 @@ export class ApiError extends Error {
 class BaseApi {
     constructor(baseURL = BASE_URL) {
         this.client = axios.create({ baseURL });
+
+        // Gắn JWT + tự đăng xuất khi phiên hết hạn. Phải cài TRƯỚC interceptor lỗi bên dưới.
+        installAuthInterceptor(this.client);
 
         this.client.interceptors.response.use(
             (response) => response,

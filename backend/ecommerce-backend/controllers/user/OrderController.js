@@ -9,13 +9,13 @@ class OrderController extends BaseController {
 
     // POST /api/hoadon/dat-hang
     placeOrder = this.handle(async (req, res) => {
-        const { maHoaDon, tongTien } = await this.orderService.placeOrder(req.body);
+        const { maHoaDon, tongTien } = await this.orderService.placeOrder({ ...req.body, maKH: req.auth.maKH });
         res.status(200).json({ success: true, message: "Đặt hàng thành công", maHoaDon, tongTien });
     }, "Lỗi đặt hàng");
 
     // PUT /api/hoadon/huy-don/:maHoaDon
     cancelOrder = this.handle(async (req, res) => {
-        await this.orderService.cancelOrder(req.params.maHoaDon);
+        await this.orderService.cancelOrder(req.params.maHoaDon, req.auth.maKH);
         res.json({ success: true, message: "Hủy đơn hàng và cập nhật vận chuyển thành công!" });
     }, "Lỗi khi hủy đơn", { serverMessage: (err) => "Lỗi server: " + err.message });
 
@@ -32,7 +32,7 @@ class OrderController extends BaseController {
 
     // GET /api/hoadon/chi-tiet/:maHoaDon
     getItems = this.handle(async (req, res) => {
-        const data = await this.orderService.getOrderItems(req.params.maHoaDon);
+        const data = await this.orderService.getOrderItems(req.params.maHoaDon, req.auth.maKH);
         res.status(200).json({ success: true, data });
     }, "Lỗi lấy chi tiết hóa đơn", { serverMessage: (err) => err.message });
 }

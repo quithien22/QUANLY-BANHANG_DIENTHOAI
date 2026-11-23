@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
 
@@ -20,7 +20,7 @@ import DanhGiaSanPhamSection from "./pages/sanpham/danhgia_page/danhgia";
 
 import ThemGioHang from "./pages/thanhtoan/themgiohang/themvaogiohang";
 import TienHanhDatHang from "./pages/thanhtoan/dathang/tienhanhdathang";
-// import ThanhToanThanhCong from "./pages/thanhtoan/ketqua/thanhtoanthanhcong";
+import ThanhToanThanhCong from "./pages/thanhtoan/ketqua/thanhtoanthanhcong";
 
 import ThongTinkhachHang from './pages/taikhoan/taikhoan-khachhang/thongtinkhachhang';
 import ChiTietDonHang from'./pages/donhang/chitietdonhang';
@@ -48,6 +48,20 @@ function Home() {
   );
 }
 
+// React Router không tự đưa trang về đầu khi đổi route: bấm "Xem chi tiết" ở cuối trang chủ/danh sách thì trang chi tiết
+// giữ nguyên vị trí cuộn cũ và hiện luôn phần đánh giá ở cuối trang. Component này cuộn lên đầu mỗi khi đổi trang.
+// Nếu URL có #anchor (vd #khu-vuc-danh-gia) thì để trình duyệt tự cuộn tới đó.
+function ScrollToTop() {
+  const { pathname, search, hash } = useLocation();
+
+  useEffect(() => {
+    if (hash) return;
+    window.scrollTo(0, 0);
+  }, [pathname, search, hash]);
+
+  return null;
+}
+
 function AppContent() {
   const location = useLocation();
   const isAuthPage = location.pathname === '/login' 
@@ -56,6 +70,7 @@ function AppContent() {
 
   return (
     <div className="app-layout">
+      <ScrollToTop />
       {!isAuthPage && <Header />}
       <main className="main-content">
         <Routes>
@@ -68,6 +83,9 @@ function AppContent() {
           <Route path="/register" element={<Register />} />
           <Route path="/home/themgiohang" element={<ThemGioHang />} />
           <Route path="/home/themgiohang/tienhanhdathang" element={<TienHanhDatHang />} />
+          {/* MoMo chuyển khách về đây sau khi thanh toán (MOMO_REDIRECT_URL, mặc định http://localhost:3000/thanh-toan-thanh-cong).
+              Thiếu route này thì bị catch-all đá về /home và kết quả thanh toán không bao giờ được xác nhận. */}
+          <Route path="/thanh-toan-thanh-cong" element={<ThanhToanThanhCong />} />
           <Route path="/home/tai-khoan" element={<ThongTinkhachHang />} />
           <Route path="/home/don-hang" element={<ChiTietDonHang />} />
           <Route path="/home/tim-kiem" element={<SuLyThanhTimKiem />} />

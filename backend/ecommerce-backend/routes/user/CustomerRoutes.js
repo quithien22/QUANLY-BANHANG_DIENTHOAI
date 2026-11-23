@@ -1,6 +1,7 @@
 // file: routes/CustomerRoutes.js
 // Mount ở /api vì gom các đường dẫn thuộc hai nhóm: /user/... và /khachhang/...
 const BaseRoutes = require('../BaseRoutes');
+const { requireUser, requireSelf } = require('../../middlewares/auth');
 
 class CustomerRoutes extends BaseRoutes {
     constructor(customerController) {
@@ -11,9 +12,9 @@ class CustomerRoutes extends BaseRoutes {
 
     registerRoutes() {
         const c = this.customerController;
-        this.router.get('/khachhang/:maKH', c.getProfile);
-        this.router.put('/user/cap-nhat-info', c.updateInfo);
-        this.router.put('/user/doi-mat-khau', c.changePassword);
+        this.router.get('/khachhang/:maKH', requireUser(), requireSelf('maKH'), c.getProfile);
+        this.router.put('/user/cap-nhat-info', requireUser(), c.updateInfo);
+        this.router.put('/user/doi-mat-khau', requireUser(), c.changePassword);
     }
 }
 

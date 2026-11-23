@@ -43,8 +43,10 @@ function SuLyTimKiem() {
     useEffect(() => {
         productApi.getAll()
             .then((data) => {
-                // Chỉ lấy 3 sản phẩm đầu tiên 
-                const duLieu = Array.isArray(data) ? data : [];
+                // Chỉ lấy 3 sản phẩm đầu tiên đang bán (getAll trả cả sản phẩm đã ngừng bán, không nên gợi ý cho khách)
+                const duLieu = Array.isArray(data)
+                    ? data.filter((sp) => sp.trangThai === true || sp.trangThai === 1)
+                    : [];
                 setSanPhamGoiY(duLieu.slice(0, 3));
             })
             .catch((error) => console.error("Lỗi lấy sản phẩm gợi ý:", error));
@@ -132,9 +134,9 @@ function SuLyTimKiem() {
                     </li>
                     <li className="timkiem-header_tags">
                         <span className="timkiem-header_tags_label">Từ khóa phổ biến:</span>
-                        <Link to="/tim-kiem?q=iPhone"><button className="timkiem-header_tag_btn">iPhone</button></Link>
-                        <Link to="/tim-kiem?q=Samsung"><button className="timkiem-header_tag_btn">Samsung</button></Link>
-                        <Link to="/tim-kiem?q=Xiaomi"><button className="timkiem-header_tag_btn">Xiaomi</button></Link>
+                        <Link to="/home/tim-kiem?q=iPhone"><button className="timkiem-header_tag_btn">iPhone</button></Link>
+                        <Link to="/home/tim-kiem?q=Samsung"><button className="timkiem-header_tag_btn">Samsung</button></Link>
+                        <Link to="/home/tim-kiem?q=Xiaomi"><button className="timkiem-header_tag_btn">Xiaomi</button></Link>
                     </li>
                 </ul>
             </div>
@@ -219,7 +221,7 @@ function SuLyTimKiem() {
                                                 <div className="timkiem-card_price">
                                                     <span className="price-new">{dinhDangTien(sp.giaBan)}</span>
                                                 </div>
-                                                <Link to={`/chi-tiet-san-pham/${sp.maSP}`}>
+                                                <Link to={`/home/hang/chi-tiet-san-pham/${sp.maSP}`}>
                                                     <button className="timkiem-card_btn">Xem chi tiết</button>
                                                 </Link>
                                             </li>
@@ -255,7 +257,7 @@ function SuLyTimKiem() {
                                         </div>
 
                                         {/* Gắn luôn link để khách bấm vào là sang trang chi tiết */}
-                                        <Link to={`/chi-tiet-san-pham/${sp.maSP}`}>
+                                        <Link to={`/home/hang/chi-tiet-san-pham/${sp.maSP}`}>
                                             <button className="timkiem-card_btn">Xem chi tiết</button>
                                         </Link>
                                     </li>

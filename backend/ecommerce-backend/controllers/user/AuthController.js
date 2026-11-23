@@ -1,5 +1,9 @@
 // file: controllers/AuthController.js
 const BaseController = require('../BaseController');
+const { phatTokenKhach } = require('../../middlewares/auth');
+
+// Gắn JWT vào thông tin đăng nhập. Frontend lưu nguyên userInfo (gồm token) và gửi lại qua header Authorization.
+const kemToken = (userInfo) => ({ ...userInfo, token: phatTokenKhach(userInfo.maKH) });
 
 class AuthController extends BaseController {
     constructor(authService) {
@@ -9,7 +13,7 @@ class AuthController extends BaseController {
 
     // POST /api/user/dang-nhap
     login = this.handle(async (req, res) => {
-        const userInfo = await this.authService.login(req.body);
+        const userInfo = kemToken(await this.authService.login(req.body));
         res.status(200).json({ success: true, userInfo });
     }, "Lỗi đăng nhập User", { serverMessage: "Lỗi hệ thống, vui lòng thử lại sau!" });
 
@@ -21,7 +25,7 @@ class AuthController extends BaseController {
 
     // POST /api/user/dang-nhap-google
     loginGoogle = this.handle(async (req, res) => {
-        const userInfo = await this.authService.loginGoogle(req.body);
+        const userInfo = kemToken(await this.authService.loginGoogle(req.body));
         res.status(200).json({ success: true, userInfo });
     }, "Lỗi đăng nhập Google", { serverMessage: "Lỗi hệ thống, vui lòng thử lại sau!" });
 }

@@ -3,6 +3,7 @@
 const crypto = require('crypto');
 const axios = require('axios');
 const BaseService = require('../BaseService');
+const HttpError = require('../../errors/HttpError');
 
 class PaymentService extends BaseService {
     constructor(db) {
@@ -23,11 +24,34 @@ class PaymentService extends BaseService {
         return !!(partnerCode && accessKey && secretKey);
     }
 
-    // Tạo giao dịch MoMo, trả về dữ liệu MoMo (có payUrl)
-    async createMomoPayment(amountRaw, maHoaDon) {
+    // Tạo giao dịch MoMo, trả về dữ liệu MoMo (có payUrl).
+    // SỐ TIỀN LUÔN LẤY TỪ DB (bảng ThanhToan) theo mã hóa đơn, không tin số tiền frontend gửi lên:
+    // nếu để khách tự đặt số tiền thì MoMo thu sai tiền, còn processResult lại báo "Số tiền không khớp".
+    // maKH (lấy từ token): chỉ tạo giao dịch cho đơn của chính khách đó (đơn người khác -> 404)
+    async createMomoPayment(amountRaw, maHoaDon, maKH) {
+        const sql = this.sql;
+        const pool = await this.getPool();
+
+        const tt = await pool.request()
+            .input('maHoaDon', sql.VarChar(20), maHoaDon)
+            .input('maKH', sql.VarChar(20), maKH)
+            .query(`
+                SELECT tt.soTien, tt.trangThai
+                FROM ThanhToan tt
+                JOIN HoaDon hd ON tt.maHoaDon = hd.maHoaDon
+                WHERE tt.maHoaDon = @maHoaDon AND hd.maKH = @maKH
+            `);
+
+        if (tt.recordset.length === 0) {
+            throw new HttpError(404, 'Khong tim thay don hang can thanh toan');
+        }
+        if (tt.recordset[0].trangThai === 'da_thanh_toan') {
+            throw new HttpError(400, 'Don hang nay da duoc thanh toan');
+        }
+
         const { partnerCode, accessKey, secretKey, redirectUrl, ipnUrl, endpoint } = this.momo;
 
-        const amount = Math.round(Number(amountRaw)); // MoMo yêu cầu số nguyên
+        const amount = Math.round(Number(tt.recordset[0].soTien)); // MoMo yêu cầu số nguyên
         const orderId = `${maHoaDon}_${Date.now()}`;   // mỗi lần tạo giao dịch phải có orderId riêng
         const requestType = "captureWallet";
         const extraData = "";

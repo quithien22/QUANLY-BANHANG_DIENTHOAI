@@ -1,5 +1,6 @@
 // file: routes/admin/ThongKeRoutes.js
 const BaseRoutes = require('../BaseRoutes');
+const { requireAdmin } = require('../../middlewares/auth');
 
 class ThongKeRoutes extends BaseRoutes {
     constructor(thongKeController) {
@@ -10,11 +11,11 @@ class ThongKeRoutes extends BaseRoutes {
 
     registerRoutes() {
         const c = this.thongKeController;
-        this.router.get('/tongquan', c.layTongQuan);
-        this.router.get('/doanhthu', c.layDoanhThu);
-        this.router.get('/top-san-pham', c.layTopSanPham);
-        this.router.get('/khuyenmai', c.layHieuQuaKhuyenMai);
-        this.router.get('/ton-kho-canh-bao', c.layTonKhoCanhBao);
+        this.router.get('/tongquan', requireAdmin(), c.layTongQuan);
+        this.router.get('/doanhthu', requireAdmin(), c.layDoanhThu);
+        this.router.get('/top-san-pham', requireAdmin(), c.layTopSanPham);
+        this.router.get('/khuyenmai', requireAdmin(), c.layHieuQuaKhuyenMai);
+        this.router.get('/ton-kho-canh-bao', requireAdmin(), c.layTonKhoCanhBao);
     }
 }
 

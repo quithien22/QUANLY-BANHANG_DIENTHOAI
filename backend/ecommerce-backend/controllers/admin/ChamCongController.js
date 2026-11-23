@@ -15,7 +15,8 @@ class ChamCongController extends BaseController {
 
     // POST /api/chamcong/tu-dong
     chamCongTuDong = this.handle(async (req, res) => {
-        const ketQua = await this.chamCongService.chamCongTuDong(req.body.maNV);
+        // Chỉ chấm công cho chính người đang đăng nhập
+        const ketQua = await this.chamCongService.chamCongTuDong(req.auth.maNV);
         res.json({ success: true, ...ketQua });
     }, "Lỗi tự động chấm công");
 
@@ -28,7 +29,11 @@ class ChamCongController extends BaseController {
 
     // PUT /api/luong/cap-nhat-co-ban/:maNV
     capNhatLuongCoBan = this.handle(async (req, res) => {
-        const ketQua = await this.chamCongService.capNhatLuongCoBan(req.params.maNV, req.body);
+        // maCVNguoiThaoTac lấy từ token (route đã giới hạn cho Giám đốc), không đọc từ body
+        const ketQua = await this.chamCongService.capNhatLuongCoBan(req.params.maNV, {
+            ...req.body,
+            maCVNguoiThaoTac: req.auth.maCV,
+        });
         res.json({ success: true, ...ketQua });
     }, "Lỗi cập nhật lương");
 }

@@ -1,5 +1,6 @@
 // file: routes/WishlistRoutes.js
 const BaseRoutes = require('../BaseRoutes');
+const { requireUser, requireSelf } = require('../../middlewares/auth');
 
 class WishlistRoutes extends BaseRoutes {
     constructor(wishlistController) {
@@ -10,8 +11,8 @@ class WishlistRoutes extends BaseRoutes {
 
     registerRoutes() {
         const c = this.wishlistController;
-        this.router.post('/toggle', c.toggle);
-        this.router.get('/:maKH', c.list);
+        this.router.post('/toggle', requireUser(), c.toggle);
+        this.router.get('/:maKH', requireUser(), requireSelf('maKH'), c.list);
     }
 }
 

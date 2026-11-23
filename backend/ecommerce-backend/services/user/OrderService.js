@@ -6,11 +6,27 @@ const HttpError = require('../../errors/HttpError');
 class OrderService extends BaseService {
     // Tạo địa chỉ (nếu chưa có) -> hóa đơn -> chi tiết -> thanh toán -> vận chuyển
     // -> xóa giỏ hàng. Tất cả trong 1 transaction.
-    async placeOrder({ maKH, hoTen, sdt, diaChi, phuongThuc, maKM, danhSachSanPham }) {
+    //
+    // muaNgay = true  : đơn "Mua ngay" từ trang chi tiết sản phẩm -> KHÔNG đụng tới giỏ hàng đang giữ của khách.
+    // muaNgay = false : đơn tạo từ giỏ hàng -> chuyển hàng đang giữ trong giỏ thành đơn (xem bước 2.5).
+    // maKM            : mã khuyến mãi khách đã áp dụng ở giỏ; server kiểm tra lại và tự tính tiền giảm.
+    async placeOrder({ maKH, hoTen, sdt, diaChi, phuongThuc, maKM, muaNgay, danhSachSanPham }) {
         const sql = this.sql;
 
         if (!maKH || !hoTen || !sdt || !diaChi || !Array.isArray(danhSachSanPham) || danhSachSanPham.length === 0) {
             throw new HttpError(400, "Thiếu thông tin bắt buộc để đặt hàng.");
+        }
+
+        // Kiểm tra từng dòng sản phẩm TRƯỚC khi mở transaction (số lượng nguyên dương, giá hợp lệ)
+        for (const sp of danhSachSanPham) {
+            const sl = Number(sp.soLuong);
+            if (!sp.maSP || !Number.isInteger(sl) || sl <= 0) {
+                throw new HttpError(400, "Thông tin sản phẩm hoặc số lượng không hợp lệ.");
+            }
+            const gia = Number(sp.gia) || Number(sp.giaBan) || 0;
+            if (!Number.isFinite(gia) || gia <= 0) {
+                throw new HttpError(400, "Giá sản phẩm không hợp lệ.");
+            }
         }
 
         const pool = await this.getPool();
@@ -53,9 +69,29 @@ class OrderService extends BaseService {
             let tongTienHang = 0;
             for (const sp of danhSachSanPham) {
                 sp.giaThucTe = Number(sp.gia) || Number(sp.giaBan) || 0;
-                tongTienHang += sp.giaThucTe * (Number(sp.soLuong) || 0);
+                tongTienHang += sp.giaThucTe * Number(sp.soLuong);
             }
-            const tongTienCuoi = tongTienHang;
+
+            // 2.1. Mã khuyến mãi: kiểm tra lại ở server (còn hiệu lực, đang bật) rồi tự tính tiền giảm.
+            // So sánh theo NGÀY để mã còn dùng được hết ngày kết thúc.
+            let maKMHopLe = null;
+            let tienGiam = 0;
+            if (maKM) {
+                const km = await new sql.Request(transaction)
+                    .input('maKM', sql.VarChar(20), maKM)
+                    .query(`
+                        SELECT phanTram FROM KhuyenMai
+                        WHERE maKM = @maKM AND trangThai = 1
+                          AND CAST(GETDATE() AS DATE) BETWEEN ngayBD AND ngayKT
+                    `);
+                if (km.recordset.length === 0) {
+                    throw new HttpError(400, "Mã giảm giá không hợp lệ hoặc đã hết hạn.");
+                }
+                const phanTram = Math.min(100, Math.max(0, Number(km.recordset[0].phanTram) || 0));
+                tienGiam = Math.round(tongTienHang * phanTram / 100);
+                maKMHopLe = maKM;
+            }
+            const tongTienCuoi = Math.max(0, tongTienHang - tienGiam);
 
             // 2.5. Chuyển hàng ĐANG GIỮ trong giỏ thành đơn, chỉ trừ kho phần còn thiếu.
             // - Khi thêm vào giỏ, CartService đã trừ tonKho (giữ hàng 15 phút). Nếu ở đây trừ lại
@@ -63,37 +99,35 @@ class OrderService extends BaseService {
             // - Cách làm: lấy các dòng giỏ của khách (đang giữ bao nhiêu mỗi sản phẩm = daGiu), xóa giỏ,
             //   rồi với từng sản phẩm cập nhật đúng phần chênh: tonKho = tonKho + daGiu - daDat.
             //     + Mua từ giỏ:  daGiu = daDat  -> tồn kho không đổi
-            //     + Mua ngay:    daGiu = 0      -> trừ đúng như trước đây
+            //     + Mua ngay:    daGiu = 0      -> trừ đúng như trước đây (và KHÔNG đụng tới giỏ)
             //     + Giỏ giữ dư so với đơn (hoặc sản phẩm không có trong đơn) -> hoàn phần dư
             // - Dòng giỏ quá 15 phút nhưng job chưa kịp dọn vẫn đang giữ kho nên vẫn tính vào daGiu;
             //   nếu hàng đã bị người khác mua mất thì điều kiện bên dưới sẽ báo hết hàng (409).
             // - Khóa theo thứ tự GioHang -> SanPham (sắp theo maSP) để tránh deadlock.
             // - Câu UPDATE giữ khóa ghi tới khi commit: người đến sau phải chờ, rồi đánh giá lại
             //   điều kiện -> nếu hết hàng thì rowsAffected = 0.
-            const gioHangDangGiu = await new sql.Request(transaction)
-                .input('maKH', sql.VarChar(20), maKH)
-                .query(`SELECT maSP, soLuong FROM GioHang WITH (UPDLOCK, HOLDLOCK) WHERE maKH = @maKH`);
-
             const daGiu = new Map();
-            for (const dong of gioHangDangGiu.recordset) {
-                const key = String(dong.maSP);
-                daGiu.set(key, (daGiu.get(key) || 0) + Number(dong.soLuong));
-            }
+            if (!muaNgay) {
+                const gioHangDangGiu = await new sql.Request(transaction)
+                    .input('maKH', sql.VarChar(20), maKH)
+                    .query(`SELECT maSP, soLuong FROM GioHang WITH (UPDLOCK, HOLDLOCK) WHERE maKH = @maKH`);
 
-            // Xóa giỏ của khách (đơn đã gom hết hàng đang giữ). Rollback thì giỏ tự quay lại.
-            await new sql.Request(transaction)
-                .input('maKH', sql.VarChar(20), maKH)
-                .query(`DELETE FROM GioHang WHERE maKH = @maKH`);
+                for (const dong of gioHangDangGiu.recordset) {
+                    const key = String(dong.maSP);
+                    daGiu.set(key, (daGiu.get(key) || 0) + Number(dong.soLuong));
+                }
+
+                // Xóa giỏ của khách (đơn đã gom hết hàng đang giữ). Rollback thì giỏ tự quay lại.
+                await new sql.Request(transaction)
+                    .input('maKH', sql.VarChar(20), maKH)
+                    .query(`DELETE FROM GioHang WHERE maKH = @maKH`);
+            }
 
             // Gộp các dòng cùng maSP (khác màu/dung lượng) vì tồn kho tính theo sản phẩm.
             const canDat = new Map();
             for (const sp of danhSachSanPham) {
-                const sl = Number(sp.soLuong) || 0;
-                if (!sp.maSP || sl <= 0) {
-                    throw new HttpError(400, "Thông tin sản phẩm hoặc số lượng không hợp lệ.");
-                }
                 const key = String(sp.maSP);
-                canDat.set(key, (canDat.get(key) || 0) + sl);
+                canDat.set(key, (canDat.get(key) || 0) + Number(sp.soLuong));
             }
 
             const dsMaSP = [...new Set([...canDat.keys(), ...daGiu.keys()])].sort((a, b) => a.localeCompare(b));
@@ -119,13 +153,13 @@ class OrderService extends BaseService {
                 }
             }
 
-            // 3. Hóa đơn
+            // 3. Hóa đơn (tongTien đã trừ khuyến mãi)
             const maHoaDon = 'HD' + Date.now();
             await new sql.Request(transaction)
                 .input('maHoaDon', sql.VarChar(20), maHoaDon)
                 .input('tongTien', sql.Float, tongTienCuoi)
                 .input('maKH', sql.VarChar(20), maKH)
-                .input('maKM', sql.VarChar(20), maKM || null)
+                .input('maKM', sql.VarChar(20), maKMHopLe)
                 .input('maDiaChi', sql.Int, maDiaChi)
                 .query(`
                     INSERT INTO HoaDon (maHoaDon, tongTien, maKH, maNV, maKM, maDiaChi, thoiGianLap, trangThai)
@@ -168,10 +202,10 @@ class OrderService extends BaseService {
                     VALUES (@maVanChuyen, @maHoaDon, NULL, NULL, 0, 'cho_lay_hang', DATEADD(day, 3, GETDATE()))
                 `);
 
-            // 7. Giỏ hàng của khách đã được xóa ở bước 2.5 (cùng transaction)
+            // 7. Giỏ hàng của khách (nếu mua từ giỏ) đã được xóa ở bước 2.5 (cùng transaction)
 
             await transaction.commit();
-            return { maHoaDon, tongTien: tongTienCuoi };
+            return { maHoaDon, tongTien: tongTienCuoi, tienGiam };
         } catch (err) {
             // Có lỗi giữa chừng -> hoàn tác để không để lại transaction treo
             try { await transaction.rollback(); } catch (_) { /* transaction đã đóng */ }
@@ -179,9 +213,9 @@ class OrderService extends BaseService {
         }
     }
 
-    // Chỉ hủy được đơn đang ở trạng thái 'cho_xac_nhan'.
+    // Chỉ hủy được đơn đang ở trạng thái 'cho_xac_nhan' VÀ thuộc về khách đang đăng nhập (maKH lấy từ token).
     // Hủy + hoàn tồn kho + hủy vận chuyển nằm trong 1 transaction.
-    async cancelOrder(maHoaDon) {
+    async cancelOrder(maHoaDon, maKH) {
         const sql = this.sql;
         const pool = await this.getPool();
         const transaction = new sql.Transaction(pool);
@@ -192,10 +226,11 @@ class OrderService extends BaseService {
             // nên bấm hủy 2 lần / 2 request song song cũng không hoàn kho 2 lần.
             const result = await new sql.Request(transaction)
                 .input('maHoaDon', sql.VarChar(20), maHoaDon)
+                .input('maKH', sql.VarChar(20), maKH)
                 .query(`
                     UPDATE HoaDon
                     SET trangThai = 'da_huy'
-                    WHERE maHoaDon = @maHoaDon AND trangThai = 'cho_xac_nhan'
+                    WHERE maHoaDon = @maHoaDon AND maKH = @maKH AND trangThai = 'cho_xac_nhan'
                 `);
 
             if (result.rowsAffected[0] === 0) {
@@ -305,13 +340,14 @@ class OrderService extends BaseService {
         return result.recordset;
     }
 
-    // Chi tiết sản phẩm của 1 hóa đơn (dùng cho "Đặt lại đơn hàng")
-    async getOrderItems(maHoaDon) {
+    // Chi tiết sản phẩm của 1 hóa đơn (dùng cho "Đặt lại đơn hàng"). Chỉ xem được đơn của chính mình (maKH từ token).
+    async getOrderItems(maHoaDon, maKH) {
         const sql = this.sql;
         const pool = await this.getPool();
 
         const result = await pool.request()
             .input('maHoaDon', sql.VarChar, maHoaDon)
+            .input('maKH', sql.VarChar(20), maKH)
             .query(`
                 SELECT 
                     cthd.maHoaDon, 
@@ -321,9 +357,10 @@ class OrderService extends BaseService {
                     sp.tenSP, 
                     sp.hinhAnh
                 FROM ChiTietHoaDon cthd
+                JOIN HoaDon hd ON cthd.maHoaDon = hd.maHoaDon
                 JOIN SanPham sp ON cthd.maSP = sp.maSP
                 LEFT JOIN BienTheSanPham bt ON cthd.maBienThe = bt.maBienThe
-                WHERE cthd.maHoaDon = @maHoaDon
+                WHERE cthd.maHoaDon = @maHoaDon AND hd.maKH = @maKH
             `);
         return result.recordset;
     }

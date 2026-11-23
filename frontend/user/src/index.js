@@ -4,6 +4,7 @@ import './index.css';
 import './thongbao.css'; // giao diện chung cho mọi thông báo SweetAlert2
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import './utils/authInterceptor'; // gắn JWT vào axios toàn cục (các trang gọi thẳng axios tới backend)
 
 // Kiểm tra "Ghi nhớ đăng nhập": nếu không tick và là phiên trình duyệt mới thì xóa thông tin đăng nhập
 try {

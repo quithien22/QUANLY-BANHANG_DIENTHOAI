@@ -15,13 +15,13 @@ class CustomerController extends BaseController {
 
     // PUT /api/user/cap-nhat-info
     updateInfo = this.handle(async (req, res) => {
-        await this.customerService.updateInfo(req.body);
+        await this.customerService.updateInfo({ ...req.body, maKH: req.auth.maKH });
         res.status(200).json({ success: true, message: "Cập nhật thành công!" });
     }, "LỖI SQL KHI CẬP NHẬT KHÁCH HÀNG", { serverMessage: (err) => "Lỗi hệ thống: " + err.message });
 
     // PUT /api/user/doi-mat-khau
     changePassword = this.handle(async (req, res) => {
-        await this.customerService.changePassword(req.body);
+        await this.customerService.changePassword({ ...req.body, maKH: req.auth.maKH });
         res.status(200).json({ success: true, message: "Đổi mật khẩu thành công!" });
     }, "Lỗi đổi mật khẩu KH", { serverMessage: "Lỗi hệ thống!" });
 }

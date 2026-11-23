@@ -9,8 +9,8 @@ class WishlistController extends BaseController {
 
     // POST /api/yeuthich/toggle
     toggle = this.handle(async (req, res) => {
-        const { maKH, maSP } = req.body;
-        const action = await this.wishlistService.toggle(maKH, maSP);
+        const { maSP } = req.body;
+        const action = await this.wishlistService.toggle(req.auth.maKH, maSP);
         res.json({ success: true, action });
     }, "Lỗi API toggle yêu thích", { serverMessage: (err) => "Lỗi server: " + err.message });
 

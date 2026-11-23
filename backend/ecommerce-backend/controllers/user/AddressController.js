@@ -15,19 +15,19 @@ class AddressController extends BaseController {
 
     // POST /api/diachi/them
     add = this.handle(async (req, res) => {
-        await this.addressService.add(req.body);
+        await this.addressService.add({ ...req.body, maKH: req.auth.maKH });
         res.status(200).json({ success: true, message: "Thêm địa chỉ thành công" });
     }, "Lỗi thêm địa chỉ", { serverMessage: (err) => err.message });
 
     // PUT /api/diachi/sua/:maDiaChi
     update = this.handle(async (req, res) => {
-        await this.addressService.update(req.params.maDiaChi, req.body);
+        await this.addressService.update(req.params.maDiaChi, req.body, req.auth.maKH);
         res.status(200).json({ success: true, message: "Đã cập nhật địa chỉ" });
     }, "Lỗi sửa địa chỉ", { serverMessage: (err) => err.message });
 
     // DELETE /api/diachi/xoa/:maDiaChi
     remove = this.handle(async (req, res) => {
-        await this.addressService.remove(req.params.maDiaChi);
+        await this.addressService.remove(req.params.maDiaChi, req.auth.maKH);
         res.status(200).json({ success: true, message: "Đã xóa địa chỉ" });
     }, "Lỗi xóa địa chỉ", { serverMessage: (err) => err.message });
 }

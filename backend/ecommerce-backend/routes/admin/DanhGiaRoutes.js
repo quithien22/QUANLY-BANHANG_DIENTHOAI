@@ -1,5 +1,6 @@
 // file: routes/admin/DanhGiaRoutes.js
 const BaseRoutes = require('../BaseRoutes');
+const { requireAdmin } = require('../../middlewares/auth');
 
 class DanhGiaRoutes extends BaseRoutes {
     constructor(danhGiaController) {
@@ -10,9 +11,9 @@ class DanhGiaRoutes extends BaseRoutes {
 
     registerRoutes() {
         const c = this.danhGiaController;
-        this.router.get('/danhgiasanpham', c.layDanhSach);
-        this.router.post('/danhgia/phanhoi', c.guiPhanHoi);
-        this.router.delete('/danhgia/xoa/:maDanhGia', c.xoa);
+        this.router.get('/danhgiasanpham', requireAdmin(), c.layDanhSach);
+        this.router.post('/danhgia/phanhoi', requireAdmin(), c.guiPhanHoi);
+        this.router.delete('/danhgia/xoa/:maDanhGia', requireAdmin(), c.xoa);
     }
 }
 

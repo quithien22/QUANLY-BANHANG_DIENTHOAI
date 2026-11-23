@@ -32,6 +32,9 @@ class PromotionService extends BaseService {
     // ADD maCode VARCHAR(30) rồi đổi điều kiện WHERE từ tenKM -> maCode.
     async applyCoupon(maNhap) {
         const sql = this.sql;
+        if (typeof maNhap !== 'string' || !maNhap.trim()) {
+            throw new HttpError(400, "Vui lòng nhập mã giảm giá");
+        }
         const pool = await this.getPool();
 
         const result = await pool.request()
@@ -39,7 +42,7 @@ class PromotionService extends BaseService {
             .query(`
                 SELECT maKM, tenKM, phanTram FROM KhuyenMai
                 WHERE tenKM = @maNhap AND trangThai = 1
-                AND GETDATE() BETWEEN ngayBD AND ngayKT
+                AND CAST(GETDATE() AS DATE) BETWEEN ngayBD AND ngayKT
             `);
 
         if (result.recordset.length === 0) {

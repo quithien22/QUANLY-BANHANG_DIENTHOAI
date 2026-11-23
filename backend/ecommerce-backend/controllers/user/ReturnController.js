@@ -10,7 +10,7 @@ class ReturnController extends BaseController {
     // POST /api/user/doitrahang/tao  (multipart, trường ảnh: hinhAnh)
     create = this.handle(async (req, res) => {
         const { maHoaDon, lyDo, loaiYeuCau } = req.body;
-        await this.returnService.create({ maHoaDon, lyDo, loaiYeuCau, file: req.file });
+        await this.returnService.create({ maHoaDon, lyDo, loaiYeuCau, file: req.file, maKH: req.auth.maKH });
         res.json({ success: true, message: "Gửi yêu cầu đổi trả thành công!" });
     }, "Lỗi tạo đổi trả", { serverMessage: (err) => "Lỗi server: " + err.message });
 

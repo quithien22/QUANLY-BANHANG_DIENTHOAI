@@ -2,6 +2,7 @@
 // Phiếu nhập hàng: danh sách, chi tiết, tạo phiếu (tạo lô hàng + cộng tồn kho trong 1 transaction).
 const BaseService = require('../BaseService');
 const HttpError = require('../../errors/HttpError');
+const { taoMa } = require('../../utils/id');
 
 class PhieuNhapService extends BaseService {
     async layDanhSach() {
@@ -51,7 +52,7 @@ class PhieuNhapService extends BaseService {
                 (tong, sp) => tong + (Number(sp.soLuong) || 0) * (Number(sp.giaNhap) || 0), 0
             );
 
-            const maPN = 'PN' + Date.now();
+            const maPN = taoMa('PN');
             await new sql.Request(giaoDich)
                 .input('maPN', sql.VarChar(20), maPN)
                 .input('maNCC', sql.VarChar(20), maNCC)
@@ -63,7 +64,8 @@ class PhieuNhapService extends BaseService {
                 `);
 
             for (const sp of danhSachSanPham) {
-                const maLoHang = 'LH' + Date.now() + Math.floor(Math.random() * 1000);
+                // Trước đây 'LH' + Date.now() + số ngẫu nhiên 0..999 -> phiếu nhập nhiều dòng trùng mã ~4%
+                const maLoHang = taoMa('LH');
 
                 await new sql.Request(giaoDich)
                     .input('maLoHang', sql.VarChar(20), maLoHang)

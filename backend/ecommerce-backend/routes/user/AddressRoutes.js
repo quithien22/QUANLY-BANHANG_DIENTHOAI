@@ -1,5 +1,6 @@
 // file: routes/AddressRoutes.js
 const BaseRoutes = require('../BaseRoutes');
+const { requireUser, requireSelf } = require('../../middlewares/auth');
 
 class AddressRoutes extends BaseRoutes {
     constructor(addressController) {
@@ -10,10 +11,10 @@ class AddressRoutes extends BaseRoutes {
 
     registerRoutes() {
         const c = this.addressController;
-        this.router.post('/them', c.add);
-        this.router.put('/sua/:maDiaChi', c.update);
-        this.router.delete('/xoa/:maDiaChi', c.remove);
-        this.router.get('/:maKH', c.list);
+        this.router.post('/them', requireUser(), c.add);
+        this.router.put('/sua/:maDiaChi', requireUser(), c.update);
+        this.router.delete('/xoa/:maDiaChi', requireUser(), c.remove);
+        this.router.get('/:maKH', requireUser(), requireSelf('maKH'), c.list);
     }
 }
 

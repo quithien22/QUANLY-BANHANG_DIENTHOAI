@@ -142,6 +142,18 @@ class ChamCongService extends BaseService {
             throw new HttpError(403, "Bạn không có quyền tăng hoặc sửa lương nhân viên! Chỉ có Giám đốc mới thực hiện được.");
         }
 
+        const luongCoBan = Number(luongCoBanMoi);
+        if (luongCoBanMoi === undefined || luongCoBanMoi === null || luongCoBanMoi === '' || !Number.isFinite(luongCoBan) || luongCoBan < 0) {
+            throw new HttpError(400, "Lương cơ bản không hợp lệ!");
+        }
+        // Không gửi thưởng (để trống) -> giữ nguyên thưởng cũ. Trước đây `luongThuongMoi || 0` biến ô trống thành 0
+        // nên mỗi lần chỉ sửa lương cơ bản là tiền thưởng bị xoá về 0 (ISNULL(@luongThuong, luongThuong) không bao giờ chạy).
+        const coThuongMoi = !(luongThuongMoi === undefined || luongThuongMoi === null || luongThuongMoi === '');
+        const luongThuong = coThuongMoi ? Number(luongThuongMoi) : null;
+        if (coThuongMoi && (!Number.isFinite(luongThuong) || luongThuong < 0)) {
+            throw new HttpError(400, "Tiền thưởng không hợp lệ!");
+        }
+
         const pool = await this.getPool();
 
         const daCoLuong = await pool.request()
@@ -151,8 +163,8 @@ class ChamCongService extends BaseService {
         if (daCoLuong.recordset.length > 0) {
             await pool.request()
                 .input('maNV', sql.VarChar, maNV)
-                .input('luongCoBan', sql.Decimal(15, 2), luongCoBanMoi)
-                .input('luongThuong', sql.Decimal(15, 2), luongThuongMoi || 0)
+                .input('luongCoBan', sql.Decimal(15, 2), luongCoBan)
+                .input('luongThuong', sql.Decimal(15, 2), luongThuong)
                 .query(`
                     UPDATE Luong 
                     SET luongCoBan = @luongCoBan, luongThuong = ISNULL(@luongThuong, luongThuong)
@@ -162,10 +174,10 @@ class ChamCongService extends BaseService {
             await pool.request()
                 .input('maLuong', sql.VarChar, 'L' + maNV)
                 .input('maNV', sql.VarChar, maNV)
-                .input('luongCoBan', sql.Decimal(15, 2), luongCoBanMoi)
-                .input('luongThuong', sql.Decimal(15, 2), luongThuongMoi || 0)
+                .input('luongCoBan', sql.Decimal(15, 2), luongCoBan)
+                .input('luongThuong', sql.Decimal(15, 2), luongThuong || 0)
                 .input('tongNgayCong', sql.Int, 0)
-                .input('luongThucNhan', sql.Decimal(15, 2), luongCoBanMoi)
+                .input('luongThucNhan', sql.Decimal(15, 2), luongCoBan)
                 .query(`
                     INSERT INTO Luong (maLuong, maNV, tongNgayCong, luongCoBan, luongThuong, luongThucNhan)
                     VALUES (@maLuong, @maNV, @tongNgayCong, @luongCoBan, @luongThuong, @luongThucNhan)

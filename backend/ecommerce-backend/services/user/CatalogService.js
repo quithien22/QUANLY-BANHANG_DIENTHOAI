@@ -24,15 +24,21 @@ class CatalogService extends BaseService {
 
     async search(tuKhoa) {
         const sql = this.sql;
-        if (!tuKhoa) return [];
+        if (!tuKhoa || typeof tuKhoa !== 'string') return [];
+
+        // NVarChar (không phải VarChar) để từ khóa tiếng Việt có dấu không bị đổi thành '?'.
+        // Chỉ tìm sản phẩm đang bán; escape % _ [ để khách gõ ký tự đặc biệt không thành ký tự thay thế.
+        const tuKhoaThoat = tuKhoa.trim().replace(/[\[%_]/g, (c) => `[${c}]`);
+        if (!tuKhoaThoat) return [];
 
         const pool = await this.getPool();
         const result = await pool.request()
-            .input('tuKhoa', sql.VarChar, `%${tuKhoa}%`)
+            .input('tuKhoa', sql.NVarChar(200), `%${tuKhoaThoat}%`)
             .query(`
-                SELECT maSP, tenSP, giaBan, hinhAnh 
-                FROM SanPham 
-                WHERE tenSP LIKE @tuKhoa
+                SELECT sp.maSP, sp.tenSP, sp.giaBan, sp.hinhAnh, lsp.tenLSP
+                FROM SanPham sp
+                LEFT JOIN LoaiSanPham lsp ON sp.maLSP = lsp.maLSP
+                WHERE sp.tenSP LIKE @tuKhoa AND sp.trangThai = 1
             `);
         return result.recordset;
     }
@@ -150,13 +156,26 @@ class CatalogService extends BaseService {
         const sql = this.sql;
         const pool = await this.getPool();
 
+        // Giá Flash Sale chỉ áp dụng khi sản phẩm nằm trong khung giờ đang diễn ra NGAY LÚC NÀY
+        // (cùng cách tính với PromotionService.getTodayFlashSale: ngày áp dụng là hôm nay + giờ hiện tại nằm trong gioBD..gioKT).
+        // Trước đây LEFT JOIN thẳng SanPhamFlashSale nên sản phẩm thuộc BẤT KỲ khung giờ nào (đã hết, chưa tới,
+        // ngày khác) cũng bị hiển thị và bán ở giá Flash Sale; thuộc nhiều khung giờ thì còn bị nhân dòng.
         const ketQuaSP = await pool.request()
             .input('maSP', sql.VarChar(20), maSP)
             .query(`
-                SELECT sp.*, spfs.giaFlashSale, kgfs.trangThai AS trangThaiFlashSale
+                SELECT sp.*, lsp.tenLSP, fs.giaFlashSale,
+                       CASE WHEN fs.giaFlashSale IS NOT NULL THEN 'dang_dien_ra' END AS trangThaiFlashSale
                 FROM SanPham sp
-                LEFT JOIN SanPhamFlashSale spfs ON sp.maSP = spfs.maSP
-                LEFT JOIN KhungGioFlashSale kgfs ON spfs.maKhungGio = kgfs.maKhungGio AND kgfs.trangThai = 'dang_dien_ra'
+                LEFT JOIN LoaiSanPham lsp ON sp.maLSP = lsp.maLSP
+                OUTER APPLY (
+                    SELECT TOP 1 spfs.giaFlashSale
+                    FROM SanPhamFlashSale spfs
+                    JOIN KhungGioFlashSale kgfs ON spfs.maKhungGio = kgfs.maKhungGio
+                    WHERE spfs.maSP = sp.maSP
+                      AND CAST(kgfs.ngayApDung AS DATE) = CAST(GETDATE() AS DATE)
+                      AND CAST(GETDATE() AS TIME) BETWEEN kgfs.gioBD AND kgfs.gioKT
+                    ORDER BY spfs.giaFlashSale ASC
+                ) fs
                 WHERE sp.maSP = @maSP
             `);
 

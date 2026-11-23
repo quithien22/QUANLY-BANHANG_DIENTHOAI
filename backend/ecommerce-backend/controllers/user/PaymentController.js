@@ -6,21 +6,24 @@ class PaymentController {
     }
 
     // POST /api/payment/momo  -> tạo giao dịch, trả payUrl cho frontend chuyển hướng
+    // (số tiền do server lấy từ DB theo orderId, field amount frontend gửi lên chỉ để tương thích)
     createMomo = async (req, res) => {
         const { amount, orderId } = req.body;
 
-        if (!orderId || !amount) {
-            return res.status(400).json({ message: 'Thieu orderId hoac amount' });
+        if (!orderId) {
+            return res.status(400).json({ message: 'Thieu orderId' });
         }
         if (!this.paymentService.isConfigured()) {
             return res.status(500).json({ message: 'Chua cau hinh MoMo trong file .env' });
         }
 
         try {
-            const data = await this.paymentService.createMomoPayment(amount, orderId);
+            // req.auth.maKH: chỉ cho thanh toán đơn của chính khách đang đăng nhập
+            const data = await this.paymentService.createMomoPayment(amount, orderId, req.auth.maKH);
             res.status(200).json(data);
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            // HttpError (404 khong thay don, 400 da thanh toan) giu dung ma; loi khac -> 500
+            res.status(error.status || 500).json({ message: error.message, error: error.message });
         }
     };
 

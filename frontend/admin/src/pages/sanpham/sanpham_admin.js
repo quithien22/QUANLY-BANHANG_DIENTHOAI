@@ -289,6 +289,9 @@ function SanPham() {
             tenLSP: sp.tenLSP || "",
             giaBan: sp.giaBan || "",
             tonKho: sp.tonKho || "",
+            badge: sp.badge || "",
+            tag: sp.tag || "",
+            donVi: sp.donVi || "Chiếc",
             trangThai: isDangBan(sp.trangThai) ? "dang_ban" : "ngung_ban",
         });
         setAnhSanPhamSua(sp.hinhAnh ? [{ url: sp.hinhAnh, isCu: true }] : []);

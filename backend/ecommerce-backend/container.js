@@ -2,6 +2,7 @@
 // Nơi duy nhất khởi tạo và nối các đối tượng: Database -> Service -> Controller -> Routes.
 // Thêm module mới: thêm vài dòng ở đây, server.js không cần sửa.
 const Database = require('./config/Database');
+const { configureAuth } = require('./middlewares/auth');
 
 // ===================== ADMIN MODULES =====================
 //Services
@@ -106,6 +107,9 @@ const ChatbotRoutes = require('./routes/user/ChatbotRoutes');
 // Trả về danh sách { path, router } để server.js mount lần lượt
 module.exports = function buildContainer(dbConfig) {
     const db = new Database(dbConfig);
+
+    // Middleware JWT (middlewares/auth.js) tra lai DB o moi request nen can dung chung 1 doi tuong Database
+    configureAuth(db);
 
     // CartService giữ hàng trong giỏ 15 phút -> cần job nền tự xóa giỏ hết hạn và hoàn tồn kho
     const cartService = new CartService(db);

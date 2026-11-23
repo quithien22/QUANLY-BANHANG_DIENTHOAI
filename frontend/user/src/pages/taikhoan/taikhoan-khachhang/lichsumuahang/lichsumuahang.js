@@ -35,6 +35,7 @@ function LichSuMuaHang() {
     const chuyenDoiTrangThai = (trangThaiDB) => {
         switch (trangThaiDB) {
             case "cho_xac_nhan": return "Chờ xác nhận";
+            case "xac_nhan": return "Đã xác nhận"; // admin xác nhận đơn; trước đây hiển thị nguyên mã "xac_nhan" và không nằm trong tab nào
             case "dang_giao": return "Đang giao";
             case "hoan_tat": return "Đã giao";
             case "da_huy": return "Đã hủy";
@@ -178,7 +179,7 @@ const xuLyDatLai = async (hd) => {
                         <i className="bx bx-chevron-right"></i>
                     </li>
                 </Link>
-                <Link to="/tai-khoan">
+                <Link to="/home/tai-khoan">
                     <li className="lsmh-breadcrumb_2">
                         <span>Tài khoản khách hàng</span>
                         <i className="bx bx-chevron-right"></i>
@@ -194,7 +195,7 @@ const xuLyDatLai = async (hd) => {
 
                 {/* THANH TAB LỌC TRẠNG THÁI */}
                 <div className="lsmh-tabs">
-                    {["Tất cả", "Chờ xác nhận", "Đang giao", "Đã giao", "Đã hủy"].map((tab) => (
+                    {["Tất cả", "Chờ xác nhận", "Đã xác nhận", "Đang giao", "Đã giao", "Đã hủy"].map((tab) => (
                         <button
                             key={tab}
                             className={`lsmh-tab-btn ${trangThaiTab === tab ? "active" : ""}`}

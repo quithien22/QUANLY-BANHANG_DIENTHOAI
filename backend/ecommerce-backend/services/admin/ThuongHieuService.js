@@ -21,13 +21,16 @@ class ThuongHieuService extends BaseService {
         return { message: "Cập nhật trạng thái thành công" };
     }
 
-    // Mã tự sinh dạng TH0 + (tổng số + 1), mặc định đang bật
+    // Mã tự sinh dạng TH + (số lớn nhất hiện có + 1), mặc định đang bật.
+    // Trước đây dùng COUNT(*)+1 nên sau khi xóa 1 thương hiệu rồi thêm mới sẽ sinh trùng mã (lỗi khóa chính).
     async them({ tenThuongHieu, hinhAnh }) {
         const sql = this.sql;
         const pool = await this.getPool();
 
-        const dem = await pool.request().query("SELECT COUNT(*) AS total FROM ThuongHieu");
-        const maMoi = `TH0${dem.recordset[0].total + 1}`;
+        const dem = await pool.request().query(
+            "SELECT MAX(TRY_CAST(SUBSTRING(maThuongHieu, 3, 20) AS INT)) AS maxSo FROM ThuongHieu WHERE maThuongHieu LIKE 'TH[0-9]%'"
+        );
+        const maMoi = 'TH' + String((dem.recordset[0].maxSo || 0) + 1).padStart(2, '0');
 
         await pool.request()
             .input('maThuongHieu', sql.VarChar, maMoi)

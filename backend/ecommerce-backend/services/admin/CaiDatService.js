@@ -1,6 +1,7 @@
 // file: services/admin/CaiDatService.js
 // Cài đặt hệ thống: hồ sơ cá nhân, thông tin cửa hàng, vận chuyển, đổi mật khẩu.
 const BaseService = require('../BaseService');
+const bcrypt = require('bcrypt');
 const HttpError = require('../../errors/HttpError');
 const { layUrlAnh } = require('../../utils/imageUrl');
 
@@ -86,24 +87,42 @@ class CaiDatService extends BaseService {
         return { anhDaiDien: kq.recordset[0]?.avatar || "" };
     }
     
-    // Giữ nguyên logic cũ: kiểm tra trong bảng TaiKhoan, so sánh mật khẩu dạng chữ thường
+    // Đăng nhập admin kiểm tra mật khẩu trong bảng NhanVien (bcrypt, hoặc chữ thường với tài khoản cũ),
+    // nên đổi mật khẩu cũng phải làm trên NhanVien. Trước đây hàm này sửa bảng TaiKhoan cũ -> đổi "thành công"
+    // nhưng mật khẩu đăng nhập không đổi (hoặc báo sai mật khẩu hiện tại dù nhập đúng).
     async doiMatKhau({ maNV, hienTai, moi }) {
         const sql = this.sql;
+
+        if (!maNV || typeof hienTai !== 'string' || typeof moi !== 'string' || !hienTai || !moi) {
+            throw new HttpError(400, "Vui lòng nhập đầy đủ thông tin!");
+        }
+        if (moi.length < 6) {
+            throw new HttpError(400, "Mật khẩu mới phải có ít nhất 6 ký tự!");
+        }
+
         const pool = await this.getPool();
 
         const kiemTra = await pool.request()
             .input('maNV', sql.VarChar, maNV)
-            .input('matKhauCu', sql.VarChar, hienTai)
-            .query("SELECT * FROM TaiKhoan WHERE (tenDangNhap = @maNV OR maNV = @maNV) AND matKhau = @matKhauCu");
+            .query("SELECT matKhau FROM NhanVien WHERE maNV = @maNV");
 
         if (kiemTra.recordset.length === 0) {
+            throw new HttpError(404, "Không tìm thấy nhân viên!");
+        }
+
+        const daLuu = kiemTra.recordset[0].matKhau;
+        const daBam = !!daLuu && /^\$2[aby]\$/.test(daLuu);
+        const khop = daBam ? await bcrypt.compare(hienTai, daLuu) : (!!daLuu && daLuu === hienTai);
+
+        if (!khop) {
             throw new HttpError(400, "Mật khẩu hiện tại không đúng!");
         }
 
+        const matKhauMoiDaBam = await bcrypt.hash(moi, 10);
         await pool.request()
             .input('maNV', sql.VarChar, maNV)
-            .input('matKhauMoi', sql.VarChar, moi)
-            .query("UPDATE TaiKhoan SET matKhau = @matKhauMoi WHERE (tenDangNhap = @maNV OR maNV = @maNV)");
+            .input('matKhauMoi', sql.VarChar, matKhauMoiDaBam)
+            .query("UPDATE NhanVien SET matKhau = @matKhauMoi WHERE maNV = @maNV");
     }
 
     async capNhatCuaHang({ tenCuaHang, diaChi, hotline, moTa }) {

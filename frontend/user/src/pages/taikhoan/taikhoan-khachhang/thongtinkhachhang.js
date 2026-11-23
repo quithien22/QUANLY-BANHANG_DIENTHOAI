@@ -46,8 +46,18 @@ function ThongTinkhachHang() {
                         setUserData(prev => ({
                             ...prev,
                             diemTichLuy: freshData.diemTichLuy || 0,
-                            tongDonHang: freshData.tongDonHang || 0
+                            tongDonHang: freshData.tongDonHang || 0,
+                            trangThai: freshData.trangThai
                         }));
+
+                        // Điền form bằng dữ liệu mới nhất từ DB. Thông tin lưu lúc đăng nhập chỉ có họ tên/email/sdt,
+                        // nếu không điền thì form hiện trống địa chỉ/ngày sinh/giới tính và bấm Lưu sẽ ghi đè trống lên DB.
+                        setHoTen(freshData.hoTen || storedUser.hoTen || "");
+                        setSdt(freshData.SDT || freshData.sdt || storedUser.sdt || "");
+                        setEmail(freshData.email || storedUser.email || "");
+                        setDiaChi(freshData.diaChi || "");
+                        setGioiTinh(freshData.gioiTinh || "Nam");
+                        setNgaySinh(freshData.ngaySinh ? String(freshData.ngaySinh).substring(0, 10) : "");
 
                         const updatedStorage = {
                             ...storedUser,
@@ -164,7 +174,9 @@ function ThongTinkhachHang() {
         }
     };
 
-    const dangHoatDong = userData.trangThai === 1;
+    // trangThai lấy từ API hồ sơ (cột BIT nên là true/false, không phải 1/0); thông tin lưu lúc đăng nhập không có trường này.
+    // Trước đây so sánh `=== 1` nên luôn hiển thị "Tạm khóa" dù tài khoản đang hoạt động.
+    const dangHoatDong = userData.trangThai !== false && userData.trangThai !== 0;
 
     return (
         <div className="taikhoan-page">

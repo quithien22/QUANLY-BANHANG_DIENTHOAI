@@ -3,26 +3,35 @@
 const BaseService = require('../BaseService');
 const HttpError = require('../../errors/HttpError');
 const { layUrlAnh } = require('../../utils/imageUrl');
+const { chayVoiMaMoi } = require('../../utils/id');
 
 class ReturnService extends BaseService {
     // file: đối tượng multer (req.file) hoặc undefined nếu không có ảnh
-    async create({ maHoaDon, lyDo, loaiYeuCau, file }) {
+    // maKH (lấy từ token): chỉ tạo yêu cầu đổi trả cho đơn của CHÍNH khách đó
+    async create({ maHoaDon, lyDo, loaiYeuCau, file, maKH }) {
         const sql = this.sql;
         const pool = await this.getPool();
 
         const checkHD = await pool.request()
             .input('maHoaDon', sql.VarChar(20), maHoaDon)
-            .query('SELECT TOP 1 maSP FROM ChiTietHoaDon WHERE maHoaDon = @maHoaDon');
+            .input('maKH', sql.VarChar(20), maKH)
+            .query(`
+                SELECT TOP 1 ct.maSP
+                FROM ChiTietHoaDon ct
+                JOIN HoaDon hd ON ct.maHoaDon = hd.maHoaDon
+                WHERE ct.maHoaDon = @maHoaDon AND hd.maKH = @maKH
+            `);
 
+        // Đơn của người khác cũng báo "không tồn tại" để không lộ mã hóa đơn nào có thật
         if (checkHD.recordset.length === 0) {
             throw new HttpError(400, "Mã hóa đơn không tồn tại. Vui lòng kiểm tra lại!");
         }
 
         const maSP = checkHD.recordset[0].maSP;
         const hinhAnhUrl = file ? layUrlAnh(file.filename) : null;
-        const maDoiTra = 'DT' + Date.now().toString().slice(-6);
 
-        await pool.request()
+        // Mã mới không trùng (trước đây 'DT' + 6 số cuối của Date.now() lặp lại sau ~17 phút)
+        await chayVoiMaMoi('DT', (maDoiTra) => pool.request()
             .input('maDoiTra', sql.VarChar(20), maDoiTra)
             .input('maHoaDon', sql.VarChar(20), maHoaDon)
             .input('maSP', sql.VarChar(20), maSP)
@@ -33,7 +42,7 @@ class ReturnService extends BaseService {
             .query(`
                 INSERT INTO DoiTraHang (maDoiTra, maHoaDon, maSP, lyDo, loaiYeuCau, trangThai, ngayTao, hinhAnh)
                 VALUES (@maDoiTra, @maHoaDon, @maSP, @lyDo, @loaiYeuCau, @trangThai, GETDATE(), @hinhAnh)
-            `);
+            `));
     }
 
     async listByCustomer(maKH) {

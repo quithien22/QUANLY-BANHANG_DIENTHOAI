@@ -3,6 +3,7 @@
 Chạy:  uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 Docs:  http://127.0.0.1:8000/docs
 """
+import hmac
 import threading
 from contextlib import asynccontextmanager
 from typing import Optional
@@ -87,8 +88,14 @@ def recommend_customer(ma_kh: str, limit: int = 5):
 
 @app.post("/train")
 def train(x_train_token: Optional[str] = Header(default=None)):
-    """Huấn luyện lại từ DB (chạy khi có dữ liệu mới), không cần restart service."""
-    if config.TRAIN_TOKEN and x_train_token != config.TRAIN_TOKEN:
+    """Huấn luyện lại từ DB (chạy khi có dữ liệu mới), không cần restart service.
+
+    Bắt buộc đặt AI_TRAIN_TOKEN trong .env; chưa đặt thì endpoint bị khóa hoàn toàn
+    (có thể train bằng dòng lệnh: python train.py).
+    """
+    if not config.TRAIN_TOKEN:
+        raise HTTPException(403, "Endpoint /train đang tắt: chưa cấu hình AI_TRAIN_TOKEN. Dùng `python train.py`.")
+    if not x_train_token or not hmac.compare_digest(x_train_token.encode(), config.TRAIN_TOKEN.encode()):
         raise HTTPException(401, "Sai X-Train-Token")
     if not train_lock.acquire(blocking=False):
         raise HTTPException(409, "Đang huấn luyện, vui lòng đợi.")

@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const axios = require('axios');
 const BaseService = require('../BaseService');
 const HttpError = require('../../errors/HttpError');
+const { taoMa } = require('../../utils/id');
 
 class AuthService extends BaseService {
     // Dạng thông tin trả về chung cho đăng nhập thường và Google
@@ -14,6 +15,12 @@ class AuthService extends BaseService {
 
     async login({ taiKhoan, matKhau }) {
         const sql = this.sql;
+
+        // Thiếu / sai kiểu dữ liệu -> 400 (trước đây bcrypt.compare ném lỗi và thành 500)
+        if (typeof taiKhoan !== 'string' || typeof matKhau !== 'string' || !taiKhoan.trim() || !matKhau) {
+            throw new HttpError(400, "Vui lòng nhập đầy đủ tài khoản và mật khẩu!");
+        }
+
         const pool = await this.getPool();
 
         const result = await pool.request()
@@ -32,7 +39,7 @@ class AuthService extends BaseService {
         let isMatch = false;
 
         // Hỗ trợ cả mật khẩu đã băm (bcrypt) và mật khẩu cũ chưa băm
-        if (user.matKhau && (user.matKhau.startsWith('$2a$') || user.matKhau.startsWith('$2b$'))) {
+        if (user.matKhau && /^\$2[aby]\$/.test(user.matKhau)) {
             isMatch = await bcrypt.compare(matKhau, user.matKhau);
         } else {
             isMatch = (matKhau === user.matKhau);
@@ -72,9 +79,10 @@ class AuthService extends BaseService {
         const sql = this.sql;
         const pool = await this.getPool();
 
-        if (!taiKhoan || !matKhau) {
+        if (typeof taiKhoan !== 'string' || typeof matKhau !== 'string' || !taiKhoan.trim() || !matKhau) {
             throw new HttpError(400, "Vui lòng nhập đầy đủ thông tin!");
         }
+        taiKhoan = taiKhoan.trim();
 
         // 1. Tài khoản (email hoặc sdt) đã tồn tại chưa?
         const checkExist = await pool.request()
@@ -94,8 +102,8 @@ class AuthService extends BaseService {
         const salt = await bcrypt.genSalt(10);
         const hashedMatKhau = await bcrypt.hash(matKhau, salt);
 
-        // 4. Sinh mã khách hàng mới
-        const maKH_Moi = "KH" + Date.now().toString().slice(-6);
+        // 4. Sinh mã khách hàng mới (không trùng; trước đây 'KH' + 6 số cuối của Date.now() lặp lại sau ~17 phút)
+        const maKH_Moi = taoMa('KH');
 
         await pool.request()
             .input('maKH', sql.VarChar(20), maKH_Moi)
@@ -171,7 +179,7 @@ class AuthService extends BaseService {
         } else {
             // 3. Chưa có tài khoản -> tự tạo mới (mật khẩu ngẫu nhiên)
             const matKhauNgauNhien = await bcrypt.hash(crypto.randomBytes(32).toString('hex'), 10);
-            const maKH_Moi = "KH" + Date.now().toString().slice(-6);
+            const maKH_Moi = taoMa('KH');
             const hoTen = (profile.name || "Khách hàng mới").substring(0, 50);
 
             await pool.request()

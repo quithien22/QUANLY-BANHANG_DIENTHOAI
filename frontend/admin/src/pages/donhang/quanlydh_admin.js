@@ -67,7 +67,8 @@ function QuanLyDonHang() {
         const keyword = tuKhoaTimKiem.toLowerCase();
         const matchTuKhoa =
             String(dh.maHoaDon).toLowerCase().includes(keyword) ||
-            (dh.hoTen && dh.hoTen.toLowerCase().includes(keyword));
+            // API layToanBo trả tên khách trong trường tenKhachHang (không có hoTen) -> trước đây tìm theo tên không bao giờ khớp
+            ((dh.tenKhachHang || dh.hoTen || "").toLowerCase().includes(keyword));
 
         //  Lọc theo khoảng ngày lập
         let matchNgay = true;

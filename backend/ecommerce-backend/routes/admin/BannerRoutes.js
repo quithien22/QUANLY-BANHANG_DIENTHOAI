@@ -1,7 +1,8 @@
 // file: routes/admin/BannerRoutes.js
-// Cùng gốc /api/caidat/banner với GET của ContentRoutes (user) nhưng khác method nên không đụng nhau.
+// Cùng gốc /api/caidat/banner với GET của ContentRoutes (user, công khai) nhưng khác method nên không đụng nhau.
 const BaseRoutes = require('../BaseRoutes');
 const upload = require('../../middlewares/upload');
+const { requireAdmin } = require('../../middlewares/auth');
 
 class BannerRoutes extends BaseRoutes {
     constructor(bannerController) {
@@ -12,9 +13,10 @@ class BannerRoutes extends BaseRoutes {
 
     registerRoutes() {
         const c = this.bannerController;
-        this.router.post('/', upload.single('hinhAnh'), c.them);
-        this.router.put('/trangthai/:id', c.doiTrangThai);
-        this.router.delete('/:id', c.xoa);
+        // requireAdmin đứng TRƯỚC upload để người lạ không ghi được file nào lên đĩa
+        this.router.post('/', requireAdmin(), upload.single('hinhAnh'), c.them);
+        this.router.put('/trangthai/:id', requireAdmin(), c.doiTrangThai);
+        this.router.delete('/:id', requireAdmin(), c.xoa);
     }
 }
 

@@ -1,5 +1,6 @@
 // file: routes/admin/HoTroRoutes.js
 const BaseRoutes = require('../BaseRoutes');
+const { requireAdmin } = require('../../middlewares/auth');
 
 class HoTroRoutes extends BaseRoutes {
     constructor(hoTroController) {
@@ -10,9 +11,9 @@ class HoTroRoutes extends BaseRoutes {
 
     registerRoutes() {
         const c = this.hoTroController;
-        this.router.post('/danhmuc', c.themDanhMuc);
-        this.router.post('/cauhoi', c.themCauHoi);
-        this.router.delete('/cauhoi/:id', c.xoaCauHoi);
+        this.router.post('/danhmuc', requireAdmin(), c.themDanhMuc);
+        this.router.post('/cauhoi', requireAdmin(), c.themCauHoi);
+        this.router.delete('/cauhoi/:id', requireAdmin(), c.xoaCauHoi);
     }
 }
 

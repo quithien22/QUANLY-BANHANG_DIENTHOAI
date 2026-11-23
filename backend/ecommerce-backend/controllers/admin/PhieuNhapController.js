@@ -19,7 +19,8 @@ class PhieuNhapController extends BaseController {
 
     // POST /api/phieunhap_nhacungcap/them
     tao = this.handle(async (req, res) => {
-        const ketQua = await this.phieuNhapService.tao(req.body);
+        // maNV (người lập phiếu) lấy từ token, không tin maNV client gửi
+        const ketQua = await this.phieuNhapService.tao({ ...req.body, maNV: req.auth.maNV });
         res.status(200).json({ success: true, ...ketQua });
     }, "Lỗi tạo phiếu nhập");
 }

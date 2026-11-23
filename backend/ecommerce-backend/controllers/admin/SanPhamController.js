@@ -24,11 +24,11 @@ class SanPhamController extends BaseController {
         res.status(200).json({ success: true, ...ketQua });
     }, "Lỗi cập nhật sản phẩm");
 
-    // DELETE /api/sanpham/:maSP
+    // DELETE /api/sanpham/:maSP  ("xóa" = ngừng bán, trangThai = 0)
     xoa = this.handle(async (req, res) => {
         const ketQua = await this.sanPhamService.xoa(req.params.maSP);
         res.status(200).json({ success: true, ...ketQua });
-    }, "Không thể xóa (có thể sản phẩm đang được tham chiếu ở hóa đơn khác)");
+    }, "Không thể ngừng bán sản phẩm");
 }
 
 module.exports = SanPhamController;

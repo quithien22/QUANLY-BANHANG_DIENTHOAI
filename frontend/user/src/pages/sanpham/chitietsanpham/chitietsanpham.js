@@ -271,10 +271,12 @@ function ChiTietSanPham() {
                         <i className="bx bx-chevron-right"></i>
                     </li>
                     <li>
-                        {sanPham.maThuongHieu ? (
-                            <Link to={`/hang/${sanPham.maThuongHieu}`}>{sanPham.tenThuongHieu}</Link>
-                        ) : (
-                            sanPham.tenThuongHieu
+                        {/* Trang hãng nhận TÊN HÃNG trên URL (/home/hang/Apple) và lọc theo cột SanPham.hang.
+                            Trước đây link trỏ /hang/<maThuongHieu> (sai tiền tố /home, sai kiểu giá trị) nên luôn bị đá về trang chủ. */}
+                        {(sanPham.hang || sanPham.tenThuongHieu) && (
+                            <Link to={`/home/hang/${encodeURIComponent(sanPham.hang || sanPham.tenThuongHieu)}`}>
+                                {sanPham.hang || sanPham.tenThuongHieu}
+                            </Link>
                         )}
                     </li>
                 </ul>

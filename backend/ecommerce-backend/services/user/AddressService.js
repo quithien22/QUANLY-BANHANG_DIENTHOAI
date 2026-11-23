@@ -42,12 +42,14 @@ class AddressService extends BaseService {
             `);
     }
 
-    async update(maDiaChi, { hoTenNguoiNhan, SDT, diaChiChiTiet }) {
+    // maKH (lấy từ token): chỉ sửa được địa chỉ của chính khách đó
+    async update(maDiaChi, { hoTenNguoiNhan, SDT, diaChiChiTiet }, maKH) {
         const sql = this.sql;
         const pool = await this.getPool();
 
-        await pool.request()
+        const ketQua = await pool.request()
             .input('maDiaChi', sql.Int, maDiaChi)
+            .input('maKH', sql.VarChar(20), maKH)
             .input('hoTenNguoiNhan', sql.NVarChar, hoTenNguoiNhan)
             .input('SDT', sql.VarChar, SDT)
             .input('diaChiChiTiet', sql.NVarChar, diaChiChiTiet)
@@ -56,25 +58,35 @@ class AddressService extends BaseService {
                 SET hoTenNguoiNhan = @hoTenNguoiNhan, 
                     SDT = @SDT, 
                     diaChiChiTiet = @diaChiChiTiet
-                WHERE maDiaChi = @maDiaChi
+                WHERE maDiaChi = @maDiaChi AND maKH = @maKH
             `);
+
+        if (ketQua.rowsAffected[0] === 0) {
+            throw new HttpError(404, "Không tìm thấy địa chỉ.");
+        }
     }
 
-    async remove(maDiaChi) {
+    // maKH (lấy từ token): chỉ xóa được địa chỉ của chính khách đó
+    async remove(maDiaChi, maKH) {
         const sql = this.sql;
         const pool = await this.getPool();
 
         const checkResult = await pool.request()
             .input('maDiaChi', sql.Int, maDiaChi)
-            .query(`SELECT macDinh FROM DiaChiGiaoHang WHERE maDiaChi = @maDiaChi`);
+            .input('maKH', sql.VarChar(20), maKH)
+            .query(`SELECT macDinh FROM DiaChiGiaoHang WHERE maDiaChi = @maDiaChi AND maKH = @maKH`);
 
-        if (checkResult.recordset.length > 0 && checkResult.recordset[0].macDinh) {
+        if (checkResult.recordset.length === 0) {
+            throw new HttpError(404, "Không tìm thấy địa chỉ.");
+        }
+        if (checkResult.recordset[0].macDinh) {
             throw new HttpError(400, "Không thể xóa địa chỉ mặc định! Hãy chọn địa chỉ khác làm mặc định trước.");
         }
 
         await pool.request()
             .input('maDiaChi', sql.Int, maDiaChi)
-            .query(`UPDATE DiaChiGiaoHang SET daXoa = 1 WHERE maDiaChi = @maDiaChi`);
+            .input('maKH', sql.VarChar(20), maKH)
+            .query(`UPDATE DiaChiGiaoHang SET daXoa = 1 WHERE maDiaChi = @maDiaChi AND maKH = @maKH`);
     }
 }
 
