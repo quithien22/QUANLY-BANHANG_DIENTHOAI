@@ -139,7 +139,35 @@ pages/     auth, Dashboard, donhang, hethong, khachhang, kho, marketing, nhansu,
 
 ## 3. Cách chạy
 
-1. Cài SQL Server và tạo CSDL `QuanLyBanHangDienThoai`.
+### Cách 1: Chạy bằng Docker Compose (Khuyên dùng - 1 lệnh duy nhất)
+
+Toàn bộ hệ thống (SQL Server, Backend Express, AI Service Python, Frontend Khách hàng, Frontend Admin) đã được đóng gói và cấu hình tự động khởi tạo cơ sở dữ liệu và dữ liệu mẫu:
+
+1. Đảm bảo máy tính đã cài đặt và khởi động **Docker Desktop**.
+2. Tại thư mục gốc của dự án, chạy lệnh:
+   ```bash
+   docker compose up --build
+   ```
+   *(Hoặc chạy ngầm trong nền: `docker compose up --build -d`)*
+
+3. Sau khi khởi động xong, truy cập các địa chỉ:
+   - **Frontend Khách hàng (Mua sắm):** [http://localhost:3000](http://localhost:3000)
+   - **Frontend Admin (Quản trị viên):** [http://localhost:3001](http://localhost:3001)
+     - Tài khoản: `admin@store.com` (hoặc `0900000001` / `NV01`)
+     - Mật khẩu: `123456`
+   - **Tài khoản khách hàng mẫu:** `user@gmail.com` / Mật khẩu: `123456`
+   - **Backend API:** [http://localhost:8080](http://localhost:8080)
+   - **AI Service:** [http://localhost:8000/docs](http://localhost:8000/docs)
+   - **SQL Server:** `localhost:1433` (user: `sa`, password: `YourStrong@Password123`)
+
+4. Dừng hệ thống:
+   ```bash
+   docker compose down
+   ```
+
+---
+
+### Cách 2: Chạy thủ công trên máy (Local)
 2. Chỉnh `dbConfig` trong `backend/ecommerce-backend/server.js` (user, password, server, port, instanceName) cho khớp máy của bạn.
 3. Tạo file `.env` trong `backend/ecommerce-backend` (xem `.env.example`; cần `GOOGLE_CLIENT_ID` nếu dùng đăng nhập Google, và các khóa MoMo nếu dùng thanh toán).
 4. Tạo thư mục `uploads/` trong thư mục chạy backend (nơi lưu ảnh upload).

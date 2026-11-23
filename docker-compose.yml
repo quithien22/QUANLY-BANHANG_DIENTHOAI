@@ -1,0 +1,154 @@
+services:
+  # ---------------------------------------------------------------------------
+  # 1. SQL Server: Co so du lieu quan he (Microsoft SQL Server 2022)
+  # ---------------------------------------------------------------------------
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: quanly_sqlserver
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "YourStrong@Password123"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - quanly_network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Password123' -C -Q 'SELECT 1' 2>/dev/null || /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Password123' -Q 'SELECT 1' 2>/dev/null || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 25
+      start_period: 15s
+
+  # ---------------------------------------------------------------------------
+  # 2. AI Service: Goi y san pham & Chatbot AI (FastAPI / Python 3.12)
+  # ---------------------------------------------------------------------------
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: quanly_ai_service
+    restart: unless-stopped
+    environment:
+      DB_SERVER: "sqlserver,1433"
+      DB_NAME: "QuanLyBanHangDienThoai"
+      DB_USER: "sa"
+      DB_PASSWORD: "YourStrong@Password123"
+      DB_DRIVER: "ODBC Driver 18 for SQL Server"
+      AI_TRAIN_TOKEN: "your_secure_train_token_here_12345"
+      FAQ_PATH: "/app/data/chatbot-train.json"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ai_model_data:/app/model
+    networks:
+      - quanly_network
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------------
+  # 3. Backend: API Server (Node.js Express + mssql)
+  #    Tu dong kiem tra va khoi tao CSDL + du lieu mau qua init-db.js
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: quanly_backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: "production"
+      PORT: "8080"
+      DB_SERVER: "sqlserver"
+      DB_PORT: "1433"
+      DB_USER: "sa"
+      DB_PASSWORD: "YourStrong@Password123"
+      DB_NAME: "QuanLyBanHangDienThoai"
+      DB_INSTANCE: ""
+      JWT_SECRET: "super_secret_jwt_key_quanlybanhangdienthoai_2026_secure_key"
+      JWT_EXPIRES_IN: "7d"
+      JWT_ADMIN_EXPIRES_IN: "12h"
+      PUBLIC_API_URL: "http://localhost:8080"
+      AI_SERVICE_URL: "http://ai-service:8000"
+      AI_SERVICE_TIMEOUT_MS: "4000"
+      # MoMo Sandbox (dien neu co)
+      MOMO_PARTNER_CODE: ""
+      MOMO_ACCESS_KEY: ""
+      MOMO_SECRET_KEY: ""
+      MOMO_IPN_URL: "http://localhost:8080/api/payment/momo-ipn"
+      MOMO_REDIRECT_URL: "http://localhost:3000/thanh-toan-thanhcong"
+      # Chatbot Gemini API Key (tuy chon, neu khong co se dung AI-service noi bo)
+      GEMINI_API_KEY: ""
+      GEMINI_MODEL: "gemini-2.5-flash"
+      # Google OAuth Client ID
+      GOOGLE_CLIENT_ID: "891745779425-nrpduohofosnbl4paltfb6fjdkeljhcm.apps.googleusercontent.com"
+    ports:
+      - "8080:8080"
+    volumes:
+      - backend_uploads:/app/ecommerce-backend/uploads
+    networks:
+      - quanly_network
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      ai-service:
+        condition: service_started
+
+  # ---------------------------------------------------------------------------
+  # 4. Frontend Khach Hang (User Storefront - React + Nginx)
+  # ---------------------------------------------------------------------------
+  frontend-user:
+    build:
+      context: ./frontend/user
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: "http://localhost:8080"
+    container_name: quanly_frontend_user
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    networks:
+      - quanly_network
+    depends_on:
+      - backend
+
+  # ---------------------------------------------------------------------------
+  # 5. Frontend Admin (Trang quan tri - React + Nginx)
+  # ---------------------------------------------------------------------------
+  frontend-admin:
+    build:
+      context: ./frontend/admin
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: "http://localhost:8080"
+    container_name: quanly_frontend_admin
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    networks:
+      - quanly_network
+    depends_on:
+      - backend
+
+# -----------------------------------------------------------------------------
+# Volumes luu tru ben vung du lieu
+# -----------------------------------------------------------------------------
+volumes:
+  sqlserver_data:
+    name: quanly_sqlserver_data
+  backend_uploads:
+    name: quanly_backend_uploads
+  ai_model_data:
+    name: quanly_ai_model_data
+
+# -----------------------------------------------------------------------------
+# Network noi bo giua cac container
+# -----------------------------------------------------------------------------
+networks:
+  quanly_network:
+    name: quanly_network
+    driver: bridge

@@ -1,0 +1,8 @@
+node_modules
+npm-debug.log
+ecommerce-backend/node_modules
+ecommerce-backend/uploads/*
+!ecommerce-backend/uploads/.gitkeep
+.env
+.git
+.github
